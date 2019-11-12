@@ -1,7 +1,7 @@
 {
-  "name": "vue-crx",
+  "name": "v-browser-ext-wallet",
   "version": "1.0.0",
-  "description": "使用Vue开发Chrome扩展插件的模板",
+  "description": "the browser extension for V wallet",
   "scripts": {
     "build": "webpack --progress",
     "watch": "webpack --progress --watch"
