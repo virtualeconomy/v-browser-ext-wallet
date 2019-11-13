@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <nav-bar></nav-bar>
+        <nav-bar class="nav-bar"></nav-bar>
     </div>
 </template>
 
@@ -26,5 +26,11 @@ export default {
     height:560px;
     background:rgba(247,247,252,1);
     color:#F7F7FC;
+}
+.nav-bar {
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    z-index:1000;
 }
 </style>

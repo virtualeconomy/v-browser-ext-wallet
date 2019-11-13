@@ -52,6 +52,10 @@ module.exports = {
                 use:'vue-loader'
             },
             {
+                test: /\.less$/,
+                loader: "vue-style-loader!css-loader!less-loader"
+            },
+            {
                 test:/\.js$/,
                 exclude: /node_modules/,
                 use:[
