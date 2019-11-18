@@ -1,0 +1,8 @@
+.details-dialog {
+    width: 280px !important;
+    margin-left: 40px !important;
+    text-align: center;
+}
+.close {
+    margin-top: -64px;
+}

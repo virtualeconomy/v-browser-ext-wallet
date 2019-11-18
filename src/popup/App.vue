@@ -8,6 +8,6 @@ export default {
     name: 'app',
 }
 </script>
-<style scoped>
-
+<style>
+@import url("/static/common.css");
 </style>

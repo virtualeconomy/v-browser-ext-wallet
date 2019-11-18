@@ -31,19 +31,20 @@
                            width="10px"
                            height="8px" src="../../static/icons/ic_selected@2x.png">
               </b-dropdown-item-button>
-              <b-dropdown-item href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.details href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-navbar>
-
+      <Details></Details>
     </div>
 </template>
 
 <script>
 import jdenticon from 'jdenticon'
+import Details from './Details.vue'
 export default {
     name: "NavBar",
     mounted() {
@@ -56,12 +57,14 @@ export default {
             },
             avtHash: '555077584842597e4246'
         }
+    },
+    components: {
+        Details
     }
 }
 </script>
 
-<style scoped lang="less">
-@import '../../static/common';
+<style scoped>
 .v-logo {
     width: 28px;
     height: 28px;
