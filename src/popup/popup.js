@@ -7,7 +7,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import jdenticon from 'jdenticon'
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
-
+chrome.runtime.sendMessage({
+    method: 'showAlert'
+}, function(response) {});
 new Vue({
     el: '#popup',
     router: router,
