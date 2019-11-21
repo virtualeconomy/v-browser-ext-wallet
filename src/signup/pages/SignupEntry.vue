@@ -43,7 +43,7 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 .select {
     width:1680px;
     height:863px;
