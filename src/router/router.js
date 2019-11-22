@@ -5,6 +5,7 @@ import SignupEntry from '../signup/pages/SignupEntry.vue'
 import Login from '../components/Login.vue'
 import Signup from '../signup/pages/Signup.vue'
 import CreateAccount from "src/signup/pages/CreateAccount.vue";
+import Terms from '../signup/pages/Terms.vue'
 
 Vue.use(Router)
 
@@ -12,7 +13,7 @@ const router = new Router({
     mode: 'history',
     routes: [{
         path: '*',
-        redirect: '/create'
+        redirect: '/signupEntry'
     }, {
         path: '/home',
         name: 'Home',
@@ -33,6 +34,10 @@ const router = new Router({
         path: '/signupEntry',
         name: 'signupentry',
         component: SignupEntry
+    }, {
+        path: '/terms',
+        name: 'terms',
+        component: Terms
     }
     ]
 })

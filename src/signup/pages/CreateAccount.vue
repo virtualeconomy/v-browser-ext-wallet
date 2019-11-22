@@ -60,8 +60,7 @@
                          src="../../../static/icons/ic_select_border.svg">
                       &nbsp;I have read and agree to the <a class='vsys-color'
                                                     href="#"
-                                                    target="_blank"
-                                                    @click="openTerms()">Terms of Service<br></a>
+                                                    @click="openTerms('/terms')">Terms of Service<br></a>
                     <b-button
                             class="input-height form-control"
                             style="margin-top: 30px"
@@ -93,7 +92,7 @@ export default {
     name: "CreateAccount",
     data: function() {
         return {
-            pageId: 'saveBackup',
+            pageId: 'create',
             password: '',
             password2: '',
             isFirstRun: true,
@@ -202,8 +201,8 @@ export default {
             this.read_agree = false
             this.pageId = newPageId
         },
-        openTerms() {
-            this.$router.push('/SignupEntry')
+        openTerms(route) {
+            this.$router.push(route)
         }
     }
 }
