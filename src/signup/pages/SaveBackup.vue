@@ -10,15 +10,32 @@
         <p class="p2">Your secret backup phrase makes it easy to back up and restore your personal account.</p>
         <p class="p3"><span style="color:rgba(255,136,55,1);">WARNING:</span> Never disclose your backup phrase. Anyone with this phrase can take your Ether forever.</p>
         <div class="word-container unselectable">
-            <template v-for="(word, idx) in wordList">
-          <span
-                  :key="idx"
-                  class="word">
-            {{ word }}
-          </span>
-                &nbsp;
-            </template>
+          <template v-for="(word, idx) in wordList">
+            <span :key="idx"
+                  class="word">{{ word }}
+            </span>&nbsp;
+          </template>
         </div>
+        <b-row style="margin-top: 103px;">
+            <b-col class="col-lef">
+                <b-button
+                        class="btn-remind"
+                        block
+                        variant="light"
+                        size="lg"
+                        @click="remind">Remind me later
+                </b-button>
+            </b-col>
+            <b-col class="col-rit">
+                <b-button
+                        block
+                        class="btn-next"
+                        variant="warning"
+                        size="lg"
+                        @click="nextPage">Next
+                </b-button>
+            </b-col>
+        </b-row>
     </div>
         <div class="tips">
             <p style="font-weight: 600;font-family:SFProText-Semibold,SFProText;">Tips:</p>
@@ -26,7 +43,7 @@
             <p>Write this phrase on a piece of paper and store in a secure location. If you want even more securuty, write it down on multiple pieces of paper and store each in 2-3 different location.</p>
             <p>Memorize this phrase.</p>
             <br>
-            <p style="color: rgba(255,136,55,1);">Download this Secret Backup Phrase and Keep it store safety on an extermal encrypted hard drive of storage medium.</p>
+            <p style="color: rgba(255,136,55,1);margin-top: -8px;">Download this Secret Backup Phrase and Keep it store safety on an extermal encrypted hard drive of storage medium.</p>
         </div>
     </diV>
 </template>
@@ -37,6 +54,12 @@ export default {
     methods: {
         back() {
             this.$emit('show-page', 'create')
+        },
+        nextPage() {
+            this.$emit('show-page', 'confirmBackup')
+        },
+        remind() {
+
         }
     },
     data: function () {
@@ -58,7 +81,7 @@ export default {
     width: 233px;
     position: relative;
     left: 607px;
-    top: -251px;
+    top: -405px;
     display: block;
 }
 .tips p {
@@ -126,5 +149,30 @@ export default {
     -ms-user-select: none;
     user-select: none;
     line-height: 200%;
+}
+.btn-remind {
+    font-size:19px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(255,136,55,1);
+    line-height:22px;
+    width:265px;
+    height:51px;
+    background:rgba(255,136,55,0);
+    border-radius:5px;
+    border:1px solid rgba(255,136,55,1);
+}
+.col-lef {
+}
+.btn-next {
+    font-size:19px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(255,255,255,1);
+    line-height:22px;
+    width:265px;
+    height:51px;
+    background:rgba(255,136,55,1);
+    border-radius:5px;
 }
 </style>
