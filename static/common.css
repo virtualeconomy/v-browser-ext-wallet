@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Roboto-Regular';
+    src: url('/static/fonts/Roboto-Regular.ttf') format('truetype');
+}
+html, body, #app {
+    font-family: 'Roboto-Regular' !important;
+}
 .details-dialog {
     width: 280px !important;
     margin-left: 40px !important;

@@ -306,4 +306,7 @@ export default {
     /*margin-bottom: -30px;*/
     margin-top: 50px;
 }
+.form-group label {
+    font-family:SFProText-Regular,SFProText;
+}
 </style>
