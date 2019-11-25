@@ -14,7 +14,7 @@
                 <div style="margin-top: 5px;"><span class="txt-2">Import your existing wallet using a 12 word seed phrase</span></div>
                 <div>
                     <b-button type="button" class="btn-import btn-warning"
-                              @click="changePage('/signup')">
+                              @click="changePage('/import')">
                         <b class="import-txt">Import Wallet</b></b-button>
                 </div>
             </div>
