@@ -2,7 +2,8 @@
     <div class="layout-main">
         <v-header></v-header>
         <div class="content">
-            <div class="import-account">
+            <div v-if="pageId==='import'"
+                 class="import-account">
                 <div class="back">
                     <img class = "back-icon" src="../../../static/icons/ic_back@2x.png">
                     <b-btn class="back-link text-decoration-none" variant="link"
@@ -89,6 +90,7 @@
                     </b-button>
                 </div>
             </div>
+            <success v-else-if="pageId==='success'"></success>
         </div>
     </div>
 </template>
@@ -98,6 +100,7 @@
     import validator from 'vue-m-validator'
     import icon1 from '../../../static/icons/ic_select_solid.svg'
     import icon2 from '../../../static/icons/ic_select_border.svg'
+    import Success from './Success.vue'
     export default {
         name: "ImportAccount",
         data: function() {
@@ -122,7 +125,8 @@
             validator.reset()
         },
         components: {
-            VHeader
+            VHeader,
+            Success,
         },
         computed: {
             isSubmitDisabled() {
@@ -205,9 +209,12 @@
                 this.register()
             },
             confirm() {
-
+                this.pageId = 'success'
             },
             changePage(newPageId) {
+                this.registering = false
+                this.isFirstRun = false
+                this.read_agree = false
                 this.pageId = newPageId
             },
             openTerms() {

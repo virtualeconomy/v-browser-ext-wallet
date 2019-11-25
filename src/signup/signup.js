@@ -15,6 +15,8 @@ const options = {
 Vue.use(Storage, options)
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
+
+router.push('/SignupEntry')
 new Vue({
     el: '#app',
     store,

@@ -13,7 +13,7 @@ const router = new Router({
     mode: 'history',
     routes: [{
         path: '*',
-        redirect: '/signupEntry'
+        redirect: '/home'
     }, {
         path: '/home',
         name: 'Home',
