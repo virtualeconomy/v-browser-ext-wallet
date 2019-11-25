@@ -2,8 +2,7 @@
     <div class="layout-main">
         <v-header></v-header>
         <div class="content">
-            <div v-if="pageId==='import'"
-                 class="import-account">
+            <div class="import-account">
                 <div class="back">
                     <img class = "back-icon" src="../../../static/icons/ic_back@2x.png">
                     <b-btn class="back-link text-decoration-none" variant="link"
@@ -230,9 +229,11 @@
         background-color: rgba(247,247,252,1);
     }
     .content {
+        height: 100%;
         display:flex;
         justify-content:center;
         align-items:center;
+        background-color: rgba(247,247,252,1);
     }
     .import-intro-1 {
         width:511px;
@@ -255,10 +256,10 @@
     .import-account {
         width: 560px;
         position: relative;
-        top: 28px;
+        margin-top: -72px;
     }
     .password-form {
-        margin-top: 37px;
+        margin-top: 25px;
     }
     .password-form label {
         height:19px;
@@ -274,7 +275,7 @@
         height: 56px;
     }
     .back {
-        height: 60px;
+        height: 50px;
     }
     .back-icon {
         width: 14px;
