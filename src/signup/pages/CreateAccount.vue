@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import seedLib from '../../libs/seed.js'
 import VHeader from './VHeader.vue'
 import validator from 'vue-m-validator'
 import icon1 from '../../../static/icons/ic_select_solid.svg'
@@ -102,6 +103,7 @@ export default {
                 'pwd1': true,
                 'pwd2': true
             },
+            seed: seedLib.create(12),
             validator: validator,
             registering: false
         }
@@ -193,6 +195,16 @@ export default {
             }
             this.registering = true
             this.isFirstRun = true
+            const userInfo = {
+                encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
+            }
+            const savedInfo = {
+                lastLogin: new Date().getTime(),
+                walletAmount: 0,
+                sessionTimeout: 5,
+                info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
+            }
+            // window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.changePage('saveBackup')
         },
         changePage(newPageId) {
