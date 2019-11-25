@@ -9,7 +9,8 @@ module.exports = {
         'background':'./src/background/background.js',
         'content':'./src/content/content.js',
         'option':'./src/option/option.js',
-        'popup':'./src/popup/popup.js'
+        'popup':'./src/popup/popup.js',
+        'signup': './src/signup/signup.js'
     },
     output:{
         path: path.resolve(__dirname, './dist'),
@@ -33,6 +34,16 @@ module.exports = {
             template: 'src/popup/popup.html',
             inject: 'body',
             chunks: ["popup"],
+            minify: { //压缩
+                removeComments: true,
+                collapseWhitespace: true,
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'signup.html',
+            template: 'src/signup/signup.html',
+            inject: 'body',
+            chunks: ["signup"],
             minify: { //压缩
                 removeComments: true,
                 collapseWhitespace: true,

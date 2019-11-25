@@ -33,6 +33,7 @@
     "jdenticon": "^2.2.0",
     "jr-qrcode": "^1.1.1",
     "vue": "^2.6.10",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-m-validator": "^1.0.5"
   }
 }
