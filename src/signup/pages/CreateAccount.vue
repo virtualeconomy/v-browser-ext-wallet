@@ -84,6 +84,7 @@
 <script>
 import seedLib from '../../libs/seed.js'
 import VHeader from './VHeader.vue'
+import Vue from 'vue'
 import validator from 'vue-m-validator'
 import icon1 from '../../../static/icons/ic_select_solid.svg'
 import icon2 from '../../../static/icons/ic_select_border.svg'
@@ -195,6 +196,7 @@ export default {
             }
             this.registering = true
             this.isFirstRun = true
+            Vue.ls.set('pwd', this.password)
             const userInfo = {
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
             }
@@ -204,7 +206,7 @@ export default {
                 sessionTimeout: 5,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
-            // window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
+            this.$store.commit('wallet/updateWallet', savedInfo)
             this.changePage('saveBackup')
         },
         changePage(newPageId) {

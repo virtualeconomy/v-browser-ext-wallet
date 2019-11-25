@@ -45,10 +45,19 @@
             <br>
             <p style="color: rgba(255,136,55,1);margin-top: -8px;">Download this Secret Backup Phrase and Keep it store safety on an extermal encrypted hard drive of storage medium.</p>
         </div>
+        <textarea
+                v-model="seedPhrase"
+                ref="wordsToCopy"
+                class="hidden"
+                readonly>
+        </textarea>
     </diV>
 </template>
 
 <script>
+import seedLib from '../../libs/seed'
+import { mapState } from 'vuex'
+import Vue from 'vue'
 export default {
     name: "SaveBackup",
     methods: {
@@ -62,9 +71,19 @@ export default {
 
         }
     },
-    data: function () {
-        return {
-            wordList: ['library', 'promote', 'tattoo', 'one', 'ginger', 'enough', 'sock', 'casino', 'turkey', 'motion', 'erode', 'inflict']
+    computed: {
+        ...mapState({
+            localWallet: state => state.wallet.localWallet,
+        }),
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.localWallet.info, Vue.ls.get('pwd')))
+        },
+        seedPhrase() {
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        wordList() {
+            return this.seedPhrase.split(' ')
         }
     }
 }
@@ -174,5 +193,14 @@ export default {
     height:51px;
     background:rgba(255,136,55,1);
     border-radius:5px;
+}
+.hidden {
+    font-size: 12pt;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: -9999px;
+    top: 0px;
 }
 </style>

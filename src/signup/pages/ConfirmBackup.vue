@@ -61,13 +61,14 @@
 </template>
 
 <script>
+import seedLib from '../../libs/seed'
+import { mapState } from 'vuex'
 import Vue from 'vue'
 export default {
     name: "ConfirmBackup",
     data: function() {
         return {
             selectedWords: [],
-            wordList: ['library', 'promote', 'tattoo', 'one', 'ginger', 'enough', 'sock', 'casino', 'turkey', 'motion', 'erode', 'inflict'],
             tagFlag: [],
             isContinueDisable: true,
             errorMsg: void 0
@@ -77,8 +78,18 @@ export default {
         this.tagFlag = Array(this.wordList.length).fill(true)
     },
     computed: {
+        ...mapState({
+            localWallet: state => state.wallet.localWallet,
+        }),
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.localWallet.info, Vue.ls.get('pwd')))
+        },
         seedPhrase() {
-            return ''
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        wordList() {
+            return this.seedPhrase.split(' ').sort(function(a, b) { return 0.5 - Math.random() })
         }
     },
     methods: {
