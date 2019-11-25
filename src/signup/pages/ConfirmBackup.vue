@@ -106,7 +106,7 @@ export default {
             }
         },
         confirm() {
-
+            this.$emit('show-page', 'success')
         }
     }
 }

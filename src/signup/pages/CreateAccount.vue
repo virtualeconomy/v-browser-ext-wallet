@@ -77,6 +77,8 @@
                          @show-page="changePage"></save-backup>
             <confirm-backup v-else-if="pageId==='confirmBackup'"
                             @show-page="changePage">haha</confirm-backup>
+            <success v-else-if="pageId==='success'"
+                            @show-page="changePage"></success>
         </div>
     </div>
 </template>
@@ -89,6 +91,7 @@ import icon1 from '../../../static/icons/ic_select_solid.svg'
 import icon2 from '../../../static/icons/ic_select_border.svg'
 import SaveBackup from './SaveBackup.vue'
 import ConfirmBackup from './ConfirmBackup.vue'
+import Success from './Success.vue'
 export default {
     name: "CreateAccount",
     data: function() {
@@ -112,6 +115,7 @@ export default {
         validator.reset()
     },
     components: {
+        Success,
         VHeader,
         SaveBackup,
         ConfirmBackup

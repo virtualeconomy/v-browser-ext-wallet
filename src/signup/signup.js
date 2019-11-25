@@ -7,6 +7,8 @@ import jdenticon from 'jdenticon'
 import router from '../router/router'
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
+
+router.push('/SignupEntry')
 new Vue({
     el: '#app',
     router: router,

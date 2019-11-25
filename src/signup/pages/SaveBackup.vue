@@ -59,7 +59,7 @@ export default {
             this.$emit('show-page', 'confirmBackup')
         },
         remind() {
-
+            this.$emit('show-page', 'success')
         }
     },
     data: function () {
