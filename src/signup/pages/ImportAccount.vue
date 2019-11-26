@@ -23,7 +23,7 @@
                 <div class="form-group first-group">
                     <label>Wallet Seed</label>
                     <b-form-textarea
-                            class="non-square"
+                            class="non-square seed"
                             v-model="seedInput"
                             maxlength="150"
                             @keydown.native.enter='preventDefault($event)'
@@ -58,7 +58,7 @@
                             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
                             :readonly="registering"
                             @input="checkPasswordMatch(password, password2)"
-                            @keyup.enter="registerEnter"
+                            @keyup.enter="importEnter"
                             v-model="password2">
                 </div>
                 <div class="form-group password-form">
@@ -76,11 +76,10 @@
                          src="../../../static/icons/ic_select_border.svg">
                     &nbsp;I have read and agree to the <a class='vsys-color'
                                                           href="#"
-                                                          target="_blank"
                                                           @click="openTerms()">Terms of Service<br></a>
                     <b-button
                             class="input-height form-control"
-                            style="margin-top: 30px"
+                            style="margin-top: 20px;padding: 0px;"
                             :disabled="isSubmitDisabled"
                             :variant="'warning'"
                             :size="'lg'"
@@ -96,135 +95,166 @@
 </template>
 
 <script>
-    import VHeader from './VHeader.vue'
-    import validator from 'vue-m-validator'
-    import icon1 from '../../../static/icons/ic_select_solid.svg'
-    import icon2 from '../../../static/icons/ic_select_border.svg'
-    import Success from './Success.vue'
-    export default {
-        name: "ImportAccount",
-        data: function() {
-            return {
-                pageId: 'import',
-                password: '',
-                password2: '',
-                seedInput: '',
-                showSeedErr: false,
-                isFirstRun: true,
-                network: 'Mainnet',
-                read_agree: false,
-                isFirst: {
-                    'pwd1': true,
-                    'pwd2': true
-                },
-                validator: validator,
-                registering: false
+import VHeader from './VHeader.vue'
+import Vue from 'vue'
+import validator from 'vue-m-validator'
+import icon1 from '../../../static/icons/ic_select_solid.svg'
+import icon2 from '../../../static/icons/ic_select_border.svg'
+import Success from './Success.vue'
+import seedLib from '../../libs/seed.js'
+export default {
+    name: "ImportAccount",
+    data: function() {
+        return {
+            pageId: 'import',
+            password: '',
+            password2: '',
+            seedInput: '',
+            showSeedErr: false,
+            isFirstRun: true,
+            network: 'Mainnet',
+            read_agree: false,
+            isFirst: {
+                'pwd1': true,
+                'pwd2': true
+            },
+            validator: validator,
+            seedPhrase: '',
+            registering: false
+        }
+    },
+    created() {
+        validator.reset()
+    },
+    components: {
+        VHeader,
+        Success,
+    },
+    computed: {
+        isSubmitDisabled() {
+            return this.isFirstRun === true || this.validator.errors.length > 0 || this.read_agree === false || this.seedInput === ''
+        },
+        isPassErrors() {
+            let errors = this.validator.getErrors('pass')
+            return errors && errors.length > 0
+        },
+        isPassMatchErrors() {
+            let errors = this.validator.getErrors('passmatch')
+            return errors && errors.length > 0
+        },
+        seedPlaceHolder() {
+            return this.showSeedErr ? '' : 'Separate each word with a single space'
+        },
+        isValidSeed() {
+            const wordList = this.seedPhrase.split(' ')
+            return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
+        },
+    },
+    methods: {
+        preventDefault(event) {
+            if (event) {
+                event.preventDefault()
             }
         },
-        created() {
-            validator.reset()
+        notFirst(field) {
+            this.isFirst[field] = false
+            this.isFirstRun = /true/i.test(Object.values(this.isFirst).join(''))
         },
-        components: {
-            VHeader,
-            Success,
-        },
-        computed: {
-            isSubmitDisabled() {
-                return this.isFirstRun === true || this.validator.errors.length > 0 || this.read_agree === false
-            },
-            isPassErrors() {
-                let errors = this.validator.getErrors('pass')
-                return errors && errors.length > 0
-            },
-            isPassMatchErrors() {
-                let errors = this.validator.getErrors('passmatch')
-                return errors && errors.length > 0
-            },
-            seedPlaceHolder() {
-                return this.showSeedErr ? '' : 'Separate each word with a single space'
+        checkSeed() {
+            this.seedPhrase = this.seedInput.trim()
+            if (!this.isValidSeed) {
+                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source. An insecure entropy source can lead to total loss of the wallet.')
+                if (isConfirmed) {
+                    this.showSeedErr = true
+                }
+            } else {
+                this.showSeedErr = true
             }
         },
-        methods: {
-            preventDefault(event) {
-                if (event) {
-                    event.preventDefault()
-                }
-            },
-            notFirst(field) {
-                this.isFirst[field] = false
-                this.isFirstRun = /true/i.test(Object.values(this.isFirst).join(''))
-            },
-            checkPasswordMatch(pass, pass2) {
-                const RULE_1 = {
-                    expression: pass !== pass2,
-                    name: 'passmatch',
-                    msg: 'Passwords are not the same'
-                }
-                validator
-                    .addRule(RULE_1)
-                this.notFirst('pwd2')
-            },
-            checkPassword(pass) {
-                const RULE_1 = {
-                    expression: !pass || pass === '',
-                    name: 'pass',
-                    msg: 'Password is required'
-                }
-                const RULE_2 = {
-                    expression: pass.length < 8,
-                    name: 'pass',
-                    msg: 'Your password should be of at least 8 characters'
-                }
-                const RULE_3 = {
-                    expression: !(/[a-zA-z]/.test(pass)),
-                    name: 'pass',
-                    msg: 'Your passowrd must contain alphabetical character'
-                }
-                validator
-                    .addRule(RULE_1)
-                    .addRule(RULE_2)
-                    .addRule(RULE_3)
-                if (!this.isFirst['pwd2']) {
-                    this.checkPasswordMatch(this.password, this.password2)
-                }
-                this.notFirst('pwd1')
-            },
-            changeIcon() {
-                if (this.read_agree === false) {
-                    document.getElementById('img_read').src = icon1
-                    this.read_agree = true
-                } else {
-                    document.getElementById('img_read').src = icon2
-                    this.read_agree = false
-                }
-            },
-            back(route) {
-                this.$router.push(route)
-            },
-            check() {
-                this.checkPassword(this.password)
+        checkPasswordMatch(pass, pass2) {
+            const RULE_1 = {
+                expression: pass !== pass2,
+                name: 'passmatch',
+                msg: 'Passwords are not the same'
+            }
+            validator
+                .addRule(RULE_1)
+            this.notFirst('pwd2')
+        },
+        checkPassword(pass) {
+            const RULE_1 = {
+                expression: !pass || pass === '',
+                name: 'pass',
+                msg: 'Password is required'
+            }
+            const RULE_2 = {
+                expression: pass.length < 8,
+                name: 'pass',
+                msg: 'Your password should be of at least 8 characters'
+            }
+            const RULE_3 = {
+                expression: !(/[a-zA-z]/.test(pass)),
+                name: 'pass',
+                msg: 'Your passowrd must contain alphabetical character'
+            }
+            validator
+                .addRule(RULE_1)
+                .addRule(RULE_2)
+                .addRule(RULE_3)
+            if (!this.isFirst['pwd2']) {
                 this.checkPasswordMatch(this.password, this.password2)
-            },
-            registerEnter() {
-                this.register()
-            },
-            confirm() {
-                this.pageId = 'success'
-            },
-            changePage(newPageId) {
-                this.registering = false
-                this.isFirstRun = false
-                this.read_agree = false
-                this.pageId = newPageId
-            },
-            openTerms() {
-                this.$router.push('/SignupEntry')
-            },
-            hideErrMsg() {
-                this.showSeedErr = false
             }
+            this.notFirst('pwd1')
+        },
+        changeIcon() {
+            if (this.read_agree === false) {
+                document.getElementById('img_read').src = icon1
+                this.read_agree = true
+            } else {
+                document.getElementById('img_read').src = icon2
+                this.read_agree = false
+            }
+        },
+        back(route) {
+            this.$router.push(route)
+        },
+        check() {
+            this.checkPassword(this.password)
+            this.checkPasswordMatch(this.password, this.password2)
+            this.checkSeed()
+        },
+        importEnter() {
+            this.register()
+        },
+        confirm() {
+            this.check()
+            if (this.isSubmitDisabled || !this.showSeedErr) {
+                return
+            }
+            this.registering = true
+            this.isFirstRun = true
+            Vue.ls.set('pwd', this.password)
+            this.seed = seedLib.fromExistingPhrase(this.seedPhrase)
+            const userInfo = {
+                encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
+            }
+            const savedInfo = {
+                lastLogin: new Date().getTime(),
+                walletAmount: 1,
+                sessionTimeout: 5,
+                info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
+            }
+            this.$store.commit('wallet/updateWallet', savedInfo)
+            this.pageId = 'success'
+        },
+        openTerms() {
+            this.$router.push('/terms')
+        },
+        hideErrMsg() {
+            this.showSeedErr = false
         }
     }
+}
 </script>
 
 <style scoped>
@@ -243,8 +273,8 @@
         background-color: rgba(247,247,252,1);
     }
     .import-intro-1 {
-        width:511px;
-        font-size:33px;
+        height: 30px;
+        font-size:32px;
         font-family:SFProDisplay-Medium,SFProDisplay;
         font-weight:500;
         color:rgba(50,50,51,1);
@@ -253,7 +283,7 @@
     }
     .import-intro-2 {
         width:494px;
-        font-size:16px;
+        font-size:15px;
         font-family:SFProText-Regular,SFProText;
         font-weight:400;
         color:rgba(50,50,51,1);
@@ -263,7 +293,7 @@
     .import-account {
         width: 560px;
         position: relative;
-        margin-top: -72px;
+        top: -50px;
     }
     .password-form {
         margin-top: 25px;
@@ -282,7 +312,7 @@
         height: 56px;
     }
     .back {
-        height: 50px;
+        height: 40px;
     }
     .back-icon {
         width: 14px;
@@ -305,7 +335,7 @@
         font-weight:400;
         color:rgba(50,50,51,1);
         line-height:22px;
-        margin-top: 37px;
+        margin-top: 25px;
     }
     .select {
         appearance: none;
@@ -333,12 +363,19 @@
         margin-right: 16px;
     }
     .error-messages {
-        /*margin-bottom: -30px;*/
-        margin-top: 50px;
+        margin-top: 40px;
     }
     .form-control:disabled, .non-square{
         padding: 20px 15px;
         border-bottom-left-radius: 0px;
         border-bottom-right-radius: 0px;
+    }
+    .seed {
+        height:22px;
+        font-size:19px;
+        font-family:SFProText-Regular,SFProText;
+        font-weight:400;
+        color:rgba(50,50,51,1);
+        line-height:22px;
     }
 </style>

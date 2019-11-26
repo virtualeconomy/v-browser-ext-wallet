@@ -76,9 +76,8 @@
             <save-backup v-else-if="pageId==='saveBackup'"
                          @show-page="changePage"></save-backup>
             <confirm-backup v-else-if="pageId==='confirmBackup'"
-                            @show-page="changePage">haha</confirm-backup>
-            <success v-else-if="pageId==='success'"
-                            @show-page="changePage"></success>
+                            @show-page="changePage"></confirm-backup>
+            <success v-else-if="pageId==='success'"></success>
         </div>
     </div>
 </template>

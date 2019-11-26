@@ -15,29 +15,31 @@
 </template>
 
 <script>
-    export default {
-        name: "success",
-        methods: {
-            closePage() {
-                window.close()
-            }
+export default {
+    name: "success",
+    methods: {
+        closePage() {
+            window.close()
         }
     }
+}
 </script>
 
 <style scoped>
 .success {
+    justify-content:center;
+    align-items:center;
     width: 560px;
+    text-align: center;
     position: relative;
-    display: block;
-    top: 28px;
+    top: -70px;
 }
 .p1 {
     height:40px;
     font-size:32px;
     font-family:SFProDisplay-Medium,SFProDisplay;
     font-weight:500;
-    color:red;
+    color:rgba(50,50,51,1);
     line-height:40px;
 }
 .p2 {
@@ -45,19 +47,18 @@
     font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
-    color:red;
+    color:rgba(50,50,51,1);
     line-height:21px;
 }
 .tip-img {
     width: 80%;
-    height: 500px;
-    margin:40px auto;
+    position: relative;
+    top: 20px;
 }
 .input-height {
-    width: 50%;
-    /*margin-top: 40px;*/
-    height: 51px;
-    position: relative;
-    left: 80px;
+    width: 280px;
+    margin-left: 140px;
+    margin-top: 50px;
+    height: 50px;
 }
 </style>
