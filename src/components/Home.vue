@@ -28,6 +28,8 @@ import NavBar from './NavBar.vue'
 import Send from './Send.vue'
 import Deposit from './Deposit.vue'
 import TransactionRecords from './TransactionRecords.vue'
+import { mapState } from 'vuex'
+import Vue from 'vue'
 export default {
     name: "Home",
     components: {
@@ -35,6 +37,16 @@ export default {
         Send,
         Deposit,
         TransactionRecords
+    },
+    computed: {
+        ...mapState({
+            localWallet: state => state.wallet.localWallet,
+        }),
+    },
+    created() {
+        if (!Vue.ls.get('pwd')) {
+            this.$router.push('/login')
+        }
     }
 }
 </script>

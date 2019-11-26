@@ -37,7 +37,6 @@ export default {
     name: 'SignupEntry',
     methods: {
         changePage(route) {
-            console.log(this.$route)
             this.$router.push(route)
         }
     }

@@ -14,16 +14,5 @@ export default new Vuex.Store({
     modules: {
         wallet
     },
-
-    state: {
-        loading: false
-    },
-
-    mutations: {
-        loading(state, loading) {
-            state.loading = loading
-        }
-    },
-
     plugins: [vuexLocal.plugin]
 })

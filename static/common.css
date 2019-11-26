@@ -39,3 +39,10 @@ html, body, #app {
     background-color: #FF8737 !important;
     border-color: #ffc107 !important;
 }
+input:focus {
+    caret-color: #FF8737 !important;
+}
+.form-control:focus {
+    border-color: rgb(255, 190, 150) !important;
+    box-shadow: none !important;
+}
