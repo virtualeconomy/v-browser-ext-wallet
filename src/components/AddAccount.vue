@@ -1,5 +1,6 @@
 <template>
     <b-modal id="addAccount"
+             lazy
              centered
              ref="addAccountModal"
              hide-footer

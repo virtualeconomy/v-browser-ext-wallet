@@ -47,11 +47,10 @@
                 </div>
                 <div class="form-group password-form">
                     <label>Choose Network</label>
-                    <select class="form-control input-height select"
-                            v-model="network">
-                        <option>Mainnet</option>
-                        <option>Testnet</option>
-                    </select>
+                    <b-form-select class="form-control input-height select"
+                                   :options="networkOptions"
+                                   v-model="networkByte">
+                    </b-form-select>
                 </div>
                 <div class="terms">
                     <img id="img_read"
@@ -100,12 +99,22 @@ export default {
             password: '',
             password2: '',
             isFirstRun: true,
-            network: 'Mainnet',
+            networkByte: 'M'.charCodeAt(0),
             read_agree: false,
             isFirst: {
                 'pwd1': true,
                 'pwd2': true
             },
+            networkOptions: [
+                {
+                    value: 'M'.charCodeAt(0),
+                    text: 'Mainnet'
+                },
+                {
+                    value: 'T'.charCodeAt(0),
+                    text: 'Testnet'
+                },
+            ],
             seed: seedLib.create(12),
             validator: validator,
             registering: false
@@ -206,6 +215,7 @@ export default {
                 lastLogin: new Date().getTime(),
                 walletAmount: 1,
                 sessionTimeout: 5,
+                networkByte: this.networkByte,
                 password: this.password,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }

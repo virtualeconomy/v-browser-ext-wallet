@@ -5,11 +5,13 @@ export default {
         lastLogin: false,
         walletAmount: false,
         sessionTimeout: false,
+        networkByte: false,
         password: false,
         info: false
     },
     mutations: {
         updateWallet(state, object) {
+            state.networkByte = object.networkByte
             state.lastLogin = object.lastLogin
             state.walletAmount = object.walletAmount
             state.sessionTimeout = object.sessionTimeout
@@ -21,6 +23,10 @@ export default {
         },
         updateWalletAmount(state) {
             state.walletAmount += 1
+        },
+        updateSettings(state, object) {
+            state.networkByte = object.networkByte
+            state.sessionTimeout = object.sessionTimeout
         }
     }
 

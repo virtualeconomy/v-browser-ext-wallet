@@ -1,5 +1,6 @@
 <template>
     <b-modal id="details"
+             lazy
              centered
              dialog-class="details-dialog"
              hide-footer
