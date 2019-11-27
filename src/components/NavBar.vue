@@ -31,13 +31,14 @@
                            width="10px"
                            height="8px" src="../../static/icons/ic_selected@2x.png">
               </b-dropdown-item-button>
-              <b-dropdown-item v-b-modal.details href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
-              <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.details href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
               <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-navbar>
+      <AddAccount></AddAccount>
       <Details></Details>
     </div>
 </template>
@@ -46,6 +47,7 @@
 import jdenticon from 'jdenticon'
 import Vue from 'vue'
 import Details from './Details.vue'
+import AddAccount from './AddAccount.vue'
 export default {
     name: "NavBar",
     mounted() {
@@ -73,7 +75,8 @@ export default {
 
     },
     components: {
-        Details
+        Details,
+        AddAccount
     },
     methods: {
         logout() {

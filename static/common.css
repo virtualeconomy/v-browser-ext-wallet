@@ -46,3 +46,7 @@ input:focus {
     border-color: rgb(255, 190, 150) !important;
     box-shadow: none !important;
 }
+button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}

@@ -4,10 +4,6 @@
              dialog-class="details-dialog"
              hide-footer
              hide-header>
-        <canvas width="56"
-                class="avatar logo-item"
-                height="56"
-                :data-jdenticon-hash="avtHash"></canvas>
         <button class="close btn-close">
             <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
         </button>
@@ -32,18 +28,9 @@
 </template>
 
 <script>
-import jdenticon from 'jdenticon'
 import jrQrcode from 'jr-qrcode'
 export default {
     name: "Details",
-    mounted() {
-        jdenticon()
-    },
-    data() {
-        return {
-            avtHash: '555077584842597e4246'
-        }
-    },
     computed: {
         accountObject() {
             return {
