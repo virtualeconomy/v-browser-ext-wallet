@@ -7,8 +7,11 @@ export default {
     },
 
     mutations: {
-        updateAccountName(state, account) {
+        addAccount(state, account) {
             state.accountNames.push(account)
+        },
+        updateSelectedAccount(state, index) {
+            state.selectedAccount = index
         }
     }
 

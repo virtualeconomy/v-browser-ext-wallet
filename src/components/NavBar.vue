@@ -5,7 +5,7 @@
               <img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png">
             </b-navbar-brand>
             <b-navbar-nav class="account">
-              <p class="account-name">{{ accountName }}</p>
+              <p class="account-name">{{ accountNames[selectedAccount] }}</p>
               <p class="account-address">{{ addressShow }}</p>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
@@ -16,74 +16,90 @@
                   <canvas class="avatar col pr-0 canvas"
                           width="36"
                           height="36"
-                          :data-jdenticon-hash="avtHash"></canvas>
+                          :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </template>
-              <b-dropdown-item-button class="button" v-for="record in Records">
+              <b-dropdown-item-button class="button"
+                                      :class="{'selected-account': index === selectedAccount}"
+                                      @click="select(index)"
+                                      v-for="(address, index) in addresses">
                       <canvas class="canvas-item"
                               width="32"
                               height="32"
-                              :data-jdenticon-hash="avtHash"></canvas>
+                              :data-jdenticon-hash="avatarDataHex(address)"></canvas>
                       <div style="display: inline-block; margin-left: 10px; height: 35px;">
-                          <p class="address-item">Account 1</p>
-                          <p class="amount-item">3097.7997 VSYS</p>
+                          <p class="address-item">{{ accountNames[index] }}</p>
+                          <p class="amount-item">88999.2 VSYS</p>
                       </div>
-                      <img class="select"
+                      <img v-if="index === selectedAccount"
+                           class="select"
                            width="10px"
                            height="8px" src="../../static/icons/ic_selected@2x.png">
               </b-dropdown-item-button>
-              <b-dropdown-item v-b-modal.details href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
-              <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.details href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
               <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-navbar>
+      <AddAccount></AddAccount>
       <Details></Details>
     </div>
 </template>
 
 <script>
 import jdenticon from 'jdenticon'
-import Vue from 'vue'
+import converters from '../js-v-sdk/src/utils/converters.js'
 import Details from './Details.vue'
+import AddAccount from './AddAccount.vue'
 export default {
     name: "NavBar",
     mounted() {
       jdenticon()
     },
-    data() {
-        return {
-            Records: {
-                'test': 999,
-            },
-            avtHash: '555077584842597e4246'
-        }
-    },
     props: {
-        address: {
-            type: String,
+        addresses: {
+            type: Object,
             require: true,
-            default: ''
+            default: function() {}
         },
-        accountName: {
-            type: String,
+        accountNames: {
+            type: Array,
             require: true,
-            default: ''
+            default: function() {
+            }
+        },
+        balances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        selectedAccount: {
+            type: Number,
+            require: true,
+            default: 0
         }
-
     },
     components: {
-        Details
+        Details,
+        AddAccount
     },
     methods: {
         logout() {
             this.$store.commit('wallet/updatePassword', false)
             this.$router.push('/login')
+        },
+        avatarDataHex(address) {
+            console.log(address)
+            return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
+        },
+        select(index) {
+            this.$store.commit('account/updateSelectedAccount', index)
         }
     },
     computed: {
         addressShow() {
-            const addrChars = this.address.split('')
+            const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
             return addrChars.join('')
 
@@ -121,6 +137,7 @@ export default {
     height: 40px;
 }
 .button {
+    margin-top: 8px;
     margin-right: 16px;
     margin-left: 16px;
     display: inline-block;
@@ -128,7 +145,6 @@ export default {
     height:56px;
     background:rgba(247,247,252,1);
     border-radius:4px;
-    border:1px solid rgba(255,136,55,1);
 }
 .canvas {
     padding-right: 0px !important;
@@ -183,6 +199,9 @@ export default {
     color:rgba(169,169,176,1);
     line-height:13px;
     margin-bottom: 4px;
+}
+.selected-account {
+    border:1px solid rgba(255,136,55,1);
 }
 .select {
     margin-top: -25px;

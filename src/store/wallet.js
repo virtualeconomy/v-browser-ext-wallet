@@ -18,6 +18,9 @@ export default {
         },
         updatePassword(state, password) {
             state.password = password
+        },
+        updateWalletAmount(state) {
+            state.walletAmount += 1
         }
     }
 
