@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import seedLib from '../libs/seed.js'
+import { mapState } from 'vuex'
 export default {
     name: "Login",
     data: function() {
@@ -46,8 +46,10 @@ export default {
             password: void 0
         }
     },
-    created() {
-        Vue.ls.clear()
+    computed: {
+        ...mapState({
+            wallet: state => state.wallet
+        })
     },
     methods: {
         checkPassword() {
@@ -55,9 +57,7 @@ export default {
                 seedLib.decryptSeedPhrase(
                     JSON.parse(
                         seedLib.decryptSeedPhrase(
-                            JSON.parse(
-                                window.localStorage.getItem(
-                                    'vuex')).wallet.localWallet.info,
+                            this.wallet.info,
                             this.password)).encrSeed,
                     this.password)
                 this.isPwdError = false
@@ -73,7 +73,7 @@ export default {
             if (this.isPwdError) {
                 return
             }
-            Vue.ls.set('pwd', this.password)
+            this.$store.commit('wallet/updatePassword', this.password)
             this.$router.push('/home')
         },
         restore() {

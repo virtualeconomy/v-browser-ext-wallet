@@ -79,14 +79,14 @@ export default {
     },
     computed: {
         ...mapState({
-            localWallet: state => state.wallet.localWallet,
+            wallet: state => state.wallet
         }),
         secretInfo() {
             return JSON.parse(
-                seedLib.decryptSeedPhrase(this.localWallet.info, Vue.ls.get('pwd')))
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
         },
         wordList() {
             return this.seedPhrase.split(' ').sort(function(a, b) { return 0.5 - Math.random() })

@@ -199,14 +199,14 @@ export default {
             }
             this.registering = true
             this.isFirstRun = true
-            Vue.ls.set('pwd', this.password)
             const userInfo = {
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
             }
             const savedInfo = {
                 lastLogin: new Date().getTime(),
-                walletAmount: 0,
+                walletAmount: 1,
                 sessionTimeout: 5,
+                password: this.password,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
             this.$store.commit('wallet/updateWallet', savedInfo)

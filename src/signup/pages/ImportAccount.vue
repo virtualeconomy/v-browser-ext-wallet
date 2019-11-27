@@ -96,7 +96,6 @@
 
 <script>
 import VHeader from './VHeader.vue'
-import Vue from 'vue'
 import validator from 'vue-m-validator'
 import icon1 from '../../../static/icons/ic_select_solid.svg'
 import icon2 from '../../../static/icons/ic_select_border.svg'
@@ -233,7 +232,6 @@ export default {
             }
             this.registering = true
             this.isFirstRun = true
-            Vue.ls.set('pwd', this.password)
             this.seed = seedLib.fromExistingPhrase(this.seedPhrase)
             const userInfo = {
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
@@ -242,6 +240,7 @@ export default {
                 lastLogin: new Date().getTime(),
                 walletAmount: 1,
                 sessionTimeout: 5,
+                password: this.password,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
             this.$store.commit('wallet/updateWallet', savedInfo)

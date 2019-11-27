@@ -1,6 +1,8 @@
 <template>
     <div class="home">
-        <nav-bar class="nav-bar"></nav-bar>
+        <nav-bar class="nav-bar"
+                 :address="address"
+                 :accountName="accountName"></nav-bar>
         <div class="account-content">
             <div>
                 <img class="token-icon"
@@ -11,7 +13,7 @@
                 <span class="unit">VSYS</span>
             </div>
             <div class="btn">
-                <b-button class="btn-deposit">
+                <b-button class="btn-deposit" @click="showMessage">
                     <img class="icon-btn"
                          src="../../static/icons/ic_deposit@3x.png"><b class="deposit-txt">Deposit</b></b-button>
                 <b-button class="btn-send">
@@ -30,6 +32,7 @@ import Deposit from './Deposit.vue'
 import TransactionRecords from './TransactionRecords.vue'
 import { mapState } from 'vuex'
 import Vue from 'vue'
+import seedLib from '../libs/seed.js'
 export default {
     name: "Home",
     components: {
@@ -38,14 +41,48 @@ export default {
         Deposit,
         TransactionRecords
     },
+    created() {
+        if (this.wallet.password === false) {
+            this.$router.push('/login')
+        }
+        this.getAddresses()
+        this.address = this.addresses[this.selectedAccount]
+        this.accountName = this.accountNames[this.selectedAccount]
+    },
+    data: function() {
+        return {
+            addresses: [],
+            address: '',
+            accountName: ''
+        }
+    },
     computed: {
         ...mapState({
-            localWallet: state => state.wallet.localWallet,
+            wallet: state => state.wallet,
+            selectedAccount: state => state.account.selectedAccount,
+            accountNames: state => state.account.accountNames
         }),
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+        }
     },
-    created() {
-        if (!Vue.ls.get('pwd')) {
-            this.$router.push('/login')
+    methods: {
+        getSeedPhrase() {
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+            }
+        },
+        getAddresses() {
+            let seedPhrase = this.getSeedPhrase()
+            for (let index = 0; index < this.wallet.walletAmount; index++) {
+                let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
+                Vue.set(this.addresses, index, seed.address)
+            }
+        },
+        showMessage() {
+            console.log(this.getSeedPhrase())
+            console.log(this.addresses)
         }
     }
 }

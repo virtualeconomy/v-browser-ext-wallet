@@ -4,7 +4,7 @@
         <div class="back">
             <img class = "back-icon" src="../../../static/icons/ic_back@2x.png"/>
             <b-btn class="back-link text-decoration-none" variant="link"
-                   @click="back">Back</b-btn>
+                   @click="changePage('create')">Back</b-btn>
         </div>
         <p class="p1">Secret Backup Phrase</p>
         <p class="p2">Your secret backup phrase makes it easy to back up and restore your personal account.</p>
@@ -23,7 +23,7 @@
                         block
                         variant="light"
                         size="lg"
-                        @click="remind">Remind me later
+                        @click="changePage('success')">Remind me later
                 </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -32,7 +32,7 @@
                         class="btn-next"
                         variant="warning"
                         size="lg"
-                        @click="nextPage">Next
+                        @click="changePage('confirmBackup')">Next
                 </b-button>
             </b-col>
         </b-row>
@@ -61,26 +61,20 @@ import Vue from 'vue'
 export default {
     name: "SaveBackup",
     methods: {
-        back() {
-            this.$emit('show-page', 'create')
-        },
-        nextPage() {
-            this.$emit('show-page', 'confirmBackup')
-        },
-        remind() {
-            this.$emit('show-page', 'success')
+        changePage(pageName) {
+            this.$emit('show-page', pageName)
         }
     },
     computed: {
         ...mapState({
-            localWallet: state => state.wallet.localWallet,
+            wallet: state => state.wallet,
         }),
         secretInfo() {
             return JSON.parse(
-                seedLib.decryptSeedPhrase(this.localWallet.info, Vue.ls.get('pwd')))
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
         },
         wordList() {
             return this.seedPhrase.split(' ')

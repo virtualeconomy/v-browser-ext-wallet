@@ -5,8 +5,8 @@
               <img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png">
             </b-navbar-brand>
             <b-navbar-nav class="account">
-              <p class="account-name">Account 1</p>
-              <p class="account-address">AUAztx...HHWpUR</p>
+              <p class="account-name">{{ accountName }}</p>
+              <p class="account-address">{{ addressShow }}</p>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
               <b-nav-item-dropdown right
@@ -34,7 +34,7 @@
               <b-dropdown-item v-b-modal.details href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
-              <b-dropdown-item href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
+              <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-navbar>
@@ -44,6 +44,7 @@
 
 <script>
 import jdenticon from 'jdenticon'
+import Vue from 'vue'
 import Details from './Details.vue'
 export default {
     name: "NavBar",
@@ -58,8 +59,35 @@ export default {
             avtHash: '555077584842597e4246'
         }
     },
+    props: {
+        address: {
+            type: String,
+            require: true,
+            default: ''
+        },
+        accountName: {
+            type: String,
+            require: true,
+            default: ''
+        }
+
+    },
     components: {
         Details
+    },
+    methods: {
+        logout() {
+            this.$store.commit('wallet/updatePassword', false)
+            this.$router.push('/login')
+        }
+    },
+    computed: {
+        addressShow() {
+            const addrChars = this.address.split('')
+            addrChars.splice(6, 23, '...')
+            return addrChars.join('')
+
+        }
     }
 }
 </script>

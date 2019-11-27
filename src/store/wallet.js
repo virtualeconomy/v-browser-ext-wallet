@@ -2,11 +2,22 @@ export default {
     namespaced: true,
 
     state: {
-        localWallet: ''
+        lastLogin: false,
+        walletAmount: false,
+        sessionTimeout: false,
+        password: false,
+        info: false
     },
     mutations: {
         updateWallet(state, object) {
-            state.localWallet = object
+            state.lastLogin = object.lastLogin
+            state.walletAmount = object.walletAmount
+            state.sessionTimeout = object.sessionTimeout
+            state.info = object.info
+            state.password = object.password
+        },
+        updatePassword(state, password) {
+            state.password = password
         }
     }
 

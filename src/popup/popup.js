@@ -15,7 +15,7 @@ const options = {
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
 Vue.use(Storage, options)
-if (!JSON.parse(window.localStorage.getItem('vuex')).hasOwnProperty('wallet')) {
+if (store.state.wallet.info === false) {
     chrome.runtime.sendMessage({
         method: 'showAlert'
     }, function(response) {});
