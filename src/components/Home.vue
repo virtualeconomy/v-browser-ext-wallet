@@ -1,8 +1,10 @@
 <template>
     <div class="home">
         <nav-bar class="nav-bar"
-                 :address="address"
-                 :accountName="accountName"></nav-bar>
+                 :addresses="addresses"
+                 :account-names="accountNames"
+                 :balances="addresses"
+                 :selected-account="selectedAccount"></nav-bar>
         <div class="account-content">
             <div>
                 <img class="token-icon"
@@ -33,6 +35,7 @@ import TransactionRecords from './TransactionRecords.vue'
 import { mapState } from 'vuex'
 import Vue from 'vue'
 import seedLib from '../libs/seed.js'
+import account from "src/store/account";
 export default {
     name: "Home",
     components: {
@@ -60,11 +63,17 @@ export default {
         ...mapState({
             wallet: state => state.wallet,
             selectedAccount: state => state.account.selectedAccount,
-            accountNames: state => state.account.accountNames
+            accountNames: state => state.account.accountNames,
+            walletAmount: state => state.wallet.walletAmount
         }),
         secretInfo() {
             return JSON.parse(
                 seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+        }
+    },
+    watch: {
+        walletAmount(now, old) {
+            this.getAddresses()
         }
     },
     methods: {
@@ -75,7 +84,7 @@ export default {
         },
         getAddresses() {
             let seedPhrase = this.getSeedPhrase()
-            for (let index = 0; index < this.wallet.walletAmount; index++) {
+            for (let index = 0; index < this.walletAmount; index++) {
                 let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
                 Vue.set(this.addresses, index, seed.address)
             }

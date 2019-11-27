@@ -55,6 +55,7 @@ export default {
     methods: {
         createAccount() {
             this.$store.commit('account/addAccount', this.inputName)
+            this.$store.commit('wallet/updateWalletAmount')
             this.$refs.addAccountModal.hide()
         },
         close() {

@@ -9,6 +9,9 @@ export default {
     mutations: {
         addAccount(state, account) {
             state.accountNames.push(account)
+        },
+        updateSelectedAccount(state, index) {
+            state.selectedAccount = index
         }
     }
 
