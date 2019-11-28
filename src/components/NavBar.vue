@@ -28,7 +28,7 @@
                               :data-jdenticon-hash="avatarDataHex(address)"></canvas>
                       <div style="display: inline-block; margin-left: 10px; height: 35px;">
                           <p class="address-item">{{ accountNames[index] }}</p>
-                          <p class="amount-item">88999.2 VSYS</p>
+                          <p class="amount-item">{{ showBalance(balances[address]) + ' ' + tokenName}}</p>
                       </div>
                       <img v-if="index === selectedAccount"
                            class="select"
@@ -80,6 +80,11 @@ export default {
             type: Number,
             require: true,
             default: 0
+        },
+        tokenName: {
+            type: String,
+            require: true,
+            default: 'VSYS'
         }
     },
     components: {
@@ -94,6 +99,14 @@ export default {
         },
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
+        },
+        showBalance(balance) {
+            let amount = String(balance)
+            if (amount.length >= 11) {
+                let index = amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
+            }
+            return amount
         },
         select(index) {
             this.$store.commit('account/updateSelectedAccount', index)

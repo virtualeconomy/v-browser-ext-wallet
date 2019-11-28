@@ -3,7 +3,8 @@ export default {
 
     state: {
         accountNames: ['Account 1'],
-        selectedAccount: 0
+        selectedAccount: 0,
+        selectedToken: 'VSYS'
     },
 
     mutations: {

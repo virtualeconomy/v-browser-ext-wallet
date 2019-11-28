@@ -3,7 +3,44 @@
         <b-row>
             <b-col class="record-icon"
                    cols="auto">
-                <img src="../../static/icons/ic_sent@3x.png"
+                <img v-if="txIcon==='sent'"
+                     src="../../static/icons/record/ic_sent.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='received'"
+                     src="../../static/icons/record/ic_received.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='leased in'"
+                     src="../../static/icons/record/ic_leasing_reverse.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='leased out'"
+                     src="../../static/icons/record/ic_leasing.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='leased out canceled'"
+                     src="../../static/icons/record/ic_leasing_cancel.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='leased in canceled'"
+                     src="../../static/icons/record/ic_leasing_cancel_in.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
+                     src="../../static/icons/record/ic_contract_signup.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
+                     src="../../static/icons/record/ic_exec_fail.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
+                     src="../../static/icons/record/ic_exec_success.svg"
+                     width="32px"
+                     height="32px">
+                <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
+                     src="../../static/icons/record/ic_exec_fail.svg"
                      width="32px"
                      height="32px">
             </b-col>
@@ -11,10 +48,10 @@
                    col="auto"
                    align-v="left">
                 <b-row>
-                    <b-col class="record-type">Send VSYS</b-col>
+                    <b-col class="record-type">{{ txTitle }}</b-col>
                 </b-row>
                 <b-row>
-                    <b-col class="record-time">10/21/2019 at 18:32</b-col>
+                    <b-col class="record-time">{{ txMonthStr }}/{{ txDayStr }}/{{ txYearStr }} at {{ txHourStr }}:{{ txMinuteStr }}</b-col>
                 </b-row>
             </b-col>
             <b-col class="record-detail-2"
@@ -32,9 +69,121 @@
 </template>
 
 <script>
-    export default {
-        name: "TransactionRecord"
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '../js-v-sdk/src/constants'
+export default {
+    name: "TransactionRecord",
+    props: {
+        txRecord: {
+            type: Object,
+            default: function() {
+                return {
+                    txType: '',
+                    txAddress: '',
+                    txTime: '',
+                    txAmount: 0,
+                    txAttachment: ''
+                }
+            }
+        },
+        address: {
+            type: String,
+            default: ''
+        }
+    },
+    computed: {
+        txType() {
+            if (this.txRecord['type'] === PAYMENT_TX) {
+                if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                    return 'Received'
+                } else {
+                    return 'Sent'
+                }
+            } else if (this.txRecord['type'] === LEASE_TX) {
+                if (this.txRecord.recipient === this.address) {
+                    return 'Leased In'
+                } else {
+                    return 'Leased Out'
+                }
+            } else if (this.txRecord['type'] === CANCEL_LEASE_TX) {
+                if (this.txRecord.lease.recipient === this.address) {
+                    return 'Leased In Canceled'
+                } else {
+                    return 'Leased Out Canceled'
+                }
+            } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
+                return 'Register Contract'
+            } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
+                if (this.isSentToken) {
+                    if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                        return 'Received'
+                    } else return 'Sent'
+                } else return 'Execute Contract Function'
+            } else {
+                return 'Received'
+            }
+        },
+        txIcon() {
+            return this.txType.toString().toLowerCase()
+        },
+        txTitle() {
+            if (this.txType === 'Leased Out') {
+                return 'Start Leasing'
+            } else if (this.txType === 'Leased In') {
+                return 'Incoming Leasing'
+            } else if (this.txType === 'Leased Out Canceled') {
+                return 'Canceled Out Leasing'
+            } else if (this.txType === 'Leased In Canceled') {
+                return 'Canceled Incoming Leasing'
+            } else if (this.txType === 'Sent') {
+                return 'Sent'
+            } else if (this.txType === 'Received') {
+                return 'Received'
+            } else if (this.txType === 'Execute Contract Function') {
+                return 'Execute Contract Function'
+            } else if (this.txType === 'Register Contract') {
+                return 'Register Contract'
+            }
+        },
+        isSentToken() {
+            return this.txRecord.sentToken === true
+        },
+        txStatus() {
+            return this.txRecord.status
+        },
+        txHourStr() {
+            const hour = new Date(this.txRecord.timestamp / 1e6).getHours()
+            if (hour < 10) {
+                return '0' + hour
+            }
+            return hour.toString()
+        },
+        txMinuteStr() {
+            const minute = new Date(this.txRecord.timestamp / 1e6).getMinutes()
+            if (minute < 10) {
+                return '0' + minute
+            }
+            return minute.toString()
+        },
+        txDayStr() {
+            const date = new Date(this.txRecord.timestamp / 1e6).getDate()
+            if (date < 10) {
+                return '0' + date
+            }
+            return date.toString()
+        },
+        txMonthStr() {
+            const month = new Date(this.txRecord.timestamp / 1e6).getMonth()
+            if (month < 10) {
+                return '0' + month
+            }
+            return month.toString()
+        },
+        txYearStr() {
+            const year = new Date(this.txRecord.timestamp / 1e6).getFullYear()
+            return year.toString()
+        }
     }
+}
 </script>
 
 <style>
@@ -42,7 +191,6 @@
     background:rgba(255,255,255,1);
 }
 .record-icon {
-    margin-left: 12px;
     margin-top: 16px;
     display:inline-block;
 }

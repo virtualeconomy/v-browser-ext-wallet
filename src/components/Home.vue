@@ -3,7 +3,8 @@
         <nav-bar class="nav-bar"
                  :addresses="addresses"
                  :account-names="accountNames"
-                 :balances="addresses"
+                 :balances="balances"
+                 :token-name="tokenName"
                  :selected-account="selectedAccount"></nav-bar>
         <div class="account-content">
             <div>
@@ -11,8 +12,7 @@
                      src="../../static/icons/ic_v_logo@3x.png">
             </div>
             <div class="balance">
-                <span class="token-balance">3097.7997</span>
-                <span class="unit">VSYS</span>
+                <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p>
             </div>
             <div class="btn">
                 <b-button class="btn-deposit" @click="showMessage">
@@ -23,7 +23,9 @@
                          src="../../static/icons/ic_send@3x.png"><b class="send-txt">Send</b></b-button>
             </div>
         </div>
-        <transaction-records class="transaction-records"></transaction-records>
+        <transaction-records class="transaction-records"
+                             :token-name="tokenName"
+                             :address="address"></transaction-records>
     </div>
 </template>
 
@@ -33,9 +35,10 @@ import Send from './Send.vue'
 import Deposit from './Deposit.vue'
 import TransactionRecords from './TransactionRecords.vue'
 import { mapState } from 'vuex'
+import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Vue from 'vue'
 import seedLib from '../libs/seed.js'
-import account from "src/store/account";
+import BigNumber from 'bignumber.js'
 export default {
     name: "Home",
     components: {
@@ -49,6 +52,7 @@ export default {
             this.$router.push('/login')
         }
         this.getAddresses()
+        this.getBalances()
         this.address = this.addresses[this.selectedAccount]
         this.accountName = this.accountNames[this.selectedAccount]
     },
@@ -56,19 +60,27 @@ export default {
         return {
             addresses: [],
             address: '',
-            accountName: ''
+            accountName: '',
+            balances: {}
         }
     },
     computed: {
         ...mapState({
+            chain: state => state.API.chain,
             wallet: state => state.wallet,
             selectedAccount: state => state.account.selectedAccount,
             accountNames: state => state.account.accountNames,
-            walletAmount: state => state.wallet.walletAmount
+            walletAmount: state => state.wallet.walletAmount,
+            selectedToken: state => state.account.selectedToken
         }),
         secretInfo() {
             return JSON.parse(
                 seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+        },
+        tokenName() {
+            if (this.selectedToken === 'VSYS') {
+                return 'VSYS'
+            }
         }
     },
     watch: {
@@ -89,9 +101,32 @@ export default {
                 Vue.set(this.addresses, index, seed.address)
             }
         },
+        getBalances() {
+            if (this.selectedToken === 'VSYS') {
+                for (const addr in this.addresses) {
+                    this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
+                        let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+                        Vue.set(this.balances, this.addresses[addr], value)
+                    }, respError => {
+                        Vue.set(this.balances, this.addresses[addr], value)
+                    })
+                }
+            }
+
+        },
+        showBalance(balance) {
+            let amount = String(balance)
+            if (amount.length >= 14) {
+                let index = amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
+            }
+            return amount
+        },
         showMessage() {
             console.log(this.getSeedPhrase())
             console.log(this.addresses)
+            console.log(this.selectedToken)
+            console.log(this.balances)
         }
     }
 }
@@ -123,24 +158,21 @@ export default {
     margin-top: 20px;
     width: 100%;
     height: 33px;
+    text-align: center;
 }
 .token-balance {
-    display:inline-block;
     font-size:28px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:33px;
-    margin-left: 93px;
 }
-.unit {
-    display:inline-block;
+.unity {
     font-size:16px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:19px;
-    margin-left: 4px;
 }
 .btn {
     width:100%;

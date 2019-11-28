@@ -38,6 +38,8 @@
     "vuex": "^3.0.1",
     "vuex-persist": "^1.4.3",
     "vue-m-validator": "^1.0.5",
-    "vue-ls": "^3.0.5"
+    "vue-ls": "^3.0.5",
+    "base-58": "0.0.1",
+    "bignumber.js": "^7.2.1"
   }
 }
