@@ -1,32 +1,32 @@
 <template>
     <div class="select">
-        <div class="v-header">
-            <img class="v-logo"
-                 src="../../../static/icons/V_Wallet_Logo@2x.png"></div>
+        <div class="v-header-container">
+            <div class="v-header">
+                <img class="v-logo"
+                    src="../../../static/icons/V_Wallet_Logo@2x.png"></div>
+        </div>
         <div class="select-body">
             <div class="new-part">
                 <div class="new-txt">New to V Wallet?</div>
             </div>
-            <div class="import-part">
-                <div><img class="import-icon"
+            <div class="import-create-part">
+                <div><img class="import-create-icon"
                           src="../../../static/icons/ic_import_big@2x.png"></div>
-                <div style="margin-top: 23px; text-align: left !important;"><span class="txt-1">No, I already have a seed phrase</span></div>
-                <div style="margin-top: 5px;"><span class="txt-2">Import your existing wallet using a 12 word seed phrase</span></div>
+                <div><span class="txt-1">No, I already have a seed phrase</span></div>
+                <div><span class="txt-2">Import your existing wallet using a 12 word seed phrase</span></div>
                 <div>
-                    <b-button type="button" class="btn-import btn-warning"
-                              @click="changePage('/import')">
-                        <b class="import-txt">Import Wallet</b></b-button>
+                    <b-button type="button" class="btn-import-create btn-warning"
+                              @click="changePage('/import')">Import Wallet</b-button>
                 </div>
             </div>
-            <div class="create-part">
-                <div><img class="create-icon"
+            <div class="import-create-part">
+                <div><img class="import-create-icon"
                           src="../../../static/icons/ic_add_account@2x.png"></div>
-                <div style="margin-top: 23px;"><span class="txt-1">Yes, let's get set up!</span></div>
-                <div style="margin-top: 5px;"><span class="txt-2">This will create a new wallet and seed phrase</span></div>
+                <div><span class="txt-1">Yes, let's get set up!</span></div>
+                <div><span class="txt-2">This will create a new wallet and seed phrase</span></div>
                 <div>
-                    <b-button type="button" class="btn-create btn-warning"
-                              @click="changePage('/create')">
-                        <b class="create-txt">Create a Wallet</b></b-button>
+                    <b-button type="button" class="btn-import-create btn-warning"
+                              @click="changePage('/create')">Create a Wallet</b-button>
                 </div>
             </div>
         </div>
@@ -44,114 +44,90 @@ export default {
 </script>
 <style scoped>
 .select {
-    width:1680px;
-    height:863px;
     background:rgba(247,247,252,1);
-    margin: 0 auto;
 }
-.v-header {
-    width:1680px;
+.v-header-container {
     height:70px;
     background:rgba(255,255,255,1);
+    text-align: center;
+}
+.v-header {
+    max-width: 700px;
+    text-align: left;
+    margin: 0 auto;
 }
 .v-logo {
-    margin-left:420px;
     margin-top:19px;
     width:146px;
     height:33px;
 }
 .select-body {
-    width:1680px;
-    height:793px;
+    text-align: center;
     background:rgba(247,247,252,1);
 }
 .new-part {
-    width:1680px;
-    height:145px;
+    height:98px;
 }
 .new-txt {
-    margin-left:720px;
     margin-top:112px;
-    font-size:33px;
+    font-size:28px;
     font-family:SFProDisplay-Medium,SFProDisplay;
     font-weight:500;
     color:rgba(50,50,51,1);
     line-height:40px;
 }
-.import-part {
-    padding: 41px 47px;
-    width:397px;
-    height:288px;
+.import-create-part {
+    width:340px;
+    height:247px;
     background:rgba(255,255,255,1);
     border-radius:7px;
     border:1px solid rgba(230,230,237,1);
     display:inline-block;
-    margin-left:420px;
+    margin: 0px 20px;
+    padding: 20px;
     text-align: center;
 }
-.import-icon {
-    width:33px;
-    height:33px;
+.import-create-icon {
+    width:28px;
+    height:28px;
+    margin: 20px;
 }
 .txt-1 {
-    font-size:19px;
+    font-size:16px;
     font-family:SFProText-Semibold,SFProText;
     font-weight:600;
     color:rgba(50,50,51,1);
     line-height:22px;
+    margin-top: 23px;
 }
 .txt-2 {
-    font-size:15px;
+    font-size:13px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:19px;
     margin-top: 9px;
     text-align: center;
+    margin-top: 5px;
 }
-.btn-import {
-    width:187px;
-    height:47px;
+.btn-import-create {
+    width:160px;
+    height:40px;
     background:rgba(255,136,55,1);
     border-radius:5px;
     margin-top: 23px;
-    border-color: #FF8737
-}
-.btn-warning {
-    color: darkorange;
-}
-.import-txt {
-    font-size:19px;
+    border-color: #FF8737;
+    font-size:16px;
     font-family:SFProText-Medium,SFProText;
     font-weight:500;
     color:rgba(255,255,255,1);
     line-height:22px;
     text-align: center;
 }
-.create-part {
-    width:397px;
-    height:288px;
-    padding: 41px 47px;
-    background:rgba(255,255,255,1);
-    border-radius:7px;
-    border:1px solid rgba(230,230,237,1);
-    display:inline-block;
-    margin-left:47px;
-    text-align: center;
+.btn-warning {
+    color: darkorange;
 }
-.create-icon {
-    width:33px;
-    height:33px;
-}
-.btn-create {
-    width:187px;
-    height:47px;
-    background:rgba(255,136,55,1);
-    border-radius:5px;
-    margin-top: 23px;
-    border-color: #FF8737
-}
-.create-txt {
+.import-txt {
     font-size:19px;
     font-family:SFProText-Medium,SFProText;
     font-weight:500;
