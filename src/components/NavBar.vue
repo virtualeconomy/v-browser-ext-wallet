@@ -36,7 +36,7 @@
                            height="8px" src="../../static/icons/ic_selected@2x.png">
               </b-dropdown-item-button>
               <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
-              <b-dropdown-item v-b-modal.details href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
               <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
@@ -45,6 +45,7 @@
       <AddAccount></AddAccount>
       <Details></Details>
       <Settings></Settings>
+      <About></About>
     </div>
 </template>
 
@@ -54,6 +55,7 @@ import converters from '../js-v-sdk/src/utils/converters.js'
 import Details from './Details.vue'
 import AddAccount from './AddAccount.vue'
 import Settings from './Settings.vue'
+import About from './About.vue'
 export default {
     name: "NavBar",
     mounted() {
@@ -90,7 +92,8 @@ export default {
     components: {
         Details,
         AddAccount,
-        Settings
+        Settings,
+        About
     },
     methods: {
         logout() {
