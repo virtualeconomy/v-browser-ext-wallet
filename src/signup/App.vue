@@ -10,4 +10,7 @@
 </script>
 <style>
     @import url("/static/common.css");
+    html, body {
+        background:rgba(247,247,252,1);
+    }
 </style>
