@@ -23,13 +23,14 @@
                 variant="link">
             <img width="12" height="12" src="../../static/icons/ic_copy@2x.png">
         </b-btn></div>
-        <div class="view"><p>View on Explorer</p><b-btn class="explorer-link" variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+        <div class="view"><p>View on Explorer</p><b-btn class="explorer-link" variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         <div class="export"><p>Export Private Key / Seed</p><b-btn class="export-link" variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
     </b-modal>
 </template>
 
 <script>
 import jrQrcode from 'jr-qrcode'
+import { ADDRESS_TEST_EXPLORER, ADDRESS_EXPLORER } from '../store/network.js'
 export default {
     name: "Details",
     computed: {
@@ -55,7 +56,21 @@ export default {
             return imgBase64
         },
     },
+    props: {
+        networkByte: {
+            type: Number,
+            require: true,
+            default: 84
+        }
+    },
     methods: {
+        viewOnExplorer() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                window.open(ADDRESS_TEST_EXPLORER + this.address)
+            } else {
+                window.open(ADDRESS_EXPLORER + this.address)
+            }
+        },
         copyText(buttonId, refName) {
             this.$refs[refName].select()
             window.document.execCommand('copy')

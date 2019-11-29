@@ -24,6 +24,7 @@
             </div>
         </div>
         <transaction-records class="transaction-records"
+                             :network-byte="networkByte"
                              :token-name="tokenName"
                              :address="address"></transaction-records>
     </div>
@@ -39,6 +40,7 @@ import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Vue from 'vue'
 import seedLib from '../libs/seed.js'
 import BigNumber from 'bignumber.js'
+
 export default {
     name: "Home",
     components: {
@@ -51,6 +53,7 @@ export default {
         if (this.wallet.password === false) {
             this.$router.push('/login')
         }
+        this.$store.commit('API/updateChain', this.networkByte)
         this.getAddresses()
         this.getBalances()
         this.address = this.addresses[this.selectedAccount]
@@ -66,6 +69,7 @@ export default {
     },
     computed: {
         ...mapState({
+            networkByte: state => state.wallet.networkByte,
             chain: state => state.API.chain,
             wallet: state => state.wallet,
             selectedAccount: state => state.account.selectedAccount,
@@ -97,7 +101,7 @@ export default {
         getAddresses() {
             let seedPhrase = this.getSeedPhrase()
             for (let index = 0; index < this.walletAmount; index++) {
-                let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
+                let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index, this.networkByte)
                 Vue.set(this.addresses, index, seed.address)
             }
         },

@@ -1,9 +1,8 @@
 <template>
     <div class="records">
         <div class="his-pane">
-            <span class="his-txt">History</span>
-            <span class="exp-txt">View on Explorer</span>
-            <img class="btn-exp" src="../../static/icons/ic_arrow_right@3x.png">
+            <p class="his-txt">History</p>
+            <div class="view"><p>View on Explorer</p><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         </div>
         <transaction-record v-for="txRecord in txRecords"
                             :tx-record="txRecord"
@@ -17,6 +16,7 @@ import TransactionRecord from './TransactionRecord.vue'
 import { EXECUTE_CONTRACT_TX } from '../js-v-sdk/src/constants'
 import common from '../js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
+import { ADDRESS_TEST_EXPLORER, ADDRESS_EXPLORER } from '../store/network.js'
 import base58 from 'base-58'
 import Vue from 'vue'
 import convert from '../js-v-sdk/src/utils/convert'
@@ -39,6 +39,11 @@ export default {
             require: true,
             default: ''
         },
+        networkByte: {
+            type: Number,
+            require: true,
+            default: 84
+        },
         tokenName: {
             type: String,
             require: true,
@@ -51,6 +56,13 @@ export default {
         })
     },
     methods: {
+        viewOnExplorer() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                window.open(ADDRESS_TEST_EXPLORER + this.address)
+            } else {
+                window.open(ADDRESS_EXPLORER + this.address)
+            }
+        },
         getTxRecords() {
             const addr = this.address
             this.chain.getTxHistory(addr, 3).then(response => {
@@ -84,7 +96,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .records {
     background:rgba(255,255,255,1);
     border:1px solid rgba(240,240,245,1);
@@ -106,30 +118,24 @@ export default {
     color:rgba(50,50,51,1);
     line-height:19px;
 }
-.exp-txt {
-    display:inline-block;
-    margin-left: 134px;
-    margin-top: 17px;
-    width:98px;
-    height:14px;
+.view {
+    float: right;
+    margin-top: 5px;
+}
+.view p {
+    position: relative;
+    left: 6px;
+    height: 14px;
     font-size:12px;
     font-family:SFProText-Medium,SFProText;
     font-weight:500;
     color:rgba(169,169,176,1);
     line-height:14px;
-}
-.btn-exp {
-    display:inline-block;
-    width:6px;
-    height:10px;
+    display: inline-block;
 }
 .transaction-record {
     z-index:1000;
     width:328px;
     height:64px;
-}
-.btn {
-    width:6px;
-    height:10px;
 }
 </style>

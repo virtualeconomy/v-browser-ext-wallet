@@ -115,7 +115,7 @@ export default {
                     text: 'Testnet'
                 },
             ],
-            seed: seedLib.create(12),
+            seed: seedLib.create(15),
             validator: validator,
             registering: false
         }

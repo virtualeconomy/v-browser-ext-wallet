@@ -6,9 +6,7 @@ import Base58 from 'base-58';
 import crypto_1 from '../js-v-sdk/src/utils/crypto'
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
-// var wallet_constant = require('../constants')
 import Account from '../js-v-sdk/src/account'
-// var network = require('../network')
 const NETWORK_BYTE = 'T'.charCodeAt(0);
 const INITIAL_NONCE = 0
 function generateNewSeed(length) {
@@ -45,12 +43,13 @@ function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
     return phrase;
 }
 var Seed = /** @class */ (function () {
-    function Seed(phrase, nonce) {
+    function Seed(phrase, nonce, networkByte) {
         this.phrase = phrase;
         this.nonce = nonce || INITIAL_NONCE;
+        this.networkByte = networkByte || NETWORK_BYTE
         let keys = crypto_1.buildKeyPair(phrase, this.nonce)
         let account = new Account()
-        this.address = account.convertPublicKeyToAddress(keys.public_key, NETWORK_BYTE)
+        this.address = account.convertPublicKeyToAddress(keys.public_key, this.networkByte)
         this.keyPair = {
             privateKey: Base58.encode(keys.private_key),
             publicKey: Base58.encode(keys.public_key)
@@ -72,8 +71,8 @@ export default {
     fromExistingPhrase: function (phrase) {
         return new Seed(phrase);
     },
-    fromExistingPhrasesWithIndex: function (phrase, nonce) {
-        return new Seed(phrase, nonce)
+    fromExistingPhrasesWithIndex: function (phrase, nonce, networkByte) {
+        return new Seed(phrase, nonce, networkByte)
     },
     isSystemPhrase: function (wordList) {
         for (let word in wordList) {
