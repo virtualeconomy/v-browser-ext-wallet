@@ -22,7 +22,7 @@
       <div class="version">Version {{ vNumber }}
       </div>
       <div class="about_text">
-        V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode. It implements V Systems wallet format specification 1.0 and V Systems wallet QR code API 3.0.
+        V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode.<br/>It implements V Systems wallet format specification 1.0 and V Systems wallet QR code API 4.0.
       </div>
       <div class="right-reserved">@2018-2019 V SYSTEMS LIMITED All rights reserved
       </div>
@@ -69,14 +69,15 @@ export default {
     font-size:16px;
 }
 .about_text {
-    margin-top: 10px;
+    margin: 15px;
+    margin-right: 10px !important;
     color:#4F515E;
     font-size:12px;
-    margin-bottom: 10px;
     text-align: left;
 }
 .right-reserved {
-    text-align: left;
+    text-align: center;
+    width: 100%;
     color:#9091A3;
     float:left;
     font-size:10px;
