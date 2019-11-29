@@ -10,9 +10,6 @@ html, body, #app {
     margin-left: 40px !important;
     text-align: center;
 }
-.close {
-    margin-top: -64px;
-}
 .vsys-color {
     color: #FF8837 !important;
 }
