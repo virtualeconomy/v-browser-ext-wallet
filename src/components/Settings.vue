@@ -131,6 +131,8 @@ export default {
             this.$refs.settingsModal.hide()
         },
         close() {
+            this.selectedNetwork = this.networkByte
+            this.selectedSession = this.sessionTimeout
             this.$refs.settingsModal.hide()
         }
     }
