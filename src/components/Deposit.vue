@@ -71,6 +71,14 @@ export default {
     methods: {
         ok() {
             this.$emit('changePage', 'home')
+        },
+        copyAddr() {
+            this.$refs.addrToCopy.select()
+            window.document.execCommand('copy')
+            this.$root.$emit('bv::show::popover', 'btn-cpy')
+            setTimeout(() => {
+                this.$root.$emit('bv::hide::popover', 'btn-cpy')
+            }, 400)
         }
     }
 }
@@ -79,6 +87,7 @@ export default {
 <style scoped>
 .deposit-content {
     padding: 30px;
+    min-height: 500px;
 }
 #address-qrcode {
     margin-top: 30px;
@@ -87,9 +96,10 @@ export default {
 }
 .input-t {
     height: 48px;
-    font-size: 13px;
+    font-size: 12px;
     color: #181B3A;
     letter-spacing: 0;
+    padding-right: 30px;
 }
 .hidden {
     font-size: 12pt;
@@ -103,7 +113,7 @@ export default {
 .btn-copy {
     position: absolute;
     right:0;
-    margin-right: 23px;
+    margin-right: 26px;
     margin-top: -43px;
 }
 </style>
