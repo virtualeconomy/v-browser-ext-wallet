@@ -191,8 +191,8 @@ export default {
     background:rgba(255,255,255,1);
 }
 .record-icon {
-    margin-top: 16px;
-    display:inline-block;
+    position: relative;
+    /*display:inline-block;*/
 }
 .record-detail-1 {
     height: 64px;
