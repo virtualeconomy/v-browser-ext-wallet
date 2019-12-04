@@ -135,7 +135,10 @@ export default {
 }
 .transaction-record {
     z-index:1000;
-    width:328px;
+    width:327px;
     height:64px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-right:1px solid rgba(240,240,245,1);
 }
 </style>
