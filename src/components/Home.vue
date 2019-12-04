@@ -17,7 +17,7 @@
                 <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p>
             </div>
             <div class="btn">
-                <b-button class="btn-deposit" @click="showMessage">
+                <b-button class="btn-deposit" @click="deposit">
                     <img class="icon-btn"
                          src="../../static/icons/ic_deposit@3x.png"><b class="deposit-txt">Deposit</b></b-button>
                 <b-button class="btn-send" @click="send">
@@ -38,6 +38,10 @@
                   :token-name="tokenName"
                   :selected-account="selectedAccount"
                   @showNavBar="showNavBar"></Send>
+        </div>
+        <div v-else-if="page === 'deposit'">
+            <Deposit :address="addresses[selectedAccount]"
+                     @changePage="changePage"></Deposit>
         </div>
     </div>
 </template>
@@ -149,11 +153,8 @@ export default {
             }
             return amount
         },
-        showMessage() {
-            console.log(this.getSeedPhrase())
-            console.log(this.addresses)
-            console.log(this.selectedToken)
-            console.log(this.balances)
+        deposit() {
+            this.page = 'deposit'
         }
     }
 }
