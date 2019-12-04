@@ -30,7 +30,7 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <AddToken></AddToken>
+            <add-token></add-token>
         </div>
     </div>
 </template>
@@ -45,6 +45,7 @@
     import Vue from 'vue'
     import seedLib from '../libs/seed.js'
     import BigNumber from 'bignumber.js'
+    import AddToken from './AddToken.vue'
 
     export default {
         name: "Home",
@@ -52,7 +53,8 @@
             NavBar,
             Send,
             Deposit,
-            TransactionRecords
+            TransactionRecords,
+            AddToken
         },
         created() {
             if (this.wallet.password === false) {
@@ -66,7 +68,7 @@
         },
         data: function() {
             return {
-                page: 'home',
+                page: 'addToken',
                 addresses: [],
                 address: '',
                 accountName: '',

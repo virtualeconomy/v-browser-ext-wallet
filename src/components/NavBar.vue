@@ -23,7 +23,8 @@
                                   src="../../static/icons/ic_arrow_up_yellow@2x.png"/></div>
                     </b-button>
                 </div>
-                <b-popover placement="bottom"
+                <b-popover ref="popover"
+                           placement="bottom"
                            target="popover-1"
                            triggers="click"
                            boundary-padding="0"
@@ -159,6 +160,8 @@ export default {
         },
         getAddTokenSignal(data) {
             this.addTokenPage = data
+            this.$refs.popover.$emit('close')
+            this.arrPos = 'down'
             this.$emit('addTokenSig', this.addTokenPage)
         }
     },
