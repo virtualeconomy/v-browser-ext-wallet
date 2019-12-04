@@ -4,6 +4,7 @@
 }
 html, body, #app {
     font-family: 'Roboto-Regular' !important;
+    background:rgba(247,247,252,1);
 }
 .details-dialog {
     width: 280px !important;
