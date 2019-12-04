@@ -34,7 +34,9 @@
                   :address="addresses[selectedAccount]"
                   :account-name="accountNames[selectedAccount]"
                   :balances="balances"
+                  :network-byte="networkByte"
                   :token-name="tokenName"
+                  :selected-account="selectedAccount"
                   @showNavBar="showNavBar"></Send>
         </div>
     </div>

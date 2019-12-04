@@ -84,11 +84,55 @@
                     :data-jdenticon-hash="avatarDataHex(address)"></canvas>
             <p class="account-name">{{ recipient }}</p>
         </div>
-        <div style="background: rgba(247,247,252,1); height: 112px"></div>
+        <div style="background: rgba(247,247,252,1);">
+            <div style="margin: 16px 0px 24px 16px">
+                <div style="height: 20px; margin-bottom: 12px;">
+                    <p class="p4">SEND VSYS</p>
+                </div>
+                <div style="height: 40px;">
+                    <img style="display: inline-block; position: fixed; left: 16px;" width="40" height="40" src="../../static/icons/ic_v_logo@3x.png"/>
+                    <p class="p5">{{ amount }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="details">
+            <label>Fee</label>
+            <p>0.1</p>
+        </div>
+        <div class="details">
+            <label>Total</label>
+            <p> {{ amount + 0.1 }}<span> VSYS</span></p>
+        </div>
+        <div class="details" style="height: 72px;">
+            <label style="margin-top: 28px;">Description</label>
+            <p style="margin-top: 24px; color:rgba(50,50,51,1); font-size: 14px;">{{ description }}</p>
+        </div>
+        <b-row class="button-row">
+            <b-col class="col-lef">
+                <b-button
+                        class="btn-cancel"
+                        block
+                        variant="light"
+                        size="lg"
+                        @click="edit">Cancel
+                </b-button>
+            </b-col>
+            <b-col class="col-rit">
+                <b-button
+                        block
+                        class="btn-next"
+                        variant="warning"
+                        size="lg"
+                        @click="confirm">Confirm
+                </b-button>
+            </b-col>
+        </b-row>
     </div>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'
+import seedLib from '../libs/seed.js'
+import Transaction from '../js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import jdenticon from 'jdenticon'
 import converters from '../js-v-sdk/src/utils/converters.js'
@@ -100,7 +144,7 @@ export default {
           recipient: 'AUAztxsft2v6rmjRRb72nLea6BNyRHHWpUR',
           amount: 12,
           unity: 8,
-          description: '',
+          description: 'This is my first send VSYS',
           pageId: 0
       }
     },
@@ -124,6 +168,16 @@ export default {
             type: String,
             require: true,
             default: 'VSYS'
+        },
+        networkByte: {
+            type: Number,
+            require: true,
+            default: 84
+        },
+        selectedAccount: {
+            type: Number,
+            require: true,
+            default: 0
         }
     },
     mounted() {
@@ -131,7 +185,9 @@ export default {
     },
     computed: {
         ...mapState({
-            account: state => state.API.account
+            account: state => state.API.account,
+            chain: state => state.API.chain,
+            wallet: state => state.wallet,
         }),
         isValidRecipient() {
             let recipient = this.recipient
@@ -183,6 +239,18 @@ export default {
         isSubmitDisabled() {
             return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+        },
+        getKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase, this.selectedAccount, this.networkByte).keyPair
+        },
+        getSeedPhrase() {
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+            }
+        },
     },
     methods: {
         avatarDataHex(address) {
@@ -198,6 +266,18 @@ export default {
         edit() {
             this.$emit('showNavBar', true)
             this.pageId = 0
+        },
+        confirm() {
+            let tra = new Transaction(this.networkByte)
+            tra.buildPaymentTx(this.getKeypair.publicKey, this.recipient, this.amount, this.description, Date.now() * 1e6)
+            this.account.buildFromPrivateKey(this.getKeypair.privateKey)
+            let signature = this.account.getSignature(tra.toBytes())
+            let sendTx = tra.toJsonForSendingTx(signature)
+            this.chain.sendPaymentTx(sendTx).then( response => {
+                this.$emit('showNavBar', true)
+                this.$emit('changePage', 'home')
+            }, respErr => {
+            })
         }
     }
 }
@@ -234,6 +314,30 @@ export default {
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:16px;
+}
+.p4 {
+    float: left;
+    padding: 3px 6px;
+    height:20px;
+    background:rgba(247,247,252,1);
+    border-radius:2px;
+    border:1px solid rgba(230,230,237,1);
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:14px;
+}
+.p5 {
+    margin-top: 4px;
+    margin-bottom: 3px;
+    position: fixed;
+    left: 68px;
+    font-size:28px;
+    font-family:Roboto-Regular,Roboto;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:33px;
 }
 .amount {
     height:16px;
@@ -370,5 +474,36 @@ export default {
     color:rgba(50,50,51,1);
     line-height:16px;
     margin: 20px 0px;
+}
+.details {
+    height: 98px;
+    background:rgba(255,255,255,1);
+    border-bottom: 1px solid rgba(240,240,245,1);
+}
+.details label {
+    margin-top: 42px;
+    margin-left: 16px;
+    display: inline-block;
+    float: left;
+    font-size:14px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:16px;
+}
+.details p {
+    margin-right: 16px;
+    float: right;
+    font-size:20px;
+    margin-top: 42px;
+    font-family:Roboto-Regular,Roboto;
+    font-weight:400;
+    color:red;
+    line-height:24px;
+}
+.button-row {
+    padding: 16px 24px;
+    height:76px;
+    background:rgba(255,255,255,1);
 }
 </style>
