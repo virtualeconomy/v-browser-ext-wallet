@@ -7,6 +7,7 @@
         <transaction-record v-for="txRecord in txRecords"
                             :tx-record="txRecord"
                             :address="address"
+                            :current-height="currentHeight"
                             class="transaction-record"></transaction-record>
     </div>
 </template>
@@ -27,10 +28,12 @@ export default {
     },
     created() {
         this.getTxRecords()
+        this.getCurrentHeight()
     },
     data: function() {
         return {
-            txRecords: {}
+            txRecords: {},
+            currentHeight: 0
         }
     },
     props: {
@@ -56,6 +59,13 @@ export default {
         })
     },
     methods: {
+        getCurrentHeight() {
+            this.chain.getHeight().then(response => {
+                this.currentHeight = response.height
+            }, respErr => {
+                this.currentHeight = 0
+            })
+        },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
                 window.open(ADDRESS_TEST_EXPLORER + this.address)
@@ -80,12 +90,6 @@ export default {
                         //     recItem['sentToken'] = true
                         //     recItem['officialName'] = certify.officialName(tokenId)
                         // }
-                    }
-                    if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
-                        let recItemCopy = JSON.parse(JSON.stringify(recItem))
-                        recItemCopy['SelfSend'] = true
-                        recItemCopy['index'] = ++count
-                        Vue.set(recList, count++, recItem)
                     }
                     return recList
                 }, {})
