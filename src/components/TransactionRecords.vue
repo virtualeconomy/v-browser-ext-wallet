@@ -9,6 +9,14 @@
                             :address="address"
                             :current-height="currentHeight"
                             class="transaction-record"></transaction-record>
+        <img height="50"
+             width="50"
+             v-if="Object.keys(txRecords).length === 0 && showDisable"
+             src="../../static/icons/ic_wait.svg">
+        <div v-if="Object.keys(txRecords).length === 0 && !showDisable"
+             class="empty">
+          There is no transaction record.
+        </div>
     </div>
 </template>
 
@@ -33,7 +41,8 @@ export default {
     data: function() {
         return {
             txRecords: {},
-            currentHeight: 0
+            currentHeight: 0,
+            showDisable: false
         }
     },
     props: {
@@ -74,6 +83,7 @@ export default {
             }
         },
         getTxRecords() {
+            this.showDisable = true
             const addr = this.address
             this.chain.getTxHistory(addr, 3).then(response => {
                 this.response = response[0]
@@ -93,7 +103,9 @@ export default {
                     }
                     return recList
                 }, {})
+                this.showDisable = false
             }, respErr => {
+                this.showDisable = false
             })
         }
     }
@@ -102,10 +114,12 @@ export default {
 
 <style scoped>
 .records {
+    text-align: center;
     background:rgba(255,255,255,1);
     border:1px solid rgba(240,240,245,1);
 }
 .his-pane {
+    text-align: left;
     width:328px;
     height:48px;
     border-bottom:1px solid rgba(240,240,245,1);
@@ -144,5 +158,9 @@ export default {
     padding-left: 12px;
     padding-right: 12px;
     border-right:1px solid rgba(240,240,245,1);
+}
+.empty {
+    padding: 24px 0;
+    color: rgba(169,169,176,1);
 }
 </style>

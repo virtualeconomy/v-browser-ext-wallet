@@ -146,6 +146,7 @@ export default {
 
         },
         showBalance(balance) {
+            if (balance === undefined) return 'NaN'
             let amount = String(balance)
             if (amount.length >= 14) {
                 let index = amount.indexOf('.')
