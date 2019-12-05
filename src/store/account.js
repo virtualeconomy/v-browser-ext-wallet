@@ -5,7 +5,7 @@ export default {
         accountNames: ['Account 1'],
         selectedAccount: 0,
         selectedToken: 'VSYS',
-        tokenRecords: {}
+        tokenRecords: []
     },
 
     mutations: {
@@ -15,8 +15,8 @@ export default {
         updateSelectedAccount(state, index) {
             state.selectedAccount = index
         },
-        addToken(state, token) {
-            state.tokenRecords.push(token)
+        addToken(state, tokenInfo) {
+            state.tokenRecords.push(tokenInfo)
         },
     }
 

@@ -13,7 +13,41 @@
                             <div><span>Verified Token</span></div>
                         </template>
                         <div class="content">
-                            <verified-token></verified-token>
+                            <div class="accounts-part">
+                                <div class="scroll"
+                                     :style="{height: '264px'}">
+                                    <div v-for="(certifiedToken, idx) in certifiedTokens"
+                                         :key="idx">
+                                        <b-btn class="token-unit">
+                                            <div class="token-svg"><img width="56px"
+                                                                        height="56px"
+                                                                        :src="certifiedTokenSvg(certifiedToken['name'])"></div>
+                                            <div  class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                        </b-btn>
+                                    </div>
+                                </div>
+                            </div>
+                            <b-row class="button-row">
+                                <b-col class="col-lef">
+                                    <b-button
+                                            class="btn-cancel"
+                                            block
+                                            variant="light"
+                                            size="lg"
+                                            @click="close">Cancel
+                                    </b-button>
+                                </b-col>
+                                <b-col class="col-rig">
+                                    <b-button
+                                            block
+                                            class="btn-confirm"
+                                            variant="warning"
+                                            size="lg"
+                                            :disabled="isSubmitDisabled"
+                                            @click="addToken">Add
+                                    </b-button>
+                                </b-col>
+                            </b-row>
                         </div>
                     </b-tab>
                     <b-tab active>
@@ -46,7 +80,7 @@
                                             variant="warning"
                                             size="lg"
                                             :disabled="isSubmitDisabled"
-                                            @click="createAccount">Add
+                                            @click="addToken">Add
                                     </b-button>
                                 </b-col>
                             </b-row>
@@ -60,6 +94,8 @@
 
 <script>
     import VerifiedToken from './VerifiedToken.vue'
+    import { mapState } from 'vuex'
+    import CertifiedTokens from '../utils/certify.js'
     export default {
         name: "AddToken",
         components: {
@@ -69,17 +105,37 @@
             return {
                 activeTab: 'verified',
                 tokenID: '',
-                tokenSymbol: ''
+                tokenSymbol: '',
+                tokenInfo: {},
+                certifiedTokens: CertifiedTokens.certifiedTokens()
             }
+        },
+        computed: {
+            ...mapState({
+                tokenRecords: state => state.account.tokenRecords
+            }),
         },
         methods: {
             tranTabChange(tabIndex) {
+                console.log(this.tokenRecords)
+                console.log(this.certifiedTokens[0]['tokenID'])
                 if (tabIndex === 0) {
                     this.activeTab = 'verified'
                 } else if (tabIndex === 1) {
                     this.activeTab = 'custom'
                 }
             },
+            addToken() {
+                console.log(this.tokenID)
+                console.log(this.tokenSymbol)
+                this.tokenInfo = {'tokenID' : this.tokenID, 'tokenSymbol' : this.tokenSymbol}
+                this.$store.commit('account/addToken', JSON.stringify(this.tokenInfo))
+            },
+            close() {
+            },
+            certifiedTokenSvg(name) {
+                return "../../static/icons/token/" + name + ".svg"
+            }
         }
     }
 </script>
@@ -179,5 +235,54 @@
     padding-right: 0px;
     padding-left: 0px;
     margin-right: -15px;
+}
+.accounts-part {
+    width: 100%;
+    padding-top: 24px;
+    padding-bottom: 48px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
+}
+.token-unit, .token-unit:hover {
+    width: 320px;
+    height: 88px;
+    background: rgba(247,247,252,1);
+    border-radius: 4px;
+    padding-left: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    border: rgba(247,247,252,1);
+}
+.token-unit:active, .token-unit:focus, .token-unit:active:focus {
+    width: 320px;
+    height: 88px;
+    background: rgba(247, 247, 252, 1);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 136, 55, 1);
+    padding-left: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
+.token-svg {
+    display:inline-block;
+    float: left;
+}
+.cer-name {
+    display:inline-block;
+    float: left;
+    position: relative;
+    top: 17px;
+    left: 16px;
+    height:21px;
+    font-size:18px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:21px;
 }
 </style>
