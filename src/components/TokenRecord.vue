@@ -1,7 +1,8 @@
 <template>
-    <b-container class="record-unit"
-                 fluid>
-        <b-row align-v="center">
+    <b-btn class="record-unit"
+           @click="addConfirm"
+           fluid>
+        <b-row>
             <b-col class="record-icon">
                 <img width="56px"
                      height="56px"
@@ -9,7 +10,7 @@
             </b-col>
             <b-col class="record-detail">
                 <div style="float:left">
-                    <div style="display: inline-block"><span class="token-balance">{{tokenBalance}}</span></div>
+                    <div style="display: inline-block"><span class="token-balance">{{showBalance(tokenBalance)}}</span></div>
                     <div style="display: inline-block"><span class="unity">{{ ' ' + tokenSymbol }}</span></div>
                 </div>
             </b-col>
@@ -30,7 +31,7 @@
                 </b-dropdown>
             </b-col>
         </b-row>
-    </b-container>
+    </b-btn>
 </template>
 
 <script>
@@ -91,27 +92,49 @@ export default {
             } else {
                 return "../../static/icons/token/other.svg"
             }
-        }
+        },
+        addConfirm() {
+            console.log('delete')
+        },
+        showBalance(balance) {
+            let amount = String(balance)
+            if (amount.length >= 7) {
+                // let index = amount.indexOf('.')
+                amount = amount.slice(0, 7) + '...'
+            }
+            return amount
+        },
     }
 }
 </script>
 
 <style scoped>
-.record-unit {
+.record-unit, .record-unit:hover {
+    width:320px;
+    height:88px;
     background:rgba(255,255,255,1);
     border-radius:4px;
-    width: 320px;
-    /*height: 88px;*/
+    padding-left: 20px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    border: rgba(255,255,255,1);
 }
-.record-unit:hover {
+.record-unit:active, .record-unit:focus, .record-unit:active:focus {
+    width:320px;
+    height:88px;
     background:rgba(233,233,242,1);
     border-radius:4px;
-    width: 320px;
+    border:rgba(233,233,242,1);
+    padding-left: 20px;
+    padding-bottom: 16px;
+    padding-top: 16px;
 }
 .record-action {
-    /*flex-grow: 0;*/
+    position: relative;
+    left: 40px;
+    padding-top: 10px;
     padding-right: 12px;
-    max-width: 60px;
+    padding-left: 0px;
 }
 .more-btn {
     background: none;
@@ -119,6 +142,7 @@ export default {
     padding: 0 0;
 }
 .token-balance {
+    float: left;
     font-size:24px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
@@ -126,6 +150,8 @@ export default {
     line-height:28px;
 }
 .unity {
+    padding-left: 4px;
+    float: left;
     font-size:14px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
@@ -137,43 +163,14 @@ export default {
     padding: 0 0;
 }
 .record-icon {
-    flex-grow: 0;
-    padding-left: 20px;
-    padding-right: 16px;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    display:inline-block;
+    float: left;
+    padding: 0 0;
 }
 .record-detail {
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 30px;
-    padding-bottom: 29px;
+    padding-top: 15px;
+    padding-left: 0px;
+    padding-right: 0px;
     min-width: 150px;
-}
-.hide-bg {
-    padding: 0 0;
-    background:rgba(50,50,51,1);
-    border-radius:4px 4px 0px 0px;
-    opacity:0.89;
-}
-.hide-word {
-    font-size:14px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(255,255,255,1);
-    line-height:16px;
-}
-.exp-bg {
-    padding: 0 0;
-    background:rgba(50,50,51,1);
-    border-radius:0px 0px 4px 4px;
-    opacity:0.89;
-}
-.exp-word {
-    font-size:14px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(255,255,255,1);
-    line-height:16px;
 }
 </style>

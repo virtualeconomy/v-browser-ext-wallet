@@ -41,11 +41,11 @@
             <div class="accounts-part">
                 <div class="scroll"
                      :style="{height: '176px'}">
-                    <TokenRecord v-for="(tokenRecord, idx) in tokenRecords"
+                    <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
                                  :address="addresses[selectedAccount]"
-                                 :token-id="tokenRecord['tokenId']"
-                                 :token-symbol="tokenRecord['tokenSymbol']"></TokenRecord>
+                                 :token-id="tokenId"
+                                 :token-symbol="tokenRecords[tokenId]"></TokenRecord>
                 </div>
             </div>
             <div class="tip-part">
@@ -107,7 +107,7 @@ export default {
     },
     methods: {
         addToken() {
-            this.$emit('addTokenSig', this.addTokenPage)
+            this.$emit('changePage', this.addTokenPage)
         },
         jumpDetail() {
         },

@@ -7,7 +7,7 @@
                  :balances="balances"
                  :token-name="tokenName"
                  :selected-account="selectedAccount"
-                 @addTokenSig="changePage"></nav-bar>
+                 @changePage="changePage"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
             <div>
@@ -31,7 +31,8 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <add-token @addTokenSig="changePage"></add-token>
+            <add-token @changePage="changePage"></add-token>
+        </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
                   :address="addresses[selectedAccount]"

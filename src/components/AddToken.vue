@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState } from 'vuex'
 import CertifiedTokens from '../utils/certify.js'
 export default {
@@ -122,12 +123,13 @@ export default {
             }
         },
         addToken() {
-            this.tokenInfo = {tokenId : this.tokenId, tokenSymbol : this.tokenSymbol}
-            this.$store.commit('account/addToken', this.tokenInfo)
-            this.$emit('addTokenSig', 'home')
+            let tmp = this.tokenRecords
+            Vue.set(tmp, this.tokenId, this.tokenSymbol)
+            this.$store.commit('account/addToken', tmp)
+            this.$emit('changePage', 'home')
         },
         close() {
-            this.$emit('addTokenSig', 'home')
+            this.$emit('changePage', 'home')
         },
         certifiedTokenSvg(name) {
             return "../../static/icons/token/" + name + ".svg"
