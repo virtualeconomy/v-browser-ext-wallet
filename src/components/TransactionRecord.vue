@@ -48,7 +48,7 @@
                    col="auto"
                    align-v="left">
                 <b-row>
-                    <b-col class="record-type">{{ txTitle }}</b-col>
+                    <b-col :class="{'record-type': true, 'short-name': true, 'long-name': isLongName }">{{ txTitle }}</b-col>
                 </b-row>
                 <b-row>
                     <b-col class="record-time">{{ txMonthStr }}/{{ txDayStr }}/{{ txYearStr }} at {{ txHourStr }}:{{ txMinuteStr }}</b-col>
@@ -61,7 +61,9 @@
                     <b-col class="record-amount">-800 VSYS</b-col>
                 </b-row>
                 <b-row>
-                    <b-col><span class="record-status">CONDIRMED</span></b-col>
+                    <b-col class="record-status">
+                        <span :class="[ isConfirmed ? 'record-confirmed' : 'record-unconfirmed' ]">{{ isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'}}</span>
+                    </b-col>
                 </b-row>
             </b-col>
         </b-row>
@@ -88,12 +90,17 @@ export default {
         address: {
             type: String,
             default: ''
+        },
+        currentHeight: {
+            type: Number,
+            default: 0
         }
     },
     computed: {
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
-                if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                let selfSend = this.txRecord['proofs'] ? this.txRecord['proofs'][0]['address'] : 'no sender'
+                if (this.txRecord.recipient === this.address && this.address !== selfSend) {
                     return 'Received'
                 } else {
                     return 'Sent'
@@ -121,6 +128,12 @@ export default {
             } else {
                 return 'Received'
             }
+        },
+        isLongName() {
+            return this.txType === 'Leased Out Canceled' || this.txType === 'Leased In Canceled' || this.txType === 'Execute Contract Function'
+        },
+        isConfirmed() {
+            return this.currentHeight - this.txRecord.height > 30
         },
         txIcon() {
             return this.txType.toString().toLowerCase()
@@ -191,42 +204,49 @@ export default {
     background:rgba(255,255,255,1);
 }
 .record-icon {
-    position: relative;
-    /*display:inline-block;*/
+    padding: 16px 12px;
+    display:inline-block;
 }
 .record-detail-1 {
+    width: 120px;
     height: 64px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     display:inline-block;
     text-align:left;
     border-bottom:1px solid rgba(240,240,245,1);
 }
 .record-type {
-    margin-left: -15px;
-    margin-top: 16px;
     font-size:14px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:16px;
 }
+.long-name {
+    margin-top: 8px !important;
+}
+.short-name {
+    margin-top: 16px;
+}
 .record-time {
-    margin-left: -15px;
     margin-top: 3px;
     font-size:11px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:13px;
-    width: 102px;
-    margin-right: 0px;
-    white-space: nowrap;
 }
 .record-detail-2 {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     height: 64px;
     text-align:right;
     border-bottom:1px solid rgba(240,240,245,1);
 }
 .record-amount {
+    margin-right: 30px;
+    padding: 0px !important;
     margin-top: 16px;
     font-size:14px;
     font-family:Roboto-Regular,Roboto;
@@ -234,16 +254,26 @@ export default {
     color:rgba(50,50,51,1);
     line-height:16px;
 }
+.record-confirmed {
+    color:rgba(113,145,0,1);
+    line-height:12px;
+    background:rgba(235,250,215,1);
+    border-radius:2px;
+    padding: 1px 4px 3px 4px;
+}
 .record-status {
+    margin-right: 30px;
+    padding: 0px !important;
     margin-top: 3px;
     font-size:10px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
-    color:rgba(113,145,0,1);
+}
+.record-unconfirmed {
+    color:#F5354B;
     line-height:12px;
-    background-size:69px 16px;
-    background:rgba(235,250,215,1);
+    background: #FFE6E8;
     border-radius:2px;
-    padding: 3px 3px;
+    padding: 1px 4px 3px 4px;
 }
 </style>

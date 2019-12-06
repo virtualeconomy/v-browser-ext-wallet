@@ -1,12 +1,13 @@
 <template>
     <div class="home">
-        <nav-bar class="nav-bar"
+        <nav-bar v-show="showNav"
+                 class="nav-bar"
                  :addresses="addresses"
                  :account-names="accountNames"
                  :balances="balances"
                  :token-name="tokenName"
                  :selected-account="selectedAccount"
-                 @addTokenSig="getPageSignal"></nav-bar>
+                 @addTokenSig="changePage"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
             <div>
@@ -17,7 +18,7 @@
                 <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
-                <b-button class="btn-deposit" @click="showMessage">
+                <b-button class="btn-deposit" @click="deposit">
                     <img class="icon-btn"
                          src="../../static/icons/ic_deposit@3x.png"><b class="deposit-txt">Deposit</b></b-button>
                 <b-button class="btn-send" @click="send">
@@ -30,7 +31,20 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <add-token @addTokenSig="getPageSignal"></add-token>
+            <add-token @addTokenSig="changePage"></add-token>
+        <div v-else-if="page === 'send'">
+            <Send @changePage="changePage"
+                  :address="addresses[selectedAccount]"
+                  :account-name="accountNames[selectedAccount]"
+                  :balances="balances"
+                  :network-byte="networkByte"
+                  :token-name="tokenName"
+                  :selected-account="selectedAccount"
+                  @showNavBar="showNavBar"></Send>
+        </div>
+        <div v-else-if="page === 'deposit'">
+            <Deposit :address="addresses[selectedAccount]"
+                     @changePage="changePage"></Deposit>
         </div>
     </div>
 </template>
@@ -60,7 +74,7 @@ export default {
         if (this.wallet.password === false) {
             this.$router.push('/login')
         }
-        this.$store.commit('API/updateChain', this.networkByte)
+        this.$store.commit('API/updateAPI', this.networkByte)
         this.getAddresses()
         this.getBalances()
         this.address = this.addresses[this.selectedAccount]
@@ -72,7 +86,8 @@ export default {
             addresses: [],
             address: '',
             accountName: '',
-            balances: {}
+            balances: {},
+            showNav: true
         }
     },
     computed: {
@@ -104,6 +119,12 @@ export default {
         send() {
             this.page = 'send'
         },
+        changePage(pageName) {
+            this.page = pageName
+        },
+        showNavBar(temp) {
+            this.showNav = temp
+        },
         getSeedPhrase() {
             if (this.secretInfo) {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
@@ -130,6 +151,7 @@ export default {
 
         },
         showBalance(balance) {
+            if (balance === undefined) return 'NaN'
             let amount = String(balance)
             if (amount.length >= 14) {
                 let index = amount.indexOf('.')
@@ -137,14 +159,8 @@ export default {
             }
             return amount
         },
-        showMessage() {
-            console.log(this.getSeedPhrase())
-            console.log(this.addresses)
-            console.log(this.selectedToken)
-            console.log(this.balances)
-        },
-        getPageSignal(data) {
-            this.page = data
+        deposit() {
+            this.page = 'deposit'
         }
     }
 }

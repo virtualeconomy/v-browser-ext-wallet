@@ -7,7 +7,17 @@
         <transaction-record v-for="txRecord in txRecords"
                             :tx-record="txRecord"
                             :address="address"
+                            :current-height="currentHeight"
                             class="transaction-record"></transaction-record>
+        <img height="50"
+             width="50"
+             class="wait-icon"
+             v-if="showDisable"
+             src="../../static/icons/ic_wait.svg">
+        <div v-if="Object.keys(txRecords).length === 0 && !showDisable"
+             class="empty">
+          There is no transaction record.
+        </div>
     </div>
 </template>
 
@@ -27,10 +37,13 @@ export default {
     },
     created() {
         this.getTxRecords()
+        this.getCurrentHeight()
     },
     data: function() {
         return {
-            txRecords: {}
+            txRecords: {},
+            currentHeight: 0,
+            showDisable: false
         }
     },
     props: {
@@ -56,6 +69,13 @@ export default {
         })
     },
     methods: {
+        getCurrentHeight() {
+            this.chain.getHeight().then(response => {
+                this.currentHeight = response.height
+            }, respErr => {
+                this.currentHeight = 0
+            })
+        },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
                 window.open(ADDRESS_TEST_EXPLORER + this.address)
@@ -64,6 +84,7 @@ export default {
             }
         },
         getTxRecords() {
+            this.showDisable = true
             const addr = this.address
             this.chain.getTxHistory(addr, 3).then(response => {
                 this.response = response[0]
@@ -81,15 +102,11 @@ export default {
                         //     recItem['officialName'] = certify.officialName(tokenId)
                         // }
                     }
-                    if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
-                        let recItemCopy = JSON.parse(JSON.stringify(recItem))
-                        recItemCopy['SelfSend'] = true
-                        recItemCopy['index'] = ++count
-                        Vue.set(recList, count++, recItem)
-                    }
                     return recList
                 }, {})
+                this.showDisable = false
             }, respErr => {
+                this.showDisable = false
             })
         }
     }
@@ -98,10 +115,12 @@ export default {
 
 <style scoped>
 .records {
+    text-align: center;
     background:rgba(255,255,255,1);
     border:1px solid rgba(240,240,245,1);
 }
 .his-pane {
+    text-align: left;
     width:328px;
     height:48px;
     border-bottom:1px solid rgba(240,240,245,1);
@@ -135,7 +154,17 @@ export default {
 }
 .transaction-record {
     z-index:1000;
-    width:328px;
+    width:327px;
     height:64px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-right:1px solid rgba(240,240,245,1);
+}
+.empty {
+    padding: 80px 0;
+    color: rgba(169,169,176,1);
+}
+.wait-icon {
+    margin-top: 80px;
 }
 </style>
