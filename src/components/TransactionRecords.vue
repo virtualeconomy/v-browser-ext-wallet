@@ -12,7 +12,7 @@
         <img height="50"
              width="50"
              class="wait-icon"
-             v-if="Object.keys(txRecords).length === 0 && showDisable"
+             v-if="showDisable"
              src="../../static/icons/ic_wait.svg">
         <div v-if="Object.keys(txRecords).length === 0 && !showDisable"
              class="empty">
