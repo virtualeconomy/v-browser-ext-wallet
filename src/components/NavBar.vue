@@ -5,8 +5,37 @@
               <img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png">
             </b-navbar-brand>
             <b-navbar-nav class="account">
-              <p class="account-name">{{ accountNames[selectedAccount] }}</p>
-              <p class="account-address">{{ addressShow }}</p>
+                <p class="account-name">{{ accountNames[selectedAccount] }}</p>
+                <p class="account-address">{{ addressShow }}</p>
+                <div class="tokens-detail">
+                    <b-button id="popover-1"
+                              class="token-detail"
+                              variant="link"
+                              align="center"
+                              @click="changeArrPos">
+                        <div><img v-if="arrPos==='down'"
+                                  width="10px"
+                                  height="6px"
+                                  src="../../static/icons/ic_arrow_down_yellow@3x.png"/></div>
+                        <div><img v-if="arrPos==='up'"
+                                  width="10px"
+                                  height="6px"
+                                  src="../../static/icons/ic_arrow_up_yellow@2x.png"/></div>
+                    </b-button>
+                </div>
+                <b-popover ref="popover"
+                           placement="bottom"
+                           target="popover-1"
+                           triggers="click"
+                           boundary-padding="0"
+                           no-fade="false">
+                    <token-select class="token-select"
+                                  :addresses="addresses"
+                                  :selected-account="selectedAccount"
+                                  :account-names="accountNames"
+                                  :avt-hash="avtHash"
+                                  @changePage="changePage"></token-select>
+                </b-popover>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
               <b-nav-item-dropdown right
@@ -56,10 +85,20 @@ import Details from './Details.vue'
 import AddAccount from './AddAccount.vue'
 import Settings from './Settings.vue'
 import About from './About.vue'
+import TokenSelect from "./TokenSelect.vue"
 export default {
     name: "NavBar",
     mounted() {
       jdenticon()
+    },
+    data() {
+        return {
+            Records: {
+                'test': 999,
+            },
+            avtHash: '555077584842597e4246',
+            arrPos: 'down'
+        }
     },
     props: {
         addresses: {
@@ -92,6 +131,7 @@ export default {
     components: {
         Details,
         AddAccount,
+        TokenSelect,
         Settings,
         About
     },
@@ -113,6 +153,14 @@ export default {
         },
         select(index) {
             this.$store.commit('account/updateSelectedAccount', index)
+        },
+        changeArrPos() {
+            this.arrPos = this.arrPos === 'down' ? 'up' : 'down';
+        },
+        changePage(data) {
+            this.$refs.popover.$emit('close')
+            this.arrPos = 'down'
+            this.$emit('changePage', data)
         }
     },
     computed: {
@@ -174,29 +222,28 @@ export default {
     background:#FFFFFF;
 }
 .account {
+    text-align: center;
     flex-direction: column !important;
-    margin-left: 75px;
+    margin-left: 76px;
 }
 .account-name {
-    width:110px;
-    height:19px;
-    font-size:16px;
-    font-family:SFProText-Medium,SFProText;
-    font-weight:500;
-    color:rgba(50,50,51,1);
-    line-height:19px;
+    font-size: 16px;
+    font-family: SFProText-Medium,SFProText;
+    font-weight: 500;
+    color: rgba(50,50,51,1);
+    line-height: 19px;
     text-align: center;
-    margin-top: 20px;
+    position: relative;
+    top: 8px;
 }
 .account-address {
-    width:110px;
-    height:14px;
-    font-size:12px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(169,169,176,1);
-    line-height:14px;
-    margin-top: -15px;
+    font-size: 12px;
+    font-family: SFProText-Regular,SFProText;
+    font-weight: 400;
+    color: rgba(169,169,176,1);
+    line-height: 14px;
+    margin-top: -8px;
+    margin-bottom: 0px;
 }
 .address-item {
     width:67px;
@@ -218,13 +265,25 @@ export default {
     line-height:13px;
     margin-bottom: 4px;
 }
-.selected-account {
-    border:1px solid rgba(255,136,55,1);
-}
 .select {
     margin-top: -25px;
     margin-left: 25px;
     display: inline-block;
+}
+.tokens-detail{
+    margin: 0 auto;
+    position: relative;
+    top: -8px;
+}
+.token-detail {
+    position: relative;
+    padding: 0 0;
+    height: 18px;
+}
+.token-select {
+    position: relative;
+    z-index:1000;
+    max-width: 340px;
 }
 
 </style>

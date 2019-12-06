@@ -6,15 +6,16 @@
                  :account-names="accountNames"
                  :balances="balances"
                  :token-name="tokenName"
-                 :selected-account="selectedAccount"></nav-bar>
+                 :selected-account="selectedAccount"
+                 @changePage="changePage"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
             <div>
                 <img class="token-icon"
-                     src="../../static/icons/ic_v_logo@3x.png">
+                src="../../static/icons/ic_v_logo@3x.png">
             </div>
             <div class="balance">
-                <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p>
+                <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
                 <b-button class="btn-deposit" @click="deposit">
@@ -28,6 +29,9 @@
                                  :network-byte="networkByte"
                                  :token-name="tokenName"
                                  :address="address"></transaction-records>
+        </div>
+        <div v-else-if="page === 'addToken'">
+            <add-token @changePage="changePage"></add-token>
         </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
@@ -56,6 +60,7 @@ import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Vue from 'vue'
 import seedLib from '../libs/seed.js'
 import BigNumber from 'bignumber.js'
+import AddToken from './AddToken.vue'
 
 export default {
     name: "Home",
@@ -63,7 +68,8 @@ export default {
         NavBar,
         Send,
         Deposit,
-        TransactionRecords
+        TransactionRecords,
+        AddToken
     },
     created() {
         if (this.wallet.password === false) {
