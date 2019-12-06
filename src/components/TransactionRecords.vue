@@ -11,6 +11,7 @@
                             class="transaction-record"></transaction-record>
         <img height="50"
              width="50"
+             class="wait-icon"
              v-if="Object.keys(txRecords).length === 0 && showDisable"
              src="../../static/icons/ic_wait.svg">
         <div v-if="Object.keys(txRecords).length === 0 && !showDisable"
@@ -160,7 +161,10 @@ export default {
     border-right:1px solid rgba(240,240,245,1);
 }
 .empty {
-    padding: 24px 0;
+    padding: 80px 0;
     color: rgba(169,169,176,1);
+}
+.wait-icon {
+    margin-top: 80px;
 }
 </style>
