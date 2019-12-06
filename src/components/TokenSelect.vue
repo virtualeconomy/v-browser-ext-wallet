@@ -21,10 +21,14 @@
                         </div>
                     </div>
                     <div class="copy">
-                        <div class="inline-p"><span class="p3">{{addressShow}}</span></div>
+                        <div class="inline-p"><span class="p3"
+                                                    id="addrToCopy"
+                                                    ref="addrToCopy">{{addressShow}}</span></div>
                         <div class="copy-icon-p">
                             <b-btn class="copy-icon" variant="link"
-                                   @click="copyAddress">
+                                   id="addr-cpy"
+                                   v-b-popover.click.topright="'Copied!'"
+                                   @click="copyAddress('addr-cpy', 'addrToCopy')">
                                 <img width="12px"
                                      height="12px"
                                      src="../../static/icons/ic_copy@2x.png">
@@ -37,22 +41,11 @@
             <div class="accounts-part">
                 <div class="scroll"
                      :style="{height: '176px'}">
-                    <!--<TokenRecord v-for="tokenId in tokenRecords"-->
-                                 <!--:key="tokenId"-->
-                                 <!--:token-id="tokenId"-->
-                                 <!--:address="this.addresses[selectedAccount]"-->
-                                 <!--:token-name="tokenName"-->
-                                 <!--:token-balance="tokenBalance"></TokenRecord>-->
-                    <TokenRecord :key="tokenId"
-                                 :token-id="tokenId"
-                                 :address="this.addresses[selectedAccount]"
-                                 :token-name="tokenName"
-                                 :token-balance="tokenBalance"></TokenRecord>
-                    <TokenRecord :key="tokenId"
-                                 :token-id="tokenId"
-                                 :address="this.addresses[selectedAccount]"
-                                 :token-name="tokenName"
-                                 :token-balance="tokenBalance"></TokenRecord>
+                    <TokenRecord v-for="(tokenRecord, idx) in tokenRecords"
+                                 :key="idx"
+                                 :address="addresses[selectedAccount]"
+                                 :token-id="tokenRecord['tokenId']"
+                                 :token-symbol="tokenRecord['tokenSymbol']"></TokenRecord>
                 </div>
             </div>
             <div class="tip-part">
@@ -74,7 +67,7 @@
 </template>
 
 <script>
-// import Vue from 'vue'
+import Vue from 'vue'
 import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
@@ -85,14 +78,14 @@ export default {
         TokenRecord,
         AddToken
     },
-    created() {
-    },
     data() {
         return {
             tokenName: 'VSYS',
             tokenBalance: 3097.7997,
             addTokenPage: 'addToken'
         }
+    },
+    created() {
     },
     props: {
         addresses: {
@@ -110,10 +103,6 @@ export default {
             require: true,
             default: function() {
             }
-        },
-        avtHash: {
-            type: String,
-            default: ''
         }
     },
     methods: {
@@ -122,7 +111,13 @@ export default {
         },
         jumpDetail() {
         },
-        copyAddress() {
+        copyAddress(buttonId, refName) {
+            this.$refs[refName].select()
+            window.document.execCommand('copy')
+            this.$root.$emit('bv::show::popover', buttonId)
+            setTimeout(() => {
+                this.$root.$emit('bv::hide::popover', buttonId)
+            }, 400)
         },
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
@@ -283,9 +278,5 @@ export default {
         position: relative;
         top: 12px;
         padding-bottom: 76px;
-    }
-    .account-icon {
-        padding: 0 0;
-        margin: 0 auto;
     }
 </style>

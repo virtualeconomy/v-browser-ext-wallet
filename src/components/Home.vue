@@ -6,7 +6,7 @@
                  :balances="balances"
                  :token-name="tokenName"
                  :selected-account="selectedAccount"
-                 @addTokenSig="getAddTokenSignal"></nav-bar>
+                 @addTokenSig="getPageSignal"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
             <div>
@@ -30,7 +30,7 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <add-token></add-token>
+            <add-token @addTokenSig="getPageSignal"></add-token>
         </div>
     </div>
 </template>
@@ -68,7 +68,7 @@
         },
         data: function() {
             return {
-                page: 'addToken',
+                page: 'home',
                 addresses: [],
                 address: '',
                 accountName: '',
@@ -143,7 +143,7 @@
                 console.log(this.selectedToken)
                 console.log(this.balances)
             },
-            getAddTokenSignal(data) {
+            getPageSignal(data) {
                 this.page = data
             }
         }

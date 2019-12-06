@@ -14,7 +14,6 @@ var certifiedTokensList = {
 }
 
 const NETWORK_BYTE = store.state.wallet.networkByte;
-console.log('network byte', NETWORK_BYTE)
 var certifiedTokens;
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']

@@ -18,6 +18,13 @@ export default {
         addToken(state, tokenInfo) {
             state.tokenRecords.push(tokenInfo)
         },
+        removeToken(state, tokenId) {
+            for(var i=0; i < state.tokenRecords.length; i++){
+                if(state.tokenRecords[i].tokenId === tokenId){
+                    state.tokenRecords.splice(i, 1)
+                }
+            }
+        }
     }
 
 }

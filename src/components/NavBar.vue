@@ -34,7 +34,7 @@
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
                                   :avt-hash="avtHash"
-                                  @addTokenSig="getAddTokenSignal"></token-select>
+                                  @addTokenSig="getPageSignal"></token-select>
                 </b-popover>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
@@ -158,7 +158,7 @@ export default {
         changeArrPos() {
             this.arrPos = this.arrPos === 'down' ? 'up' : 'down';
         },
-        getAddTokenSignal(data) {
+        getPageSignal(data) {
             this.addTokenPage = data
             this.$refs.popover.$emit('close')
             this.arrPos = 'down'

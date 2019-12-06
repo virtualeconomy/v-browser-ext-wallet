@@ -5,7 +5,7 @@
             <b-col class="record-icon">
                 <img width="56px"
                      height="56px"
-                     src="../../static/icons/ic_v_logo@3x.png">
+                     :src="tokenSvg(tokenSymbol)">
             </b-col>
             <b-col class="record-detail">
                 <div style="float:left">
@@ -27,8 +27,6 @@
                     </template>
                     <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
                     <b-dropdown-item @click="exp"><span>View on Explorer</span></b-dropdown-item>
-                    <!--<b-dropdown-item @click="hide" class="hide-bg"><span class="hide-word">Hide Token</span></b-dropdown-item>-->
-                    <!--<b-dropdown-item @click="exp" class="exp-bg"><span class="exp-word">View on Explorer</span></b-dropdown-item>-->
                 </b-dropdown>
             </b-col>
         </b-row>
@@ -47,11 +45,17 @@ export default {
         }
     },
     props: {
-        address: {
-            type: String,
-            default: ''
-        },
         tokenId: {
+            type: String,
+            default: '',
+            require: true
+        },
+        tokenSymbol: {
+            type: String,
+            default: '',
+            require: true
+        },
+        address: {
             type: String,
             default: '',
             require: true
@@ -68,19 +72,26 @@ export default {
     },
     methods: {
         hide() {
+            this.$store.commit('account/removeToken', this.tokenId)
         },
         exp() {
         },
         updateToken() {
-            console.log(this.address)
-            console.log(this.tokenId)
             this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
                 this.unity = BigNumber(response.unity)
                 this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
-                console.log('res', response)
             }, respError => {
             })
         },
+        tokenSvg(name) {
+            if (name === 'VSYS'){
+                return "../../static/icons/token/" + name + ".png"
+            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
+                return "../../static/icons/token/" + name + ".svg"
+            } else {
+                return "../../static/icons/token/other.svg"
+            }
+        }
     }
 }
 </script>

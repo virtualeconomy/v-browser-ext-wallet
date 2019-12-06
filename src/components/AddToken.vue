@@ -52,13 +52,13 @@
                     </b-tab>
                     <b-tab active>
                         <template slot="title">
-                            <div><span>Customer Token</span></div>
+                            <div><span>Custom Token</span></div>
                         </template>
                         <div class="content">
                             <div class="form-group cus-group">
                                 <label>Token ID</label>
                                 <input class="form-control"
-                                       v-model="tokenID">
+                                       v-model="tokenId">
                                 <label>Token Symbol</label>
                                 <input class="form-control input-bottom"
                                        v-model="tokenSymbol">
@@ -93,18 +93,16 @@
 </template>
 
 <script>
-    import VerifiedToken from './VerifiedToken.vue'
     import { mapState } from 'vuex'
     import CertifiedTokens from '../utils/certify.js'
     export default {
         name: "AddToken",
         components: {
-            VerifiedToken
         },
         data: function() {
             return {
                 activeTab: 'verified',
-                tokenID: '',
+                tokenId: '',
                 tokenSymbol: '',
                 tokenInfo: {},
                 certifiedTokens: CertifiedTokens.certifiedTokens()
@@ -117,8 +115,6 @@
         },
         methods: {
             tranTabChange(tabIndex) {
-                console.log(this.tokenRecords)
-                console.log(this.certifiedTokens[0]['tokenID'])
                 if (tabIndex === 0) {
                     this.activeTab = 'verified'
                 } else if (tabIndex === 1) {
@@ -126,12 +122,12 @@
                 }
             },
             addToken() {
-                console.log(this.tokenID)
-                console.log(this.tokenSymbol)
-                this.tokenInfo = {'tokenID' : this.tokenID, 'tokenSymbol' : this.tokenSymbol}
-                this.$store.commit('account/addToken', JSON.stringify(this.tokenInfo))
+                this.tokenInfo = {tokenId : this.tokenId, tokenSymbol : this.tokenSymbol}
+                this.$store.commit('account/addToken', this.tokenInfo)
+                this.$emit('addTokenSig', 'home')
             },
             close() {
+                this.$emit('addTokenSig', 'home')
             },
             certifiedTokenSvg(name) {
                 return "../../static/icons/token/" + name + ".svg"
