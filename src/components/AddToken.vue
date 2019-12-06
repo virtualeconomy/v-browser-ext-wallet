@@ -93,47 +93,47 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
-    import CertifiedTokens from '../utils/certify.js'
-    export default {
-        name: "AddToken",
-        components: {
-        },
-        data: function() {
-            return {
-                activeTab: 'verified',
-                tokenId: '',
-                tokenSymbol: '',
-                tokenInfo: {},
-                certifiedTokens: CertifiedTokens.certifiedTokens()
+import { mapState } from 'vuex'
+import CertifiedTokens from '../utils/certify.js'
+export default {
+    name: "AddToken",
+    components: {
+    },
+    data: function() {
+        return {
+            activeTab: 'verified',
+            tokenId: '',
+            tokenSymbol: '',
+            tokenInfo: {},
+            certifiedTokens: CertifiedTokens.certifiedTokens()
+        }
+    },
+    computed: {
+        ...mapState({
+            tokenRecords: state => state.account.tokenRecords
+        }),
+    },
+    methods: {
+        tranTabChange(tabIndex) {
+            if (tabIndex === 0) {
+                this.activeTab = 'verified'
+            } else if (tabIndex === 1) {
+                this.activeTab = 'custom'
             }
         },
-        computed: {
-            ...mapState({
-                tokenRecords: state => state.account.tokenRecords
-            }),
+        addToken() {
+            this.tokenInfo = {tokenId : this.tokenId, tokenSymbol : this.tokenSymbol}
+            this.$store.commit('account/addToken', this.tokenInfo)
+            this.$emit('addTokenSig', 'home')
         },
-        methods: {
-            tranTabChange(tabIndex) {
-                if (tabIndex === 0) {
-                    this.activeTab = 'verified'
-                } else if (tabIndex === 1) {
-                    this.activeTab = 'custom'
-                }
-            },
-            addToken() {
-                this.tokenInfo = {tokenId : this.tokenId, tokenSymbol : this.tokenSymbol}
-                this.$store.commit('account/addToken', this.tokenInfo)
-                this.$emit('addTokenSig', 'home')
-            },
-            close() {
-                this.$emit('addTokenSig', 'home')
-            },
-            certifiedTokenSvg(name) {
-                return "../../static/icons/token/" + name + ".svg"
-            }
+        close() {
+            this.$emit('addTokenSig', 'home')
+        },
+        certifiedTokenSvg(name) {
+            return "../../static/icons/token/" + name + ".svg"
         }
     }
+}
 </script>
 <style scoped>
 .add-token {

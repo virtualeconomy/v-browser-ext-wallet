@@ -137,146 +137,146 @@ export default {
 </script>
 
 <style scoped>
-    .token-select {
-        overflow: hidden;
-        z-index:1000;
-        max-width: 340px;
-    }
-    .content {
-        text-align:center
-    }
-    .detail-part {
-        position: relative;
-        top: 27px;
-        width: 100%;
-    }
-    .accounts-part {
-        width: 100%;
-        position: relative;
-        top: 40px;
-    }
-    .tip-part {
-        position: relative;
-        top: 54px;
-        width: 100%;
-    }
-    .account-name {
-        position: relative;
-        top: 12px;
-    }
-    .name {
-        font-size:20px;
-        font-family:SFProText-Medium,SFProText;
-        font-weight:500;
-        color:rgba(50,50,51,1);
-        line-height:24px;
-    }
-    .details-copy {
-        position: relative;
-        top: 24px;
-        padding-bottom: 10px;
-    }
-    .details {
-        width: 95px;
-        position: relative;
-        display:inline-block;
-        background:rgba(247,247,252,1);
-        border-radius:17px 0px 0px 17px;
-    }
-    .copy {
-        width: 168px;
-        display:inline-block;
-        position: relative;
-        left: 1px;
-        background:rgba(247,247,252,1);
-        border-radius:0px 17px 17px 0px;
-    }
-    .hr-account {
-        position: relative;
-        top: 30px;
-        width:320px;
-        height:1px;
-        background:rgba(240,240,245,1);
-    }
-    .p1 {
-        font-size:16px;
-        font-family:SFProText-Medium,SFProText;
-        font-weight:500;
-        color:rgba(50,50,51,1);
-        line-height:19px;
-    }
-    .p2 {
-        position: relative;
-        top: 8px;
-        font-size:13px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(169,169,176,1);
-        line-height:14px;
-        text-align: center;
-        width: 216px;
-        word-wrap: break-word;
-        word-break: break-all;
-        overflow: hidden;
-        margin: 0 auto;
-    }
-    .p3 {
-        width:116px;
-        height:15px;
-        font-size:13px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(169,169,176,1);
-        line-height:15px;
-    }
-    .inline-p {
-        display:inline-block;
-        padding: 2px;
-    }
-    .detail-word {
-        font-size:13px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(255,136,55,1);
-        line-height:15px;
-        padding: 0 0;
-    }
-    .detail-word-p {
-        display:inline-block;
-    }
-    .add-word {
-        width:80px;
-        height:20px;
-        font-size:14px;
-        font-family:SFProText-Medium,SFProText;
-        font-weight:500;
-        color:rgba(255,136,55,1);
-        line-height:16px;
-        padding: 0 0;
-    }
-    .add-word-p {
-        display:inline-block;
-        position: relative;
-        left: 2px;
-    }
-    .copy-icon-p {
-        display:inline-block;
-    }
-    .copy-icon {
-        width: 24px;
-        height: 24px;
-        padding: 0 0;
-        position: relative;
-        top: -2px;
-    }
-    .scroll {
-        overflow-y: scroll;
-        overflow-x: hidden;
-        z-index: 100;
-    }
-    .add-btn {
-        position: relative;
-        top: 12px;
-        padding-bottom: 76px;
-    }
+.token-select {
+    overflow: hidden;
+    z-index:1000;
+    max-width: 340px;
+}
+.content {
+    text-align:center
+}
+.detail-part {
+    position: relative;
+    top: 27px;
+    width: 100%;
+}
+.accounts-part {
+    width: 100%;
+    position: relative;
+    top: 40px;
+}
+.tip-part {
+    position: relative;
+    top: 54px;
+    width: 100%;
+}
+.account-name {
+    position: relative;
+    top: 12px;
+}
+.name {
+    font-size:20px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(50,50,51,1);
+    line-height:24px;
+}
+.details-copy {
+    position: relative;
+    top: 24px;
+    padding-bottom: 10px;
+}
+.details {
+    width: 95px;
+    position: relative;
+    display:inline-block;
+    background:rgba(247,247,252,1);
+    border-radius:17px 0px 0px 17px;
+}
+.copy {
+    width: 168px;
+    display:inline-block;
+    position: relative;
+    left: 1px;
+    background:rgba(247,247,252,1);
+    border-radius:0px 17px 17px 0px;
+}
+.hr-account {
+    position: relative;
+    top: 30px;
+    width:320px;
+    height:1px;
+    background:rgba(240,240,245,1);
+}
+.p1 {
+    font-size:16px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(50,50,51,1);
+    line-height:19px;
+}
+.p2 {
+    position: relative;
+    top: 8px;
+    font-size:13px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:14px;
+    text-align: center;
+    width: 216px;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: hidden;
+    margin: 0 auto;
+}
+.p3 {
+    width:116px;
+    height:15px;
+    font-size:13px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:15px;
+}
+.inline-p {
+    display:inline-block;
+    padding: 2px;
+}
+.detail-word {
+    font-size:13px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(255,136,55,1);
+    line-height:15px;
+    padding: 0 0;
+}
+.detail-word-p {
+    display:inline-block;
+}
+.add-word {
+    width:80px;
+    height:20px;
+    font-size:14px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(255,136,55,1);
+    line-height:16px;
+    padding: 0 0;
+}
+.add-word-p {
+    display:inline-block;
+    position: relative;
+    left: 2px;
+}
+.copy-icon-p {
+    display:inline-block;
+}
+.copy-icon {
+    width: 24px;
+    height: 24px;
+    padding: 0 0;
+    position: relative;
+    top: -2px;
+}
+.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
+}
+.add-btn {
+    position: relative;
+    top: 12px;
+    padding-bottom: 76px;
+}
 </style>

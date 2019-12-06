@@ -10,7 +10,7 @@
             <b-col class="record-detail">
                 <div style="float:left">
                     <div style="display: inline-block"><span class="token-balance">{{tokenBalance}}</span></div>
-                    <div style="display: inline-block"><span class="unity">{{ ' ' + 'VSYS' }}</span></div>
+                    <div style="display: inline-block"><span class="unity">{{ ' ' + tokenSymbol }}</span></div>
                 </div>
             </b-col>
             <b-col class="record-action">
