@@ -15,7 +15,7 @@
                 src="../../static/icons/ic_v_logo@3x.png">
             </div>
             <div class="balance">
-                <p class="token-balance">{{ showBalance(balances[address]) }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
+                <p class="token-balance">{{ accountBalance ? 'NaN' : accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
                 <b-button class="btn-deposit" @click="deposit">
@@ -61,6 +61,7 @@ import Vue from 'vue'
 import seedLib from '../libs/seed.js'
 import BigNumber from 'bignumber.js'
 import AddToken from './AddToken.vue'
+import certify from '../utils/certify.js'
 
 export default {
     name: "Home",
@@ -78,7 +79,7 @@ export default {
         this.$store.commit('API/updateAPI', this.networkByte)
         this.getAddresses()
         this.getBalances()
-        this.address = this.addresses[this.selectedAccount]
+        this.getTokenBalances()
         this.accountName = this.accountNames[this.selectedAccount]
     },
     data: function() {
@@ -88,6 +89,7 @@ export default {
             address: '',
             accountName: '',
             balances: {},
+            tokenBalances: {},
             showNav: true
         }
     },
@@ -99,6 +101,7 @@ export default {
             selectedAccount: state => state.account.selectedAccount,
             accountNames: state => state.account.accountNames,
             walletAmount: state => state.wallet.walletAmount,
+            tokenRecords: state => state.account.tokenRecords,
             selectedToken: state => state.account.selectedToken
         }),
         secretInfo() {
@@ -108,7 +111,22 @@ export default {
         tokenName() {
             if (this.selectedToken === 'VSYS') {
                 return 'VSYS'
+            } else {
+                return certify.getTokenName(this.selectedToken)
             }
+        },
+        accountBalance() {
+            let amount = 0
+            if (this.selectedToken === 'VSYS') {
+                amount = String(this.balances[this.address])
+            } else {
+                amount = String(this.tokenBalances[this.selectedToken])
+            }
+            if (amount.length >= 14) {
+                let index = amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
+            }
+            return amount
         }
     },
     watch: {
@@ -137,28 +155,25 @@ export default {
                 let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index, this.networkByte)
                 Vue.set(this.addresses, index, seed.address)
             }
+            this.address = this.addresses[this.selectedAccount]
         },
         getBalances() {
-            if (this.selectedToken === 'VSYS') {
-                for (const addr in this.addresses) {
-                    this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
-                        let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
-                        Vue.set(this.balances, this.addresses[addr], value)
+            for (const addr in this.addresses) {
+                this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
+                    let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+                    Vue.set(this.balances, this.addresses[addr], value)
                     }, respError => {
                         Vue.set(this.balances, this.addresses[addr], value)
                     })
                 }
-            }
-
         },
-        showBalance(balance) {
-            if (balance === undefined) return 'NaN'
-            let amount = String(balance)
-            if (amount.length >= 14) {
-                let index = amount.indexOf('.')
-                amount = amount.slice(0, index + 3) + '...'
+        getTokenBalances() {
+            for (let tokenId in this.tokenRecords) {
+                this.chain.getTokenBalance(this.address, tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
+                    Vue.set(this.tokenBalances, tokenId, value)
+                })
             }
-            return amount
         },
         deposit() {
             this.page = 'deposit'

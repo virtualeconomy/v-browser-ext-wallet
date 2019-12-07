@@ -4,7 +4,7 @@ export default {
     state: {
         accountNames: ['Account 1'],
         selectedAccount: 0,
-        selectedToken: 'VSYS',
+        selectedToken: 'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3',
         tokenRecords: {}
     },
 
@@ -17,7 +17,9 @@ export default {
         },
         addToken(state, tokenRecordsInfo) {
             state.tokenRecords = tokenRecordsInfo
-            console.log(state.tokenRecords)
+        },
+        updateSelectedToken(state, tokenId) {
+            state.selectedToken = tokenId
         },
         removeToken(state, tokenId) {
             for(var i=0; i < state.tokenRecords.length; i++){
