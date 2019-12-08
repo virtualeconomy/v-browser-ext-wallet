@@ -4,7 +4,9 @@
                  class="nav-bar"
                  :addresses="addresses"
                  :account-names="accountNames"
+                 :token-balances="tokenBalances"
                  :balances="balances"
+                 :selected-token="selectedToken"
                  :token-name="tokenName"
                  :selected-account="selectedAccount"
                  @changePage="changePage"></nav-bar>
@@ -12,10 +14,10 @@
              class="account-content">
             <div>
                 <img class="token-icon"
-                src="../../static/icons/ic_v_logo@3x.png">
+                     :src="tokenSvg(tokenName)">
             </div>
             <div class="balance">
-                <p class="token-balance">{{ accountBalance ? 'NaN' : accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
+                <p class="token-balance">{{ accountBalance ? accountBalance : 'NaN'}}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
                 <b-button class="btn-deposit" @click="deposit">
@@ -173,6 +175,15 @@ export default {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, tokenId, value)
                 })
+            }
+        },
+        tokenSvg(name) {
+            if (name === 'VSYS'){
+                return "../../static/icons/token/" + name + ".png"
+            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
+                return "../../static/icons/token/" + name + ".svg"
+            } else {
+                return "../../static/icons/token/other.svg"
             }
         },
         deposit() {

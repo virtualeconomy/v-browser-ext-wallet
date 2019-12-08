@@ -10,7 +10,7 @@
             </b-col>
             <b-col class="record-detail">
                 <div style="float:left">
-                    <div style="display: inline-block"><span class="token-balance">{{showBalance(tokenBalance)}}</span></div>
+                    <div style="display: inline-block"><span class="token-balance">{{showBalance(balance)}}</span></div>
                     <div style="display: inline-block"><span class="unity">{{ ' ' + tokenSymbol }}</span></div>
                 </div>
             </b-col>
@@ -36,13 +36,13 @@
 
 <script>
 import BigNumber from 'bignumber.js'
+import Vue from 'vue'
 import { mapState } from 'vuex'
 export default {
     name: "TokenRecord",
     data: function() {
         return {
-            unity: BigNumber(1),
-            tokenBalance: BigNumber(3097.9777)
+            unity: BigNumber(1)
         }
     },
     props: {
@@ -60,29 +60,29 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        balance: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
-            chain: state => state.API.chain
+            chain: state => state.API.chain,
+            tokenRecords: state => state.account.tokenRecords
         })
     },
     created() {
-        this.updateToken()
     },
     methods: {
         hide() {
-            this.$store.commit('account/removeToken', this.tokenId)
+            var tmp = this.tokenRecords
+            Vue.delete(tmp, this.tokenId)
+            this.$store.commit('account/updateToken', tmp)
         },
         exp() {
-        },
-        updateToken() {
-            this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
-                this.unity = BigNumber(response.unity)
-                this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
-            }, respError => {
-            })
         },
         tokenSvg(name) {
             if (name === 'VSYS'){
@@ -94,7 +94,8 @@ export default {
             }
         },
         addConfirm() {
-            console.log('delete')
+            this.$store.commit('account/updateSelectedToken', this.tokenId)
+            this.$emit('selectSucceed')
         },
         showBalance(balance) {
             let amount = String(balance)

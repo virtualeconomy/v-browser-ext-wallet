@@ -33,8 +33,12 @@
                                   :addresses="addresses"
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
-                                  :avt-hash="avtHash"
-                                  @changePage="changePage"></token-select>
+                                  :token-balances="tokenBalances"
+                                  :balances="balances"
+                                  :selected-token="selectedToken"
+                                  :token-name="tokenName"
+                                  @changePage="changePage"
+                                  @selectSucceed="selectSucceed"></token-select>
                 </b-popover>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
@@ -117,12 +121,22 @@ export default {
             require: true,
             default: function() {}
         },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         selectedAccount: {
             type: Number,
             require: true,
             default: 0
         },
         tokenName: {
+            type: String,
+            require: true,
+            default: 'VSYS'
+        },
+        selectedToken: {
             type: String,
             require: true,
             default: 'VSYS'
@@ -161,6 +175,10 @@ export default {
             this.$refs.popover.$emit('close')
             this.arrPos = 'down'
             this.$emit('changePage', data)
+        },
+        selectSucceed() {
+            this.$refs.popover.$emit('close')
+            this.arrPos = 'down'
         }
     },
     computed: {
@@ -168,7 +186,6 @@ export default {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
             return addrChars.join('')
-
         }
     }
 }

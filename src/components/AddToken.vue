@@ -125,7 +125,7 @@ export default {
         addToken() {
             let tmp = this.tokenRecords
             Vue.set(tmp, this.tokenId, this.tokenSymbol)
-            this.$store.commit('account/addToken', tmp)
+            this.$store.commit('account/updateToken', tmp)
             this.$emit('changePage', 'home')
         },
         close() {

@@ -41,11 +41,18 @@
             <div class="accounts-part">
                 <div class="scroll"
                      :style="{height: '176px'}">
+                    <TokenRecord :token-id="'VSYS'"
+                                 :address="addresses[selectedAccount]"
+                                 :balance="balances[addresses[selectedAccount]]"
+                                 :token-symbol="'VSYS'"
+                                 @selectSucceed="selectSucceed"></TokenRecord>
                     <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
                                  :address="addresses[selectedAccount]"
+                                 :balance="tokenBalances[tokenId]"
                                  :token-id="tokenId"
-                                 :token-symbol="tokenRecords[tokenId]"></TokenRecord>
+                                 :token-symbol="tokenRecords[tokenId]"
+                                 @selectSucceed="selectSucceed"></TokenRecord>
                 </div>
             </div>
             <div class="tip-part">
@@ -103,6 +110,26 @@ export default {
             require: true,
             default: function() {
             }
+        },
+        balances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        tokenName: {
+            type: String,
+            require: true,
+            default: 'VSYS'
+        },
+        selectedToken: {
+            type: String,
+            require: true,
+            default: 'VSYS'
         }
     },
     methods: {
@@ -122,6 +149,9 @@ export default {
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         },
+        selectSucceed() {
+            this.$emit('selectSucceed')
+        }
     },
     computed: {
         ...mapState({
