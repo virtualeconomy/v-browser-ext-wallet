@@ -2,7 +2,7 @@
     <div v-if="pageId === 0"
          class="send-content">
         <div>
-            <p class="p1">Send VSYS</p>
+            <p class="p1">Send {{ tokenName }}</p>
             <b-button class="text-decoration-none cancel-link"
                       @click="cancel"
                       variant="link">Cancel</b-button>
@@ -19,10 +19,10 @@
             <label>Assets</label>
             <div class="assets-item">
                 <img class="token-icon"
-                     src="../../static/icons/ic_v_logo@3x.png"/>
+                     :src="tokenSvg"/>
                 <div>
-                    <p class="p2">VSYS</p>
-                    <p class="p3">Available: <span class="amount">1000 VSYS</span></p>
+                    <p class="p2"> {{ tokenName }}</p>
+                    <p class="p3">Available: <span class="amount">{{ assetBalance }} {{ tokenName }}</span></p>
                 </div>
             </div>
             <label>Amount</label>
@@ -30,8 +30,7 @@
                           class="form-item"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isValidAmount"
-                          onfocus="this.select()">
+                          :state="isValidAmount">
             </b-form-input>
             <label>Description</label>
             <b-form-textarea id="descriptionInput"
@@ -87,21 +86,21 @@
         <div style="background: rgba(247,247,252,1);">
             <div style="margin: 16px 0px 24px 16px">
                 <div style="height: 20px; margin-bottom: 12px;">
-                    <p class="p4">SEND VSYS</p>
+                    <p class="p4">SEND {{ tokenName }}</p>
                 </div>
                 <div style="height: 40px;">
-                    <img style="display: inline-block; position: fixed; left: 16px;" width="40" height="40" src="../../static/icons/ic_v_logo@3x.png"/>
+                    <img style="display: inline-block; position: fixed; left: 16px;" width="40" height="40" :src="tokenSvg"/>
                     <p class="p5">{{ amount }}</p>
                 </div>
             </div>
         </div>
         <div class="details">
             <label>Fee</label>
-            <p>0.1</p>
+            <p>{{ txFee }}</p>
         </div>
         <div class="details">
             <label>Total</label>
-            <p> {{ amount + 0.1 }}<span> VSYS</span></p>
+            <p> {{ selectedToken === 'VSYS' ? amount + txFee : amount + ' ' + tokenName + ' + ' + txFee }}<span> VSYS</span></p>
         </div>
         <div class="details" style="height: 72px;">
             <label style="margin-top: 28px;">Description</label>
@@ -130,12 +129,14 @@
     </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import seedLib from '../libs/seed.js'
 import Transaction from '../js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import jdenticon from 'jdenticon'
 import converters from '../js-v-sdk/src/utils/converters.js'
+import common from '../js-v-sdk/src/utils/common.js'
+import { CONTRACT_EXEC_FEE, TX_FEE, VSYS_PRECISION } from '../js-v-sdk/src/constants'
 const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140
 export default {
     name: "Send",
@@ -143,9 +144,11 @@ export default {
       return {
           recipient: 'AUAztxsft2v6rmjRRb72nLea6BNyRHHWpUR',
           amount: 12,
-          unity: 8,
+          unity: VSYS_PRECISION,
+          isSplit: false,
           description: 'This is my first send VSYS',
-          pageId: 0
+          pageId: 0,
+          txFee: this.selectedToken === 'VSYS' ? TX_FEE : CONTRACT_EXEC_FEE
       }
     },
     props: {
@@ -164,6 +167,11 @@ export default {
             require: true,
             default: function() {}
         },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         tokenName: {
             type: String,
             require: true,
@@ -178,17 +186,48 @@ export default {
             type: Number,
             require: true,
             default: 0
+        },
+        selectedToken: {
+            type: String,
+            require: true,
+            default: ''
         }
     },
     mounted() {
         jdenticon()
+        if (this.selectedToken !== 'VSYS') {
+            this.getTokenInfo()
+        }
     },
     computed: {
         ...mapState({
             account: state => state.API.account,
             chain: state => state.API.chain,
-            wallet: state => state.wallet,
+            wallet: state => state.wallet
         }),
+        tokenSvg() {
+            const name = this.tokenName
+            if (name === 'VSYS'){
+                return "../../static/icons/token/" + name + ".png"
+            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
+                return "../../static/icons/token/" + name + ".svg"
+            } else {
+                return "../../static/icons/token/other.svg"
+            }
+        },
+        assetBalance() {
+            let amount = 0
+            if (this.selectedToken === 'VSYS') {
+                amount = String(this.balances[this.address])
+            } else {
+                amount = String(this.tokenBalances[this.selectedToken])
+            }
+            if (amount.length >= 16) {
+                let index = amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
+            }
+            return amount
+        },
         isValidRecipient() {
             let recipient = this.recipient
             if (!recipient) {
@@ -219,9 +258,11 @@ export default {
             return !(amount.toString().split('.')[1] && amount.toString().split('.')[1].length > this.unity)
         },
         isSufficient() {
-            return true
-            // let balance = this.balances[this.address] : this.balances[this.coldAddress]
-            // return BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
+            if (this.selectedToken === 'VSYS') {
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.balances[this.address]).minus(TX_FEE))
+            } else {
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken])) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.balances[this.address]))
+            }
         },
         isValidDescription() {
             if (!this.description) {
@@ -253,6 +294,19 @@ export default {
         },
     },
     methods: {
+        getTokenInfo() {
+            let contractId = common.tokenIDToContractID(this.selectedToken)
+            this.chain.getContractInfo(contractId).then(response => {
+                this.isSplit = response.type === 'TokenContractWithSplit'
+            }, respError => {
+            })
+            this.chain.getTokenInfo(this.selectedToken).then(response => {
+                if (!response.hasOwnProperty('error')) {
+                    this.unity = BigNumber(response.unity)
+                }
+            }, respError => {
+            })
+        },
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         },
@@ -269,17 +323,29 @@ export default {
         },
         confirm() {
             let tra = new Transaction(this.networkByte)
-            tra.buildPaymentTx(this.getKeypair.publicKey, this.recipient, this.amount, this.description, Date.now() * 1e6)
+            if (this.selectedToken === 'VSYS') {
+                tra.buildPaymentTx(this.getKeypair.publicKey, this.recipient, this.amount, this.description, Date.now() * 1e6)
+            } else {
+                tra.buildSendTokenTx(this.getKeypair.publicKey, this.selectedToken, this.recipient, this.amount, this.unity, this.isSplit, this.description)
+            }
             this.account.buildFromPrivateKey(this.getKeypair.privateKey)
             let signature = this.account.getSignature(tra.toBytes())
             let sendTx = tra.toJsonForSendingTx(signature)
-            this.chain.sendPaymentTx(sendTx).then( response => {
-                this.$emit('showNavBar', true)
-                this.$emit('changePage', 'home')
-            }, respErr => {
-            })
+            if (this.selectedToken === 'VSYS') {
+                this.chain.sendPaymentTx(sendTx).then(response => {
+                    this.$emit('showNavBar', true)
+                    this.$emit('changePage', 'home')
+                }, respErr => {
+                })
+            } else {
+                this.chain.sendExecuteContractTx(sendTx).then(response => {
+                    this.$emit('showNavBar', true)
+                    this.$emit('changePage', 'home')
+                }, respErr => {
+                })
+            }
+            }
         }
-    }
 }
 </script>
 

@@ -37,11 +37,13 @@
         </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
-                  :address="addresses[selectedAccount]"
+                  :address="address"
                   :account-name="accountNames[selectedAccount]"
                   :balances="balances"
+                  :token-balances="tokenBalances"
                   :network-byte="networkByte"
                   :token-name="tokenName"
+                  :selected-token="selectedToken"
                   :selected-account="selectedAccount"
                   @showNavBar="showNavBar"></Send>
         </div>
