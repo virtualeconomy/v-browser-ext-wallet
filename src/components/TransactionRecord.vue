@@ -58,7 +58,7 @@
                    col="auto"
                    align-v="right">
                 <b-row>
-                    <b-col class="record-amount">-800 VSYS</b-col>
+                    <b-col class="record-amount">{{ txAmount }}</b-col>
                 </b-row>
                 <b-row>
                     <b-col class="record-status">
@@ -71,7 +71,8 @@
 </template>
 
 <script>
-import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '../js-v-sdk/src/constants'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, CONTRACT_REGISTER_FEE, CONTRACT_EXEC_FEE } from '../js-v-sdk/src/constants'
+import BigNumber from 'bignumber.js'
 export default {
     name: "TransactionRecord",
     props: {
@@ -99,8 +100,7 @@ export default {
     computed: {
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
-                let selfSend = this.txRecord['proofs'] ? this.txRecord['proofs'][0]['address'] : 'no sender'
-                if (this.txRecord.recipient === this.address && this.address !== selfSend) {
+                if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
                     return 'Received'
                 } else {
                     return 'Sent'
@@ -121,7 +121,7 @@ export default {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
                 if (this.isSentToken) {
-                    if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                    if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined && this.txStatus === 'Success') {
                         return 'Received'
                     } else return 'Sent'
                 } else return 'Execute Contract Function'
@@ -148,9 +148,9 @@ export default {
             } else if (this.txType === 'Leased In Canceled') {
                 return 'Canceled Incoming Leasing'
             } else if (this.txType === 'Sent') {
-                return 'Sent'
+                return 'Sent ' + this.txRecord.officialName
             } else if (this.txType === 'Received') {
-                return 'Received'
+                return 'Received ' + this.txRecord.officialName
             } else if (this.txType === 'Execute Contract Function') {
                 return 'Execute Contract Function'
             } else if (this.txType === 'Register Contract') {
@@ -194,7 +194,32 @@ export default {
         txYearStr() {
             const year = new Date(this.txRecord.timestamp / 1e6).getFullYear()
             return year.toString()
-        }
+        },
+        txAmount() {
+            if (this.isSentToken) {
+                if (this.txType === 'Sent') {
+                    return '-' + BigNumber(this.txRecord.amount) + ' ' + this.txRecord.officialName
+                } else {
+                    return '+' + BigNumber(this.txRecord.amount) + ' ' + this.txRecord.officialName
+                }
+            }
+            if (this.txRecord.lease) {
+                return BigNumber(this.txRecord.lease.amount).dividedBy(VSYS_PRECISION) + 'VSYS'
+            }
+            if (this.txRecord['type'] === PAYMENT_TX || this.txRecord['type'] === LEASE_TX) {
+                if (this.txType === 'Sent') {
+                    return '-' + BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION) + ' VSYS'
+                } else {
+                    return '+' + BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION) + ' VSYS'
+                }
+            }
+            if (this.txType === 'Register Contract') {
+                return '-' + CONTRACT_REGISTER_FEE + ' VSYS'
+            }
+            if (this.txType === 'Execute Contract Function') {
+                return '-' + CONTRACT_EXEC_FEE + ' VSYS'
+            }
+        },
     }
 }
 </script>

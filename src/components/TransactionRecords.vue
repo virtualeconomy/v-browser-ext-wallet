@@ -23,12 +23,13 @@
 
 <script>
 import TransactionRecord from './TransactionRecord.vue'
-import { EXECUTE_CONTRACT_TX } from '../js-v-sdk/src/constants'
+import { EXECUTE_CONTRACT_TX, PAYMENT_TX } from '../js-v-sdk/src/constants'
 import common from '../js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
 import { ADDRESS_TEST_EXPLORER, ADDRESS_EXPLORER } from '../store/network.js'
-import base58 from 'base-58'
 import Vue from 'vue'
+import base58 from 'base-58'
+import BigNumber from 'bignumber.js'
 import convert from '../js-v-sdk/src/utils/convert'
 export default {
     name: "TransactionRecords",
@@ -61,6 +62,16 @@ export default {
             type: String,
             require: true,
             default: 'VSYS'
+        },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
         }
     },
     computed: {
@@ -94,13 +105,19 @@ export default {
                     Vue.set(recList, count++, recItem)
                     if (recItem['type'] === EXECUTE_CONTRACT_TX) {
                         let tokenId = common.contractIDToTokenID(recItem['contractId'])
-                        // if (certify.isCertified(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
-                        //     let functionData = convert.parseFunctionData(recItem['functionData'])
-                        //     recItem['recipient'] = functionData[0]
-                        //     recItem['amount'] = functionData[1]
-                        //     recItem['sentToken'] = true
-                        //     recItem['officialName'] = certify.officialName(tokenId)
-                        // }
+                        if (this.tokenRecords.hasOwnProperty(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
+                            let functionData = convert.parseFunctionData(recItem['functionData'])
+                            recItem['recipient'] = functionData[0]
+                            recItem['amount'] = BigNumber(functionData[1]).dividedBy(this.tokenBalances[tokenId].unity)
+                            recItem['sentToken'] = true
+                            recItem['officialName'] = this.tokenRecords[tokenId]
+                        }
+                    }
+                    if (recItem['type'] === PAYMENT_TX) {
+                        recItem['officialName'] = 'VSYS'
+                    }
+                    if (recItem['recipient'] === this.address && this.address === senderAddr) {
+                        recItem['SelfSend'] = true
                     }
                     return recList
                 }, {})
