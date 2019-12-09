@@ -7,7 +7,7 @@
             <div class="height-full"
                  bg-variant="white"
                  border-variant="primary">
-                <b-tabs @input="tranTabChange">
+                <b-tabs @input="tokenTabChange">
                     <b-tab>
                         <template slot="title">
                             <div><span>Verified Token</span></div>
@@ -16,13 +16,15 @@
                             <div class="accounts-part">
                                 <div class="scroll"
                                      :style="{height: '264px'}">
-                                    <div v-for="(certifiedToken, idx) in certifiedTokens"
-                                         :key="idx">
-                                        <b-btn class="token-unit">
+                                    <div v-for="(certifiedToken, tokenId) in certifiedTokens"
+                                         :key="tokenId">
+                                        <b-btn class="token-unit"
+                                               @click="addVerifiedToken(tokenId, certifiedToken['name'])">
                                             <div class="token-svg"><img width="56px"
                                                                         height="56px"
                                                                         :src="certifiedTokenSvg(certifiedToken['name'])"></div>
-                                            <div  class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                            <div class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                            <div class="notice" v-if="isSubmitDisabled && selectedVerifiedToken === tokenId"><p>Already added!</p></div>
                                         </b-btn>
                                     </div>
                                 </div>
@@ -59,6 +61,7 @@
                                 <label>Token ID</label>
                                 <input class="form-control"
                                        v-model="tokenId">
+                                <div class="tips" v-if="isSubmitDisabled"><span>Already added this token!</span></div>
                                 <label>Token Symbol</label>
                                 <input class="form-control input-bottom"
                                        v-model="tokenSymbol">
@@ -102,20 +105,31 @@ export default {
     },
     data: function() {
         return {
-            activeTab: 'verified',
+            activeTab: 'custom',
             tokenId: '',
             tokenSymbol: '',
             tokenInfo: {},
-            certifiedTokens: CertifiedTokens.certifiedTokens()
+            certifiedTokens: CertifiedTokens.certifiedTokens(),
+            selectedVerifiedToken: '',
+            selectedVerifiedSymbol: ''
         }
     },
     computed: {
         ...mapState({
             tokenRecords: state => state.account.tokenRecords
         }),
+        isSubmitDisabled() {
+            let tmp = this.tokenRecords
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            if (tokenId in tmp) {
+                return true
+            } else {
+                return false
+            }
+        }
     },
     methods: {
-        tranTabChange(tabIndex) {
+        tokenTabChange(tabIndex) {
             if (tabIndex === 0) {
                 this.activeTab = 'verified'
             } else if (tabIndex === 1) {
@@ -124,15 +138,26 @@ export default {
         },
         addToken() {
             let tmp = this.tokenRecords
-            Vue.set(tmp, this.tokenId, this.tokenSymbol)
-            this.$store.commit('account/updateToken', tmp)
-            this.$emit('changePage', 'home')
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
+            if (tokenId in tmp) {
+                console.log('already in', tokenId)
+                console.log('tmp', tmp)
+            } else {
+                Vue.set(tmp, tokenId, tokenSymbol)
+                this.$store.commit('account/updateToken', tmp)
+                this.$emit('changePage', 'home')
+            }
         },
         close() {
             this.$emit('changePage', 'home')
         },
         certifiedTokenSvg(name) {
             return "../../static/icons/token/" + name + ".svg"
+        },
+        addVerifiedToken(tokenId, verifiedSymbol) {
+            this.selectedVerifiedToken = tokenId
+            this.selectedVerifiedSymbol = verifiedSymbol
         }
     }
 }
@@ -282,5 +307,24 @@ export default {
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:21px;
+}
+.notice {
+    position: relative;
+    top: 20px;
+    float: right;
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(246,0,46,1);
+    line-height:14px;
+}
+.tips {
+    position: relative;
+    top: -20px;
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(246,0,46,1);
+    line-height:14px;
 }
 </style>
