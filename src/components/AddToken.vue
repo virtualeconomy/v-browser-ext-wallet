@@ -309,7 +309,7 @@ export default {
     overflow-x: hidden;
     z-index: 100;
 }
-.token-unit, .token-unit:hover {
+.token-unit {
     width: 320px;
     height: 88px;
     background: rgba(247,247,252,1);
@@ -319,7 +319,7 @@ export default {
     padding-top: 16px;
     border: rgba(247,247,252,1);
 }
-.token-unit:active, .token-unit:focus, .token-unit:active:focus {
+.token-unit:active, .token-unit:focus, .token-unit:hover, .token-unit:active:focus {
     width: 320px;
     height: 88px;
     background: rgba(247, 247, 252, 1);
