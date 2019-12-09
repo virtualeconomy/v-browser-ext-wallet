@@ -15,7 +15,7 @@
                 src="../../static/icons/ic_v_logo@3x.png">
             </div>
             <div class="balance">
-                <p class="token-balance">{{ accountBalance ? 'NaN' : accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
+                <p class="token-balance">{{ accountBalance ? accountBalance : 'NaN' }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
                 <b-button class="btn-deposit" @click="deposit">
@@ -35,11 +35,13 @@
         </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
-                  :address="addresses[selectedAccount]"
+                  :address="address"
                   :account-name="accountNames[selectedAccount]"
                   :balances="balances"
+                  :token-balances="tokenBalances"
                   :network-byte="networkByte"
                   :token-name="tokenName"
+                  :selected-token="selectedToken"
                   :selected-account="selectedAccount"
                   @showNavBar="showNavBar"></Send>
         </div>
