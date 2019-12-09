@@ -24,7 +24,7 @@
                                                                         height="56px"
                                                                         :src="certifiedTokenSvg(certifiedToken['name'])"></div>
                                             <div class="cer-name"><span>{{certifiedToken['name']}}</span></div>
-                                            <div class="notice" v-if="isSubmitDisabled && selectedVerifiedToken === tokenId"><p>Already added!</p></div>
+                                            <div class="notice" v-if="isExistedToken(tokenId)">Already added!</div>
                                         </b-btn>
                                     </div>
                                 </div>
@@ -59,12 +59,27 @@
                         <div class="content">
                             <div class="form-group cus-group">
                                 <label>Token ID</label>
-                                <input class="form-control"
-                                       v-model="tokenId">
-                                <div class="tips" v-if="isSubmitDisabled"><span>Already added this token!</span></div>
+                                <b-form-input class="form-control"
+                                              v-model="tokenId"
+                                              :state="isValidToken(tokenId)"
+                                              aria-describedby="inputTokenLiveFeedback"
+                                              placeholder="Please input Token ID"
+                                              onfocus="this.select()"></b-form-input>
+                                <b-form-invalid-feedback id="inputTokenLiveFeedback"
+                                                         style="margin-top: -20px">
+                                    Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
+                                </b-form-invalid-feedback>
                                 <label>Token Symbol</label>
-                                <input class="form-control input-bottom"
-                                       v-model="tokenSymbol">
+                                <b-form-input class="form-control input-bottom"
+                                              v-model="tokenSymbol"
+                                              :state="isValidSymbol(tokenSymbol)"
+                                              aria-describedby="inputSymbolLiveFeedback"
+                                              placeholder="Please input Token Symbol"
+                                              onfocus="this.select()"></b-form-input>
+                                <b-form-invalid-feedback id="inputSymbolLiveFeedback"
+                                                         v-if="!isValidSymbol(tokenSymbol)">
+                                    Symbol must be digits or English letters within 5.
+                                </b-form-invalid-feedback>
                             </div>
                             <b-row class="button-row">
                                 <b-col class="col-lef">
@@ -111,20 +126,21 @@ export default {
             tokenInfo: {},
             certifiedTokens: CertifiedTokens.certifiedTokens(),
             selectedVerifiedToken: '',
-            selectedVerifiedSymbol: ''
+            selectedVerifiedSymbol: '',
+            responseErr: false
         }
     },
     computed: {
         ...mapState({
+            chain: state => state.API.chain,
             tokenRecords: state => state.account.tokenRecords
         }),
         isSubmitDisabled() {
-            let tmp = this.tokenRecords
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
-            if (tokenId in tmp) {
-                return true
+            if (this.activeTab === 'verified') {
+                return tokenId in this.tokenRecords
             } else {
-                return false
+                return tokenId.length <= 0 && this.isValidSymbol(this.tokenSymbol)
             }
         }
     },
@@ -141,23 +157,45 @@ export default {
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
             let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
             if (tokenId in tmp) {
-                console.log('already in', tokenId)
-                console.log('tmp', tmp)
-            } else {
-                Vue.set(tmp, tokenId, tokenSymbol)
-                this.$store.commit('account/updateToken', tmp)
                 this.$emit('changePage', 'home')
+            }
+            if (tokenId) {
+                this.chain.getTokenInfo(tokenId).then(response => {
+                    this.responseErr = false
+                    if (response.hasOwnProperty('error')) {
+                        this.responseErr = true
+                        return
+                    }
+                    Vue.set(tmp, tokenId, tokenSymbol)
+                    this.$store.commit('account/updateToken', tmp)
+                    this.$emit('changePage', 'home')
+                }, respError => {
+                    this.responseErr = true
+                })
             }
         },
         close() {
             this.$emit('changePage', 'home')
         },
-        certifiedTokenSvg(name) {
-            return "../../static/icons/token/" + name + ".svg"
-        },
         addVerifiedToken(tokenId, verifiedSymbol) {
             this.selectedVerifiedToken = tokenId
             this.selectedVerifiedSymbol = verifiedSymbol
+        },
+        certifiedTokenSvg(name) {
+            return "../../static/icons/token/" + name + ".svg"
+        },
+        isExistedToken(tokenId) {
+            return tokenId in this.tokenRecords
+        },
+        isValidSymbol(symbol) {
+            let Regx = /^[A-Za-z0-9]*$/;
+            return symbol.length <= 5 && Regx.test(symbol)
+        },
+        isValidToken(tokenId) {
+            if (tokenId.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
         }
     }
 }
