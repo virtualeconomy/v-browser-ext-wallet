@@ -11,7 +11,8 @@
                 <div class="token-balance"><span>{{showBalance(balance)}}</span></div>
                 <div class="unity"><span>{{ ' ' + tokenSymbol }}</span></div>
         </div>
-        <div class="record-action">
+        <div v-if="!(tokenId === 'VSYS')"
+             class="record-action">
             <b-dropdown no-caret
                         class="more-btn"
                         variant="link"
