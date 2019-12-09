@@ -25,7 +25,7 @@
                     </div>
                 </template>
                 <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
-                <b-dropdown-item @click="exp"><span>View on Explorer</span></b-dropdown-item>
+                <b-dropdown-item @click="viewOnExplorer"><span>View on Explorer</span></b-dropdown-item>
             </b-dropdown>
         </div>
     </b-btn>
@@ -35,6 +35,7 @@
 import BigNumber from 'bignumber.js'
 import Vue from 'vue'
 import { mapState } from 'vuex'
+import { TOKEN_TEST_EXPLORER, TOKEN_EXPLORER } from '../store/network.js'
 export default {
     name: "TokenRecord",
     data: function() {
@@ -79,7 +80,12 @@ export default {
             Vue.delete(tmp, this.tokenId)
             this.$store.commit('account/updateToken', tmp)
         },
-        exp() {
+        viewOnExplorer() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                window.open(TOKEN_TEST_EXPLORER + this.tokenId)
+            } else {
+                window.open(TOKEN_EXPLORER + this.tokenId)
+            }
         },
         tokenSvg(name) {
             if (name === 'VSYS'){
@@ -96,8 +102,9 @@ export default {
         },
         showBalance(balance) {
             let amount = String(balance)
+            console.log('amount', amount)
             if (amount.length >= 13) {
-                let index = amount.indexOf('.')
+                let index = amount.indexOf('.') === -1 ? 7 : amount.indexOf('.')
                 amount = amount.slice(0, index + 3) + '...'
             }
             return amount
