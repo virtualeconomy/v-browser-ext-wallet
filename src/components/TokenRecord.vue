@@ -2,35 +2,31 @@
     <b-btn class="record-unit"
            @click="addConfirm"
            fluid>
-        <b-row>
-            <b-col class="record-icon">
-                <img width="56px"
-                     height="56px"
-                     :src="tokenSvg(tokenSymbol)">
-            </b-col>
-            <b-col class="record-detail">
-                <div style="float:left">
-                    <div style="display: inline-block"><span class="token-balance">{{showBalance(balance)}}</span></div>
-                    <div style="display: inline-block"><span class="unity">{{ ' ' + tokenSymbol }}</span></div>
-                </div>
-            </b-col>
-            <b-col class="record-action">
-                <b-dropdown no-caret
-                            class="more-btn"
-                            variant="link"
-                            right>
-                    <template slot="button-content" style="padding: 0 0">
-                        <div class="more-icon">
-                            <img width="20px"
-                                 height="20px"
-                                 src="../../static/icons/ic_more@2x.png">
-                        </div>
-                    </template>
-                    <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
-                    <b-dropdown-item @click="exp"><span>View on Explorer</span></b-dropdown-item>
-                </b-dropdown>
-            </b-col>
-        </b-row>
+        <div class="record-icon">
+            <img width="56px"
+                 height="56px"
+                 :src="tokenSvg(tokenSymbol)">
+        </div>
+        <div class="record-detail">
+                <div class="token-balance"><span>{{showBalance(balance)}}</span></div>
+                <div class="unity"><span>{{ ' ' + tokenSymbol }}</span></div>
+        </div>
+        <div class="record-action">
+            <b-dropdown no-caret
+                        class="more-btn"
+                        variant="link"
+                        right>
+                <template slot="button-content" style="padding: 0 0">
+                    <div class="more-icon">
+                        <img width="20px"
+                             height="20px"
+                             src="../../static/icons/ic_more@2x.png">
+                    </div>
+                </template>
+                <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
+                <b-dropdown-item @click="exp"><span>View on Explorer</span></b-dropdown-item>
+            </b-dropdown>
+        </div>
     </b-btn>
 </template>
 
@@ -99,9 +95,9 @@ export default {
         },
         showBalance(balance) {
             let amount = String(balance)
-            if (amount.length >= 7) {
-                // let index = amount.indexOf('.')
-                amount = amount.slice(0, 7) + '...'
+            if (amount.length >= 13) {
+                let index = amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
             }
             return amount
         },
@@ -131,9 +127,11 @@ export default {
     padding-top: 16px;
 }
 .record-action {
+    width: 40px;
+    float: right;
+    display: inline-block;
     position: relative;
-    left: 40px;
-    padding-top: 10px;
+    top: 10px;
     padding-right: 12px;
     padding-left: 0px;
 }
@@ -143,8 +141,9 @@ export default {
     padding: 0 0;
 }
 .token-balance {
+    display: inline-block;
     float: left;
-    font-size:24px;
+    font-size:20px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
     color:rgba(50,50,51,1);
@@ -152,6 +151,7 @@ export default {
 }
 .unity {
     padding-left: 4px;
+    padding-top: 8px;
     float: left;
     font-size:14px;
     font-family:Roboto-Regular,Roboto;
@@ -169,9 +169,8 @@ export default {
     padding: 0 0;
 }
 .record-detail {
+    display: inline-block;
     padding-top: 15px;
-    padding-left: 0px;
-    padding-right: 0px;
     min-width: 150px;
 }
 </style>

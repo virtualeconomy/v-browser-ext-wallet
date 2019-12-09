@@ -17,7 +17,8 @@
                         </div>
                         <div class="detail-word-p">
                             <b-btn class="vsys-color text-decoration-none detail-word" variant="link"
-                                   @click="jumpDetail">Details</b-btn>
+                                   @click="goDetails"
+                                   v-b-modal.details>Details</b-btn>
                         </div>
                     </div>
                     <div class="copy">
@@ -70,6 +71,7 @@
                 </div>
             </div>
         </div>
+        <Details></Details>
     </div>
 </template>
 
@@ -79,9 +81,11 @@ import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
+import Details from "src/components/Details.vue";
 export default {
     name: "TokenSelect",
     components: {
+        Details,
         TokenRecord,
         AddToken
     },
@@ -135,8 +139,6 @@ export default {
     methods: {
         addToken() {
             this.$emit('changePage', this.addTokenPage)
-        },
-        jumpDetail() {
         },
         copyAddress(buttonId, refName) {
             this.$refs[refName].select()
