@@ -251,7 +251,7 @@ export default {
 }
 .btn {
     width:100%;
-    height:96px;
+    height:85px;
 }
 .btn-deposit {
     display:inline-block;
