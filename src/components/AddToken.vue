@@ -7,7 +7,7 @@
             <div class="height-full"
                  bg-variant="white"
                  border-variant="primary">
-                <b-tabs @input="tranTabChange">
+                <b-tabs @input="tokenTabChange">
                     <b-tab>
                         <template slot="title">
                             <div><span>Verified Token</span></div>
@@ -16,13 +16,15 @@
                             <div class="accounts-part">
                                 <div class="scroll"
                                      :style="{height: '264px'}">
-                                    <div v-for="(certifiedToken, idx) in certifiedTokens"
-                                         :key="idx">
-                                        <b-btn class="token-unit">
+                                    <div v-for="(certifiedToken, tokenId) in certifiedTokens"
+                                         :key="tokenId">
+                                        <b-btn class="token-unit"
+                                               @click="addVerifiedToken(tokenId, certifiedToken['name'])">
                                             <div class="token-svg"><img width="56px"
                                                                         height="56px"
                                                                         :src="certifiedTokenSvg(certifiedToken['name'])"></div>
-                                            <div  class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                            <div class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                            <div class="notice" v-if="isExistedToken(tokenId)">Already added!</div>
                                         </b-btn>
                                     </div>
                                 </div>
@@ -57,11 +59,27 @@
                         <div class="content">
                             <div class="form-group cus-group">
                                 <label>Token ID</label>
-                                <input class="form-control"
-                                       v-model="tokenId">
+                                <b-form-input class="form-control"
+                                              v-model="tokenId"
+                                              :state="isValidToken(tokenId)"
+                                              aria-describedby="inputTokenLiveFeedback"
+                                              placeholder="Please input Token ID"
+                                              onfocus="this.select()"></b-form-input>
+                                <b-form-invalid-feedback id="inputTokenLiveFeedback"
+                                                         style="margin-top: -20px">
+                                    Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
+                                </b-form-invalid-feedback>
                                 <label>Token Symbol</label>
-                                <input class="form-control input-bottom"
-                                       v-model="tokenSymbol">
+                                <b-form-input class="form-control input-bottom"
+                                              v-model="tokenSymbol"
+                                              :state="isValidSymbol(tokenSymbol)"
+                                              aria-describedby="inputSymbolLiveFeedback"
+                                              placeholder="Please input Token Symbol"
+                                              onfocus="this.select()"></b-form-input>
+                                <b-form-invalid-feedback id="inputSymbolLiveFeedback"
+                                                         v-if="!isValidSymbol(tokenSymbol)">
+                                    Symbol must be digits or English letters within 5.
+                                </b-form-invalid-feedback>
                             </div>
                             <b-row class="button-row">
                                 <b-col class="col-lef">
@@ -102,20 +120,32 @@ export default {
     },
     data: function() {
         return {
-            activeTab: 'verified',
+            activeTab: 'custom',
             tokenId: '',
             tokenSymbol: '',
             tokenInfo: {},
-            certifiedTokens: CertifiedTokens.certifiedTokens()
+            certifiedTokens: CertifiedTokens.certifiedTokens(),
+            selectedVerifiedToken: '',
+            selectedVerifiedSymbol: '',
+            responseErr: false
         }
     },
     computed: {
         ...mapState({
+            chain: state => state.API.chain,
             tokenRecords: state => state.account.tokenRecords
         }),
+        isSubmitDisabled() {
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            if (this.activeTab === 'verified') {
+                return tokenId in this.tokenRecords
+            } else {
+                return tokenId.length <= 0 && this.isValidSymbol(this.tokenSymbol)
+            }
+        }
     },
     methods: {
-        tranTabChange(tabIndex) {
+        tokenTabChange(tabIndex) {
             if (tabIndex === 0) {
                 this.activeTab = 'verified'
             } else if (tabIndex === 1) {
@@ -124,15 +154,48 @@ export default {
         },
         addToken() {
             let tmp = this.tokenRecords
-            Vue.set(tmp, this.tokenId, this.tokenSymbol)
-            this.$store.commit('account/addToken', tmp)
-            this.$emit('changePage', 'home')
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
+            if (tokenId in tmp) {
+                this.$emit('changePage', 'home')
+            }
+            if (tokenId) {
+                this.chain.getTokenInfo(tokenId).then(response => {
+                    this.responseErr = false
+                    if (response.hasOwnProperty('error')) {
+                        this.responseErr = true
+                        return
+                    }
+                    Vue.set(tmp, tokenId, tokenSymbol)
+                    this.$store.commit('account/updateToken', tmp)
+                    this.$emit('changePage', 'home')
+                }, respError => {
+                    this.responseErr = true
+                })
+            }
         },
         close() {
             this.$emit('changePage', 'home')
         },
+        addVerifiedToken(tokenId, verifiedSymbol) {
+            this.selectedVerifiedToken = tokenId
+            this.selectedVerifiedSymbol = verifiedSymbol
+        },
         certifiedTokenSvg(name) {
             return "../../static/icons/token/" + name + ".svg"
+        },
+        isExistedToken(tokenId) {
+            return tokenId in this.tokenRecords
+        },
+        isValidSymbol(symbol) {
+            let Regx = /^[A-Za-z0-9]*$/;
+            return symbol.length <= 5 && Regx.test(symbol)
+        },
+        isValidToken(tokenId) {
+            if (tokenId.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
         }
     }
 }
@@ -246,7 +309,7 @@ export default {
     overflow-x: hidden;
     z-index: 100;
 }
-.token-unit, .token-unit:hover {
+.token-unit {
     width: 320px;
     height: 88px;
     background: rgba(247,247,252,1);
@@ -256,7 +319,7 @@ export default {
     padding-top: 16px;
     border: rgba(247,247,252,1);
 }
-.token-unit:active, .token-unit:focus, .token-unit:active:focus {
+.token-unit:active, .token-unit:focus, .token-unit:hover, .token-unit:active:focus {
     width: 320px;
     height: 88px;
     background: rgba(247, 247, 252, 1);
@@ -282,5 +345,24 @@ export default {
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:21px;
+}
+.notice {
+    position: relative;
+    top: 20px;
+    float: right;
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(246,0,46,1);
+    line-height:14px;
+}
+.tips {
+    position: relative;
+    top: -20px;
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(246,0,46,1);
+    line-height:14px;
 }
 </style>

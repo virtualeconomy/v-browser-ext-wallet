@@ -2,47 +2,45 @@
     <b-btn class="record-unit"
            @click="addConfirm"
            fluid>
-        <b-row>
-            <b-col class="record-icon">
-                <img width="56px"
-                     height="56px"
-                     :src="tokenSvg(tokenSymbol)">
-            </b-col>
-            <b-col class="record-detail">
-                <div style="float:left">
-                    <div style="display: inline-block"><span class="token-balance">{{showBalance(tokenBalance)}}</span></div>
-                    <div style="display: inline-block"><span class="unity">{{ ' ' + tokenSymbol }}</span></div>
-                </div>
-            </b-col>
-            <b-col class="record-action">
-                <b-dropdown no-caret
-                            class="more-btn"
-                            variant="link"
-                            right>
-                    <template slot="button-content" style="padding: 0 0">
-                        <div class="more-icon">
-                            <img width="20px"
-                                 height="20px"
-                                 src="../../static/icons/ic_more@2x.png">
-                        </div>
-                    </template>
-                    <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
-                    <b-dropdown-item @click="exp"><span>View on Explorer</span></b-dropdown-item>
-                </b-dropdown>
-            </b-col>
-        </b-row>
+        <div class="record-icon">
+            <img width="56px"
+                 height="56px"
+                 :src="tokenSvg(tokenSymbol)">
+        </div>
+        <div class="record-detail">
+                <div class="token-balance"><span>{{showBalance(balance)}}</span></div>
+                <div class="unity"><span>{{ ' ' + tokenSymbol }}</span></div>
+        </div>
+        <div v-if="!(tokenId === 'VSYS')"
+             class="record-action">
+            <b-dropdown no-caret
+                        class="more-btn"
+                        variant="link"
+                        right>
+                <template slot="button-content" style="padding: 0 0">
+                    <div class="more-icon">
+                        <img width="20px"
+                             height="20px"
+                             src="../../static/icons/ic_more@2x.png">
+                    </div>
+                </template>
+                <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>
+                <b-dropdown-item @click="viewOnExplorer"><span>View on Explorer</span></b-dropdown-item>
+            </b-dropdown>
+        </div>
     </b-btn>
 </template>
 
 <script>
 import BigNumber from 'bignumber.js'
+import Vue from 'vue'
 import { mapState } from 'vuex'
+import { TOKEN_TEST_EXPLORER, TOKEN_EXPLORER } from '../store/network.js'
 export default {
     name: "TokenRecord",
     data: function() {
         return {
-            unity: BigNumber(1),
-            tokenBalance: BigNumber(3097.9777)
+            unity: BigNumber(1)
         }
     },
     props: {
@@ -60,29 +58,34 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        balance: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
-            chain: state => state.API.chain
+            chain: state => state.API.chain,
+            tokenRecords: state => state.account.tokenRecords
         })
     },
     created() {
-        this.updateToken()
     },
     methods: {
         hide() {
-            this.$store.commit('account/removeToken', this.tokenId)
+            var tmp = this.tokenRecords
+            Vue.delete(tmp, this.tokenId)
+            this.$store.commit('account/updateToken', tmp)
         },
-        exp() {
-        },
-        updateToken() {
-            this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
-                this.unity = BigNumber(response.unity)
-                this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
-            }, respError => {
-            })
+        viewOnExplorer() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                window.open(TOKEN_TEST_EXPLORER + this.tokenId)
+            } else {
+                window.open(TOKEN_EXPLORER + this.tokenId)
+            }
         },
         tokenSvg(name) {
             if (name === 'VSYS'){
@@ -94,13 +97,15 @@ export default {
             }
         },
         addConfirm() {
-            console.log('delete')
+            this.$store.commit('account/updateSelectedToken', this.tokenId)
+            this.$emit('selectSucceed')
         },
         showBalance(balance) {
             let amount = String(balance)
-            if (amount.length >= 7) {
-                // let index = amount.indexOf('.')
-                amount = amount.slice(0, 7) + '...'
+            console.log('amount', amount)
+            if (amount.length >= 13) {
+                let index = amount.indexOf('.') === -1 ? 7 : amount.indexOf('.')
+                amount = amount.slice(0, index + 3) + '...'
             }
             return amount
         },
@@ -130,9 +135,11 @@ export default {
     padding-top: 16px;
 }
 .record-action {
+    width: 40px;
+    float: right;
+    display: inline-block;
     position: relative;
-    left: 40px;
-    padding-top: 10px;
+    top: 10px;
     padding-right: 12px;
     padding-left: 0px;
 }
@@ -142,8 +149,9 @@ export default {
     padding: 0 0;
 }
 .token-balance {
+    display: inline-block;
     float: left;
-    font-size:24px;
+    font-size:20px;
     font-family:Roboto-Regular,Roboto;
     font-weight:400;
     color:rgba(50,50,51,1);
@@ -151,6 +159,7 @@ export default {
 }
 .unity {
     padding-left: 4px;
+    padding-top: 8px;
     float: left;
     font-size:14px;
     font-family:Roboto-Regular,Roboto;
@@ -168,9 +177,8 @@ export default {
     padding: 0 0;
 }
 .record-detail {
+    display: inline-block;
     padding-top: 15px;
-    padding-left: 0px;
-    padding-right: 0px;
     min-width: 150px;
 }
 </style>

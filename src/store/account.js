@@ -15,18 +15,11 @@ export default {
         updateSelectedAccount(state, index) {
             state.selectedAccount = index
         },
-        addToken(state, tokenRecordsInfo) {
+        updateToken(state, tokenRecordsInfo) {
             state.tokenRecords = tokenRecordsInfo
         },
         updateSelectedToken(state, tokenId) {
             state.selectedToken = tokenId
-        },
-        removeToken(state, tokenId) {
-            for(var i=0; i < state.tokenRecords.length; i++){
-                if(state.tokenRecords[i].tokenId === tokenId){
-                    state.tokenRecords.splice(i, 1)
-                }
-            }
         }
     }
 

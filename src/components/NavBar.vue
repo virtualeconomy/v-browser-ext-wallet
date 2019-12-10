@@ -2,22 +2,25 @@
     <div>
         <b-navbar class="nav-item">
             <b-navbar-brand>
-              <img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png">
+                <b-btn class="logo-btn"
+                       @click="updatePopover"><img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png"></b-btn>
             </b-navbar-brand>
             <b-navbar-nav class="account">
-                <p class="account-name">{{ accountNames[selectedAccount] }}</p>
-                <p class="account-address">{{ addressShow }}</p>
+                <b-btn class="logo-btn"
+                       @click="updatePopover"><p class="account-name">{{ accountNames[selectedAccount] }}</p></b-btn>
+                <b-btn class="logo-btn"
+                       @click="updatePopover"><p class="account-address">{{ addressShow }}</p></b-btn>
                 <div class="tokens-detail">
                     <b-button id="popover-1"
                               class="token-detail"
                               variant="link"
                               align="center"
-                              @click="changeArrPos">
-                        <div><img v-if="arrPos==='down'"
+                              @click="pop = !pop">
+                        <div><img v-if="pop===false"
                                   width="10px"
                                   height="6px"
                                   src="../../static/icons/ic_arrow_down_yellow@3x.png"/></div>
-                        <div><img v-if="arrPos==='up'"
+                        <div><img v-if="pop===true"
                                   width="10px"
                                   height="6px"
                                   src="../../static/icons/ic_arrow_up_yellow@2x.png"/></div>
@@ -26,15 +29,20 @@
                 <b-popover ref="popover"
                            placement="bottom"
                            target="popover-1"
-                           triggers="click"
+                           triggers=""
                            boundary-padding="0"
-                           no-fade="false">
+                           no-fade="false"
+                           :show.sync="pop">
                     <token-select class="token-select"
                                   :addresses="addresses"
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
-                                  :avt-hash="avtHash"
-                                  @changePage="changePage"></token-select>
+                                  :token-balances="tokenBalances"
+                                  :balances="balances"
+                                  :selected-token="selectedToken"
+                                  :token-name="tokenName"
+                                  @changePage="changePage"
+                                  @selectSucceed="selectSucceed"></token-select>
                 </b-popover>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
@@ -97,7 +105,8 @@ export default {
                 'test': 999,
             },
             avtHash: '555077584842597e4246',
-            arrPos: 'down'
+            arrPos: 'down',
+            pop: false
         }
     },
     props: {
@@ -117,12 +126,22 @@ export default {
             require: true,
             default: function() {}
         },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         selectedAccount: {
             type: Number,
             require: true,
             default: 0
         },
         tokenName: {
+            type: String,
+            require: true,
+            default: 'VSYS'
+        },
+        selectedToken: {
             type: String,
             require: true,
             default: 'VSYS'
@@ -161,6 +180,19 @@ export default {
             this.$refs.popover.$emit('close')
             this.arrPos = 'down'
             this.$emit('changePage', data)
+        },
+        selectSucceed() {
+            this.$refs.popover.$emit('close')
+            this.arrPos = 'down'
+        },
+        updatePopover() {
+            if(this.pop) {
+                this.$refs.popover.$emit('close')
+                this.pop = false
+            } else {
+                this.$refs.popover.$emit('open')
+                this.pop = true
+            }
         }
     },
     computed: {
@@ -168,7 +200,6 @@ export default {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
             return addrChars.join('')
-
         }
     }
 }
@@ -178,6 +209,21 @@ export default {
 .v-logo {
     width: 28px;
     height: 28px;
+}
+.logo-btn {
+    padding: 0 0;
+    background: rgba(255,255,255,1);
+    border: rgba(255,255,255,1);
+}
+.logo-btn:hover {
+    padding: 0 0;
+    background: rgba(255,255,255,1);
+    border: rgba(255,255,255,1);
+}
+.logo-btn:active, .logo-btn:focus, .logo-btn:active:focus {
+    padding: 0 0;
+    background: rgba(255,255,255,1);
+    border: rgba(255,255,255,1);
 }
 .icon {
     width: 20px;

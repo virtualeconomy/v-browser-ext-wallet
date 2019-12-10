@@ -17,7 +17,8 @@
                         </div>
                         <div class="detail-word-p">
                             <b-btn class="vsys-color text-decoration-none detail-word" variant="link"
-                                   @click="jumpDetail">Details</b-btn>
+                                   @click="goDetails"
+                                   v-b-modal.details>Details</b-btn>
                         </div>
                     </div>
                     <div class="copy">
@@ -41,11 +42,18 @@
             <div class="accounts-part">
                 <div class="scroll"
                      :style="{height: '176px'}">
+                    <TokenRecord :token-id="'VSYS'"
+                                 :address="addresses[selectedAccount]"
+                                 :balance="balances[addresses[selectedAccount]]"
+                                 :token-symbol="'VSYS'"
+                                 @selectSucceed="selectSucceed"></TokenRecord>
                     <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
                                  :address="addresses[selectedAccount]"
+                                 :balance="tokenBalances[tokenId]"
                                  :token-id="tokenId"
-                                 :token-symbol="tokenRecords[tokenId]"></TokenRecord>
+                                 :token-symbol="tokenRecords[tokenId]"
+                                 @selectSucceed="selectSucceed"></TokenRecord>
                 </div>
             </div>
             <div class="tip-part">
@@ -63,6 +71,7 @@
                 </div>
             </div>
         </div>
+        <Details></Details>
     </div>
 </template>
 
@@ -72,9 +81,11 @@ import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
+import Details from "src/components/Details.vue";
 export default {
     name: "TokenSelect",
     components: {
+        Details,
         TokenRecord,
         AddToken
     },
@@ -103,13 +114,31 @@ export default {
             require: true,
             default: function() {
             }
+        },
+        balances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        tokenBalances: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
+        tokenName: {
+            type: String,
+            require: true,
+            default: 'VSYS'
+        },
+        selectedToken: {
+            type: String,
+            require: true,
+            default: 'VSYS'
         }
     },
     methods: {
         addToken() {
             this.$emit('changePage', this.addTokenPage)
-        },
-        jumpDetail() {
         },
         copyAddress(buttonId, refName) {
             this.$refs[refName].select()
@@ -122,6 +151,9 @@ export default {
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         },
+        selectSucceed() {
+            this.$emit('selectSucceed')
+        }
     },
     computed: {
         ...mapState({
