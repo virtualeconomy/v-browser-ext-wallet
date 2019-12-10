@@ -32,7 +32,9 @@
         <div class="view">
             <p>Export Private Key / Seed</p>
             <b-btn v-b-modal.privacy variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
-        <Privacy></Privacy>
+        <Privacy :address="address"
+                 :account-name="accountName"
+                 @close="close"></Privacy>
     </b-modal>
 </template>
 

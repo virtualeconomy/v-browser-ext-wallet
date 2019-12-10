@@ -291,7 +291,7 @@ export default {
             if (this.secretInfo) {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
             }
-        },
+        }
     },
     methods: {
         getTokenInfo() {

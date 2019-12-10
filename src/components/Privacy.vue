@@ -1,6 +1,7 @@
 <template>
     <b-modal id="privacy"
              lazy
+             ref="privacyModal"
              centered
              hide-footer
              hide-header>
@@ -8,17 +9,19 @@
             <img class="back-icon" src="../../static/icons/ic_back@2x.png"/>
             <b-btn class="back-link text-decoration-none" variant="link"
                    @click="back">Back</b-btn>
-            <button class="close btn-close">
-                <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
-            </button>
         </div>
         <div class="privacy">
-            <p class="p1">Account 1</p>
-            <p class="p2">Adasdas..Basda</p>
+            <p class="p1">{{ accountName }}</p>
+            <p class="p2">{{ addressShow }}</p>
             <b-form-group class="private-form">
                 <label>Private Key</label>
                 <b-input-group class="input-t"
-                               v-if="true">
+                               v-if="privateKeyHidden">
+                    <b-btn @click="showPriKey"
+                           size="sm"
+                           variant="white"
+                           :disabled="!prvKeyPwd"
+                           class="privacy-button">Show</b-btn>
                     <b-form-input size="sm"
                                   placeholder="Type your password"
                                   v-model="prvKeyPwd"
@@ -26,81 +29,62 @@
                                   type="password"
                                   id="prvKeyPwd">
                     </b-form-input>
-                    <b-input-group-append>
-                        <b-btn @click="showPriKey"
-                               size="sm"
-                               variant="link"
-                               class="privacy-button text-decoration-none">Show</b-btn>
-                    </b-input-group-append>
                 </b-input-group>
                 <b-input-group class="input-t"
                                v-else>
+                    <b-btn size="sm"
+                           variant="white"
+                           @click="hidePriKey"
+                           class="privacy-button">Hide</b-btn>
                     <b-form-input id="priKey"
                                   readonly
                                   size="sm"
+                                  class="show-info"
                                   v-model="privateKey"
                                   type="text">
                     </b-form-input>
-                    <b-input-group-append>
-                        <b-btn size="sm"
-                               variant="link"
-                               class="privacy-button text-decoration-none">Hide</b-btn>
-                    </b-input-group-append>
                 </b-input-group>
             </b-form-group>
             <b-form-group class="private-form">
                 <label>Seed</label>
                 <b-input-group class="input-t"
-                               v-if="true">
+                               v-if="seedHidden">
+                    <b-btn @click="showSeed"
+                           size="sm"
+                           variant="white"
+                           :disabled="!seedPwd"
+                           class="privacy-button">Show</b-btn>
                     <b-form-input size="sm"
                                   placeholder="Type your password"
-                                  v-model="prvKeyPwd"
-                                  @input="hideErr('prvKeyPwdErr')"
+                                  v-model="seedPwd"
+                                  @input="hideErr('seedPwdError')"
                                   type="password"
                                   id="prvKeyPwd">
                     </b-form-input>
-                    <b-input-group-append>
-                        <b-btn @click="showPriKey"
-                               size="sm"
-                               variant="link"
-                               class="privacy-button text-decoration-none">Show</b-btn>
-                    </b-input-group-append>
                 </b-input-group>
                 <b-input-group class="input-t"
                                v-else>
+                    <b-btn size="sm"
+                           variant="white"
+                           @click="hideSeed"
+                           class="privacy-button">Hide</b-btn>
                     <b-form-input id="priKey"
                                   readonly
                                   size="sm"
-                                  v-model="privateKey"
+                                  v-model="seed"
                                   type="text">
                     </b-form-input>
-                    <b-input-group-append>
-                        <b-btn size="sm"
-                               variant="link"
-                               class="privacy-button text-decoration-none">Hide</b-btn>
-                    </b-input-group-append>
                 </b-input-group>
             </b-form-group>
             <div class="text-area"><p class="p3">Warning: Never disclose this key. Anyone with your private keys can steal any assets help in your account.</p></div>
             <b-row style="margin-top: 20px;margin-bottom: 15px;">
-                <b-col class="col-lef">
-                    <b-button
-                            class="btn-cancel"
-                            block
-                            variant="light"
-                            size="lg"
-                            @click="close">Cancel
-                    </b-button>
-                </b-col>
-                <b-col class="col-rit">
-                    <b-button
-                            block
-                            class="btn-confirm"
-                            variant="warning"
-                            size="lg"
-                            :disabled="isSubmitDisabled"
-                            @click="createAccount">Confirm
-                    </b-button>
+                <b-col>
+                <b-button block
+                          class="btn-confirm"
+                          variant="warning"
+                          size="lg"
+                          @click="close">Close
+                </b-button>
                 </b-col>
             </b-row>
         </div>
@@ -108,15 +92,105 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import seedLib from '../libs/seed.js'
 export default {
-    name: "Privacy"
+    name: "Privacy",
+    data: function() {
+        return {
+            prvKeyPwd: '',
+            seedPwd: '',
+            seed: this.getSeedPhrase,
+            prvKeyPwdErr: false,
+            seedPwdErr: false,
+            seedHidden: true,
+            privateKeyHidden: true,
+            privateKey: this.getPrivateKey
+        }
+    },
+    props: {
+        address: {
+            type: String,
+            require: true,
+            default: ''
+        },
+        accountName: {
+            type: String,
+            require: true,
+            default: ''
+        }
+    },
+    computed: {
+        ...mapState({
+            wallet: state => state.wallet,
+            selectedAccount: state => state.account.selectedAccount,
+        }),
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+        },
+        getPrivateKey() {
+            return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase, this.selectedAccount, this.networkByte).keyPair.privateKey
+        },
+        getSeedPhrase() {
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+            }
+        },
+        addressShow() {
+            const addrChars = this.address.split('')
+            addrChars.splice(6, 23, '...')
+            return addrChars.join('')
+        }
+    },
+    methods: {
+        showPriKey() {
+            if (this.prvKeyPwd === this.wallet.password) {
+                setTimeout(() => {
+                    this.prvKeyPwdErr = false
+                    this.privateKey = this.getPrivateKey
+                    this.privateKeyHidden = false
+                    this.prvKeyPwd = ''
+                }, 400)
+            } else {
+                this.prvKeyPwdErr = true
+            }
+        },
+        hidePriKey() {
+            this.privateKey = ''
+            this.privateKeyHidden = true
+        },
+        showSeed() {
+            if (this.seedPwd === this.wallet.password) {
+                setTimeout(() => {
+                    this.seedPwdErr = false
+                    this.seed = this.getSeedPhrase
+                    this.seedHidden = false
+                    this.seedPwd = ''
+                }, 400)
+            } else {
+                this.seedPwdErr = true
+            }
+        },
+        hideSeed() {
+            this.seed = ''
+            this.seedHidden = true
+        },
+        hideErr(errorType) {
+            this[errorType] = false
+        },
+        back() {
+            this.$refs.privacyModal.hide()
+        },
+        close() {
+            this.$refs.privacyModal.hide()
+            this.$emit('close')
+        }
+    }
 }
 </script>
 
 <style scoped>
-.close {
-    margin-right: 3px;
-}
 .back {
     height: 40px;
 }
@@ -169,18 +243,19 @@ export default {
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:16px;
-    border-right: none;
 }
 #priKey {
+    background:rgba(255,255,255,1);
     border-radius:4px;
     border:1px solid rgba(230,230,237,1);
     height: 56px !important;
+    padding-right: 70px;
     font-size:14px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:20px;
-    border-right: none;
+    word-break: break-all;
 }
 .private-form {
     text-align: left;
@@ -195,14 +270,15 @@ export default {
     margin-bottom: 12px;
 }
 .privacy-button {
-    border-radius:4px;
-    border:1px solid rgba(230,230,237,1);
     font-size:14px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(255,136,55,1);
     line-height:16px;
-    border-left: none;
+    position: absolute;
+    margin-top: 15px;
+    margin-left: 250px;
+    z-index: 100;
 }
 .text-area {
     height:66px;
@@ -218,17 +294,6 @@ export default {
     font-weight:400;
     color:rgba(246,0,46,1);
     line-height:14px;
-}
-.btn-cancel {
-    font-size:16px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(50,50,51,1);
-    line-height:19px;
-    height:44px;
-    background:rgba(255,255,255,1);
-    border-radius:4px;
-    border:1px solid rgba(242,242,247,1);
 }
 .btn-confirm {
     font-size:16px;
