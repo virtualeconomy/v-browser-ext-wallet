@@ -3,12 +3,15 @@
         <b-navbar class="nav-item">
             <b-navbar-brand>
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png"></b-btn>
             </b-navbar-brand>
             <b-navbar-nav class="account">
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><p class="account-name">{{ accountNames[selectedAccount] }}</p></b-btn>
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><p class="account-address">{{ addressShow }}</p></b-btn>
                 <div class="tokens-detail">
                     <b-button id="popover-1"
