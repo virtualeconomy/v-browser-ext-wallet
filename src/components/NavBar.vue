@@ -256,13 +256,12 @@ export default {
 }
 .nav-item {
     height: 60px;
-    padding-right: 6px;
     background:#FFFFFF;
 }
 .account {
     text-align: center;
     flex-direction: column !important;
-    margin-left: 76px;
+    margin: 0 auto;
 }
 .account-name {
     font-size: 16px;
@@ -323,5 +322,9 @@ export default {
     z-index:1000;
     max-width: 340px;
 }
-
+.ml-auto {
+    margin-left: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
 </style>
