@@ -80,7 +80,8 @@
             </b-navbar-nav>
         </b-navbar>
       <AddAccount></AddAccount>
-      <Details></Details>
+      <Details :address="addresses[selectedAccount]"
+               :account-name="accountNames[selectedAccount]"></Details>
       <Settings></Settings>
       <About></About>
     </div>
@@ -102,7 +103,6 @@ export default {
     data() {
         return {
             avtHash: '555077584842597e4246',
-            arrPos: 'down',
             pop: false
         }
     },
@@ -170,17 +170,12 @@ export default {
         select(index) {
             this.$store.commit('account/updateSelectedAccount', index)
         },
-        changeArrPos() {
-            this.arrPos = this.arrPos === 'down' ? 'up' : 'down';
-        },
         changePage(data) {
             this.$refs.popover.$emit('close')
-            this.arrPos = 'down'
             this.$emit('changePage', data)
         },
         selectSucceed() {
             this.$refs.popover.$emit('close')
-            this.arrPos = 'down'
         },
         updatePopover() {
             if(this.pop) {

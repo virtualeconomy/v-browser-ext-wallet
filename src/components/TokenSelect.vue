@@ -18,8 +18,7 @@
                         <div class="detail-word-p">
                             <b-btn class="vsys-color text-decoration-none detail-word"
                                    variant="link"
-                                   @click="details"
-                                   v-b-modal.details>Details</b-btn>
+                                   @click="details">Details</b-btn>
                         </div>
                     </div>
                     <div class="copy">
@@ -34,7 +33,7 @@
                                    variant="link"
                                    id="addr-cpy"
                                    v-b-popover.click.topright="'Copied!'"
-                                   @click="copyAddress('addr-cpy', 'addrToCopy')">
+                                   @click="copyAddress">
                                 <img width="12px"
                                      height="12px"
                                      src="../../static/icons/ic_copy@2x.png">
@@ -76,7 +75,6 @@
                 </div>
             </div>
         </div>
-        <Details></Details>
     </div>
 </template>
 
@@ -85,11 +83,9 @@ import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
-import Details from "src/components/Details.vue";
 export default {
     name: "TokenSelect",
     components: {
-        Details,
         TokenRecord,
         AddToken
     },
@@ -144,7 +140,8 @@ export default {
             }, 400)
         },
         details() {
-            this.$refs.popover.$emit('close')
+            this.$root.$emit('bv::show::modal', 'details')
+            this.$emit('selectSucceed')
         },
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')

@@ -7,9 +7,8 @@ html, body, #app {
     background:rgba(247,247,252,1);
 }
 .details-dialog {
-    width: 280px !important;
-    margin-left: 40px !important;
     text-align: center;
+    padding-bottom: 32px !important;
 }
 .vsys-color {
     color: #FF8837 !important;
