@@ -4,7 +4,7 @@ export default {
     state: {
         accountNames: ['Account 1'],
         selectedAccount: 0,
-        selectedToken: 'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3',
+        selectedToken: 'VSYS',
         tokenRecords: {}
     },
 

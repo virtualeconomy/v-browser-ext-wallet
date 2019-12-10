@@ -102,7 +102,6 @@ export default {
         },
         showBalance(balance) {
             let amount = String(balance)
-            console.log('amount', amount)
             if (amount.length >= 13) {
                 let index = amount.indexOf('.') === -1 ? 7 : amount.indexOf('.')
                 amount = amount.slice(0, index + 3) + '...'

@@ -35,12 +35,12 @@
                            :show.sync="pop">
                     <token-select class="token-select"
                                   :addresses="addresses"
+                                  :address="addresses[selectedAccount]"
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
                                   :token-balances="tokenBalances"
                                   :balances="balances"
                                   :selected-token="selectedToken"
-                                  :token-name="tokenName"
                                   @changePage="changePage"
                                   @selectSucceed="selectSucceed"></token-select>
                 </b-popover>
@@ -101,9 +101,6 @@ export default {
     },
     data() {
         return {
-            Records: {
-                'test': 999,
-            },
             avtHash: '555077584842597e4246',
             arrPos: 'down',
             pop: false

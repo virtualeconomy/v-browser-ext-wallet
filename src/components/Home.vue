@@ -7,7 +7,6 @@
                  :token-balances="tokenBalances"
                  :balances="balances"
                  :selected-token="selectedToken"
-                 :token-name="tokenName"
                  :selected-account="selectedAccount"
                  @changePage="changePage"></nav-bar>
         <div v-if="page === 'home'"

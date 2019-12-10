@@ -220,7 +220,7 @@ export default {
             if (this.selectedToken === 'VSYS') {
                 amount = String(this.balances[this.address])
             } else {
-                amount = String(this.tokenBalances[this.selectedToken])
+                amount = String(this.tokenBalances[this.selectedToken].value)
             }
             if (amount.length >= 16) {
                 let index = amount.indexOf('.')
@@ -261,7 +261,7 @@ export default {
             if (this.selectedToken === 'VSYS') {
                 return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.balances[this.address]).minus(TX_FEE))
             } else {
-                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken])) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.balances[this.address]))
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken].value)) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.balances[this.address]))
             }
         },
         isValidDescription() {

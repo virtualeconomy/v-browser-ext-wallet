@@ -8,7 +8,7 @@
                  bg-variant="white"
                  border-variant="primary">
                 <b-tabs @input="tokenTabChange">
-                    <b-tab>
+                    <b-tab active>
                         <template slot="title">
                             <div><span>Verified Token</span></div>
                         </template>
@@ -52,7 +52,7 @@
                             </b-row>
                         </div>
                     </b-tab>
-                    <b-tab active>
+                    <b-tab>
                         <template slot="title">
                             <div><span>Custom Token</span></div>
                         </template>
@@ -120,7 +120,7 @@ export default {
     },
     data: function() {
         return {
-            activeTab: 'custom',
+            activeTab: 'verified',
             tokenId: '',
             tokenSymbol: '',
             tokenInfo: {},
