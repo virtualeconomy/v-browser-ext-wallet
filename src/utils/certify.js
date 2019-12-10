@@ -13,7 +13,6 @@ var certifiedTokensList = {
 }
 
 const NETWORK_BYTE = store.state.wallet.networkByte;
-const localTokens = store.state.account.tokenRecords
 var certifiedTokens;
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']
@@ -24,12 +23,5 @@ if (String.fromCharCode(NETWORK_BYTE) === 'T') {
 export default{
     certifiedTokens() {
         return certifiedTokens
-    },
-    getTokenName(tokenId) {
-        if (certifiedTokens[tokenId]) {
-            return certifiedTokens[tokenId].name
-        } else {
-            return localTokens[tokenId]
-        }
     }
 }

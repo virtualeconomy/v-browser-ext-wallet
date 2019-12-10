@@ -17,19 +17,23 @@
                      :src="tokenSvg(tokenName)">
             </div>
             <div class="balance">
-                <p class="token-balance">{{ accountBalance ? accountBalance : 'NaN'}}<span class="unity">{{ ' ' + tokenName }}</span> </p >
+                <p class="token-balance">{{ accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
             </div>
             <div class="btn">
-                <b-button class="btn-deposit" @click="deposit">
+                <b-button class="btn-deposit"
+                          @click="deposit">
                     <img class="icon-btn"
                          src="../../static/icons/ic_deposit@3x.png"><b class="deposit-txt">Deposit</b></b-button>
-                <b-button class="btn-send" @click="send">
+                <b-button class="btn-send"
+                          @click="send">
                     <img class="icon-btn"
                          src="../../static/icons/ic_send@3x.png"><b class="send-txt">Send</b></b-button>
             </div>
             <transaction-records class="transaction-records"
                                  :network-byte="networkByte"
                                  :token-name="tokenName"
+                                 :token-balances="tokenBalances"
+                                 :token-records="tokenRecords"
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
@@ -65,7 +69,6 @@ import Vue from 'vue'
 import seedLib from '../libs/seed.js'
 import BigNumber from 'bignumber.js'
 import AddToken from './AddToken.vue'
-import certify from '../utils/certify.js'
 
 export default {
     name: "Home",
@@ -106,7 +109,8 @@ export default {
             accountNames: state => state.account.accountNames,
             walletAmount: state => state.wallet.walletAmount,
             tokenRecords: state => state.account.tokenRecords,
-            selectedToken: state => state.account.selectedToken
+            selectedToken: state => state.account.selectedToken,
+            tokenRecords: state => state.account.tokenRecords
         }),
         secretInfo() {
             return JSON.parse(
@@ -116,15 +120,23 @@ export default {
             if (this.selectedToken === 'VSYS') {
                 return 'VSYS'
             } else {
-                return certify.getTokenName(this.selectedToken)
+                return this.tokenRecords[this.selectedToken]
             }
         },
         accountBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
-                amount = String(this.balances[this.address])
+                if (this.balances[this.address]) {
+                    amount = String(this.balances[this.address])
+                } else {
+                    amount = '0'
+                }
             } else {
-                amount = String(this.tokenBalances[this.selectedToken])
+                if (this.tokenBalances[this.selectedToken]) {
+                    amount = String(this.tokenBalances[this.selectedToken].value)
+                } else {
+                    amount = '0'
+                }
             }
             if (amount.length >= 14) {
                 let index = amount.indexOf('.')
@@ -175,7 +187,7 @@ export default {
             for (let tokenId in this.tokenRecords) {
                 this.chain.getTokenBalance(this.address, tokenId).then(response => {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
-                    Vue.set(this.tokenBalances, tokenId, value)
+                    Vue.set(this.tokenBalances, tokenId, { 'value': value, 'unity': response.unity })
                 })
             }
         },
@@ -222,6 +234,7 @@ export default {
     width: 100%;
     height: 33px;
     text-align: center;
+    margin-bottom: 24px;
 }
 .token-balance {
     font-size:28px;
@@ -242,20 +255,28 @@ export default {
     height:96px;
 }
 .btn-deposit {
-    margin-top: 24px;
     display:inline-block;
     width:128px;
     height:40px;
     background:rgba(0,188,37,1);
+    border: 1px solid rgba(0,188,37,1);
     border-radius:4px;
 }
 .btn-send {
-    margin-top: 24px;
     margin-left: 20px;
     width:128px;
     height:40px;
     background:rgba(246,0,46,1);
+    border: 1px solid rgba(246,0,46,1);
     border-radius:4px;
+}
+.btn-send:active, .btn-send:hover{
+    background-color: #E03146 !important;
+    border: 1px solid #E03146 !important;
+}
+.btn-deposit:active, .btn-deposit:hover{
+    background-color: #45b33f !important;
+    border: 1px solid #45b33f !important;
 }
 .icon-btn {
     width:16px;
