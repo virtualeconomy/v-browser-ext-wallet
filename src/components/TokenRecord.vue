@@ -1,5 +1,5 @@
 <template>
-    <b-btn class="record-unit"
+    <b-btn :class="[selectedToken==tokenId ? 'selected-record-unit' : 'record-unit']"
            @click="addConfirm"
            fluid>
         <div class="record-icon">
@@ -69,7 +69,8 @@ export default {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
             chain: state => state.API.chain,
-            tokenRecords: state => state.account.tokenRecords
+            tokenRecords: state => state.account.tokenRecords,
+            selectedToken: state => state.account.selectedToken
         })
     },
     created() {
@@ -133,6 +134,16 @@ export default {
     padding-bottom: 16px;
     padding-top: 16px;
 }
+.selected-record-unit, .selected-record-unit:hover, .selected-record-unit:active, .selected-record-unit:focus, .selected-record-unit:active:focus {
+    width:320px;
+    height:88px;
+    background:rgba(233,233,242,1);
+    border-radius:4px;
+    border:rgba(233,233,242,1);
+    padding-left: 20px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
 .record-action {
     width: 40px;
     float: right;
@@ -176,8 +187,9 @@ export default {
     padding: 0 0;
 }
 .record-detail {
+    float: left;
     display: inline-block;
+    padding-left: 15px;
     padding-top: 15px;
-    min-width: 150px;
 }
 </style>

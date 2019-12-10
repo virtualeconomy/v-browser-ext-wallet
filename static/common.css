@@ -81,4 +81,6 @@ button:focus {
     line-height:16px !important;
     margin-right: 24px;
 }
-
+.navbar-brand {
+    margin-right: 39px !important;
+}
