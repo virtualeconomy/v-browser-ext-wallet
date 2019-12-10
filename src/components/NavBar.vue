@@ -58,10 +58,12 @@
                           height="36"
                           :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </template>
-              <b-dropdown-item-button class="button"
-                                      :class="{'selected-account': index === selectedAccount}"
-                                      @click="select(index)"
-                                      v-for="(address, index) in addresses">
+              <div class="scroll"
+                   :style="{height: '200px'}">
+                  <b-dropdown-item-button class="button"
+                                          :class="{'selected-account': index === selectedAccount}"
+                                          @click="select(index)"
+                                          v-for="(address, index) in addresses">
                       <canvas class="canvas-item"
                               width="32"
                               height="32"
@@ -74,7 +76,8 @@
                            class="select"
                            width="10px"
                            height="8px" src="../../static/icons/ic_selected@2x.png">
-              </b-dropdown-item-button>
+                  </b-dropdown-item-button>
+              </div>
               <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
@@ -255,7 +258,7 @@ export default {
 }
 .canvas {
     padding-right: 0px !important;
-    margin-top: 6px;
+    margin-top: 5px;
 }
 .nav-item {
     height: 60px;
@@ -329,5 +332,10 @@ export default {
     margin-left: 0px !important;
     padding-left: 0px !important;
     padding-right: 0px !important;
+}
+.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
 }
 </style>
