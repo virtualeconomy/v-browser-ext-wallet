@@ -170,7 +170,7 @@ export default {
     max-width: 340px;
 }
 .content {
-    text-align:center
+    text-align:center;
 }
 .detail-part {
     position: relative;
