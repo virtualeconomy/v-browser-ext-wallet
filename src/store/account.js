@@ -26,6 +26,12 @@ export default {
         updateSelectedToken(state, tokenId) {
             state.selectedToken = tokenId
         },
+        updateAccountName(state, accountNames) {
+            let temp = state.accountNames
+            temp[accountNames.index] = accountNames.name
+            state.accountNames = null
+            state.accountNames = temp
+        },
         initializeAccount(state) {
             state.accountNames = ['Account 1']
             state.selectedAccount = 0

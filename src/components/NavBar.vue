@@ -90,6 +90,7 @@
         </b-navbar>
       <AddAccount></AddAccount>
       <Details :address="addresses[selectedAccount]"
+               :selected-account="selectedAccount"
                :account-name="accountNames[selectedAccount]"></Details>
       <Settings></Settings>
       <About></About>
@@ -104,6 +105,7 @@ import AddAccount from './AddAccount.vue'
 import Settings from './Settings.vue'
 import About from './About.vue'
 import TokenSelect from "./TokenSelect.vue"
+import { mapState } from 'vuex'
 export default {
     name: "NavBar",
     mounted() {
@@ -119,12 +121,6 @@ export default {
             type: Object,
             require: true,
             default: function() {}
-        },
-        accountNames: {
-            type: Array,
-            require: true,
-            default: function() {
-            }
         },
         balances: {
             type: Object,
@@ -204,6 +200,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            accountNames: state => state.account.accountNames
+        }),
         addressShow() {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')

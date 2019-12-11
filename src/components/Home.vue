@@ -4,7 +4,6 @@
         <nav-bar v-show="showNav"
                  class="nav-bar"
                  :addresses="addresses"
-                 :account-names="accountNames"
                  :token-balances="tokenBalances"
                  :balances="balances"
                  :token-records="tokenRecords"

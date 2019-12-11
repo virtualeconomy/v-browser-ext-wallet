@@ -5,12 +5,17 @@
              centered
              body-class="details-dialog"
              hide-footer
+             @hidden="updateAccountName"
              hide-header>
         <button class="close btn-close" @click="close">
             <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
         </button>
         <div class="account-content">
-            <p>{{ accountName }}</p><img width="12" height="12" src="../../static/icons/ic_edit@2x.png"/>
+            <b-input id="accountName"
+                     readonly
+                     v-model="inputName"
+                     type="text"></b-input><b-btn @click="editAccountName"
+                                                  variant="link"><img width="12" height="12" src="../../static/icons/ic_edit@2x.png"/></b-btn>
         </div>
         <img :src="getQrCodeImg"/>
         <div class="address"><p>{{ address }}</p>
@@ -52,9 +57,15 @@ import { ADDRESS_TEST_EXPLORER, ADDRESS_EXPLORER } from '../store/network.js'
 import { PROTOCOL, OPC_ACCOUNT } from '../js-v-sdk/src/constants.js'
 import { mapState } from 'vuex'
 import Privacy from './Privacy.vue'
+import account from "src/store/account";
 export default {
     name: "Details",
     components: { Privacy },
+    data: function() {
+        return {
+            inputName: this.accountName
+        }
+    },
     computed: {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
@@ -96,11 +107,26 @@ export default {
             type: String,
             require: true,
             default: ''
+        },
+        selectedAccount: {
+            type: Number,
+            require: true,
+            default: 0
         }
     },
     methods: {
+        editAccountName() {
+            document.getElementById('accountName').readOnly = !document.getElementById('accountName').readOnly
+        },
         close() {
             this.$refs.detailsModal.hide()
+        },
+        updateAccountName() {
+            if (this.inputName !== this.accountName) {
+                let name = this.inputName.trim()
+                const info = { 'index': this.selectedAccount, 'name': name}
+                this.$store.commit('account/updateAccountName', info)
+            }
         },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
@@ -130,17 +156,27 @@ export default {
 .account-content {
     margin-top: 20px;
     margin-bottom: 2px;
-    p {
+    input {
+        padding: 0px;
         display: inline-block;
         font-size:20px;
+        width: 120px;
+        border-color: rgb(255, 190, 150) !important;
+        text-align: center;
         font-family:SFProDisplay-Medium,SFProDisplay;
         font-weight:500;
         color:rgba(50,50,51,1);
         line-height:24px;
         margin: 0px;
     }
-    img {
-        position: relative; left: 8px;
+    input[readonly] {
+        border: none;
+        background: none;
+    }
+    button {
+        padding: 0px;
+        position: relative;
+        left: 4px;
     }
 }
 .address {
@@ -167,8 +203,6 @@ export default {
     }
     button {
         padding: 0px;
-        margin-top: 4px;
-        float: right;
     }
 }
 .hidden {
