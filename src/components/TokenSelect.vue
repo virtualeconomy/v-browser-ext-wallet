@@ -3,9 +3,10 @@
         <div class="content">
             <div class="detail-part">
                 <div>
-                    <img width="56px"
-                         height="56px"
-                         src="../../static/icons/ic_v_logo@3x.png">
+                    <canvas class="canvas-item"
+                            width="56"
+                            height="56"
+                            :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </div>
                 <div class="account-name"><span class="name">{{ accountNames[selectedAccount] }}</span></div>
                 <div class="details-copy">
@@ -81,12 +82,16 @@
 </template>
 
 <script>
+import jdenticon from 'jdenticon'
 import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
 export default {
     name: "TokenSelect",
+    mounted() {
+        jdenticon()
+    },
     components: {
         TokenRecord,
         AddToken
@@ -155,6 +160,9 @@ export default {
         },
         selectSucceed() {
             this.$emit('selectSucceed')
+        },
+        avatarDataHex(address) {
+            return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         }
     },
     computed: {
@@ -180,6 +188,8 @@ export default {
     position: relative;
     top: 27px;
     width: 100%;
+}
+.canvas-item {
 }
 .accounts-part {
     width: 100%;
