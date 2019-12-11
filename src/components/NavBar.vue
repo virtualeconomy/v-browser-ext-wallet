@@ -42,6 +42,7 @@
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
                                   :token-balances="tokenBalances"
+                                  :token-records="tokenRecords"
                                   :balances="balances"
                                   :selected-token="selectedToken"
                                   @changePage="changePage"
@@ -139,6 +140,11 @@ export default {
             type: Number,
             require: true,
             default: 0
+        },
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
         },
         tokenName: {
             type: String,

@@ -7,6 +7,7 @@
                  :account-names="accountNames"
                  :token-balances="tokenBalances"
                  :balances="balances"
+                 :token-records="tokenRecords"
                  :selected-token="selectedToken"
                  :selected-account="selectedAccount"
                  @changePage="changePage"></nav-bar>
@@ -37,7 +38,8 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <add-token @changePage="changePage"></add-token>
+            <add-token :token-records="tokenRecords"
+                       @changePage="changePage"></add-token>
         </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
@@ -83,6 +85,7 @@ export default {
         if (this.wallet.password === false) {
             this.$router.push('/login')
         }
+        this.getTokenRecords()
         this.$store.commit('API/updateAPI', this.networkByte)
         this.getAddresses()
         this.getBalances()
@@ -97,6 +100,7 @@ export default {
             accountName: '',
             balances: {},
             tokenBalances: {},
+            tokenRecords: {},
             sessionClearTimeout: void 0,
             showNav: true
         }
@@ -109,7 +113,8 @@ export default {
             selectedAccount: state => state.account.selectedAccount,
             accountNames: state => state.account.accountNames,
             walletAmount: state => state.wallet.walletAmount,
-            tokenRecords: state => state.account.tokenRecords,
+            testnetTokenRecords: state => state.account.testnetTokenRecords,
+            mainnetTokenRecords: state => state.account.mainnetTokenRecords,
             selectedToken: state => state.account.selectedToken,
             tokenRecords: state => state.account.tokenRecords
         }),
@@ -177,6 +182,7 @@ export default {
             }
         },
         networkByte(now, old) {
+            this.getTokenRecords()
             this.$store.commit('API/updateAPI', this.networkByte)
             this.getAddresses()
             this.$store.commit('account/updateSelectedToken', 'VSYS')
@@ -191,6 +197,15 @@ export default {
         clearTimeout(this.sessionClearTimeout)
     },
     methods: {
+        getTokenRecords() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                this.tokenRecords = this.testnetTokenRecords
+            } else if (String.fromCharCode(this.networkByte) === 'M') {
+                this.tokenRecords = this.mainnetTokenRecords
+            } else {
+                this.tokenRecords = {}
+            }
+        },
         setSessionClearTimeout() {
             let oldTimeout = 5
             try {

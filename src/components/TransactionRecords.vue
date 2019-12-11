@@ -40,8 +40,8 @@ export default {
         TransactionRecord
     },
     created() {
-        this.getTxRecords()
         this.getCurrentHeight()
+        this.getTxRecords()
     },
     data: function() {
         return {
@@ -79,6 +79,7 @@ export default {
     },
     watch: {
         address(now, old) {
+            this.getCurrentHeight()
             this.getTxRecords()
         }
     },

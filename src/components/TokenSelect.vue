@@ -50,12 +50,14 @@
                                  :address="address"
                                  :balance="balances[address]"
                                  :token-symbol="'VSYS'"
+                                 :token-records="tokenRecords"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                     <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
                                  :address="address"
                                  :balance="tokenBalances[tokenId].value"
                                  :token-id="tokenId"
+                                 :token-records="tokenRecords"
                                  :token-symbol="tokenRecords[tokenId]"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                 </div>
@@ -121,6 +123,11 @@ export default {
             require: true,
             default: ''
         },
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         selectedToken: {
             type: String,
             require: true,
@@ -151,9 +158,6 @@ export default {
         }
     },
     computed: {
-        ...mapState({
-            tokenRecords: state => state.account.tokenRecords
-        }),
         addressShow() {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
