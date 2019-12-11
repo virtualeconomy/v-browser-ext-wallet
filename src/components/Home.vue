@@ -13,7 +13,7 @@
              class="account-content">
             <div>
                 <img class="token-icon"
-                     :src="tokenSvg(tokenName)">
+                     :src="tokenSvg">
             </div>
             <div class="balance">
                 <p class="token-balance">{{ accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
@@ -122,6 +122,16 @@ export default {
                 return this.tokenRecords[this.selectedToken]
             }
         },
+        tokenSvg() {
+            let name = this.tokenName
+            if (name === 'VSYS'){
+                return "../../static/icons/token/" + name + ".png"
+            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
+                return "../../static/icons/token/" + name + ".svg"
+            } else {
+                return "../../static/icons/token/other.svg"
+            }
+        },
         accountBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
@@ -147,12 +157,32 @@ export default {
     watch: {
         walletAmount(now, old) {
             this.getAddresses()
+            this.getBalances()
+            this.getTokenBalances()
+        },
+        selectedAccount(now ,old) {
+            this.address = this.addresses[this.selectedAccount]
+            this.getBalances()
+            this.getTokenBalances()
+        },
+        selectedToken(now, old) {
+            this.getTokenBalances()
+        },
+        page(now, old) {
+            if (now === 'home') {
+                this.getBalances()
+                this.getTokenBalances()
+            }
+        },
+        networkByte(now, old) {
+            this.$store.commit('API/updateAPI', this.networkByte)
+            this.getAddresses()
+            this.$store.commit('account/updateSelectedToken', 'VSYS')
+            this.getBalances()
+            this.accountName = this.accountNames[this.selectedAccount]
         }
     },
     methods: {
-        send() {
-            this.page = 'send'
-        },
         changePage(pageName) {
             this.page = pageName
         },
@@ -190,14 +220,8 @@ export default {
                 })
             }
         },
-        tokenSvg(name) {
-            if (name === 'VSYS'){
-                return "../../static/icons/token/" + name + ".png"
-            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
-                return "../../static/icons/token/" + name + ".svg"
-            } else {
-                return "../../static/icons/token/other.svg"
-            }
+        send() {
+            this.page = 'send'
         },
         deposit() {
             this.page = 'deposit'

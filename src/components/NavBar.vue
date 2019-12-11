@@ -59,7 +59,7 @@
                           :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </template>
               <div class="scroll"
-                   :style="{height: '200px'}">
+                   :style="{'min-height': 'auto', 'max-height': '200px'}">
                   <b-dropdown-item-button class="button"
                                           :class="{'selected-account': index === selectedAccount}"
                                           @click="select(index)"
@@ -108,7 +108,6 @@ export default {
     },
     data() {
         return {
-            avtHash: '555077584842597e4246',
             pop: false
         }
     },
@@ -307,6 +306,10 @@ export default {
     color:rgba(169,169,176,1);
     line-height:13px;
     margin-bottom: 4px;
+}
+.selected-account {
+    border-radius:4px;
+    border:1px solid rgba(255,136,55,1) !important;
 }
 .select {
     margin-top: -25px;

@@ -77,6 +77,11 @@ export default {
             default: function() {}
         }
     },
+    watch: {
+        address(now, old) {
+            this.getTxRecords()
+        }
+    },
     computed: {
         ...mapState({
             chain: state => state.API.chain
