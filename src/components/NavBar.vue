@@ -62,6 +62,7 @@
               <div class="scroll"
                    :style="{'min-height': 'auto', 'max-height': '200px'}">
                   <b-dropdown-item-button class="button"
+                                          variant="white"
                                           :class="{'selected-account': index === selectedAccount}"
                                           @click="select(index)"
                                           v-for="(address, index) in addresses">
