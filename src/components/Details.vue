@@ -27,11 +27,19 @@
             <img width="12" height="12" src="../../static/icons/ic_copy@2x.png"></b-btn>
         </div>
         <div class="view">
-            <p>View on Explorer</p>
-            <b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+            <b-btn variant="white"
+                   class="view-p"
+                   @click="viewOnExplorer">View on Explorer</b-btn>
+            <b-btn class="view-button"
+                   variant="link"
+                   @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         <div class="view">
-            <p>Export Private Key / Seed</p>
-            <b-btn v-b-modal.privacy variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+            <b-btn variant="white"
+                   class="view-p"
+                   v-b-modal.privacy>Export Private Key / Seed</b-btn>
+            <b-btn class="view-button"
+                   v-b-modal.privacy
+                   variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         <Privacy :address="address"
                  :account-name="accountName"
                  @close="close"></Privacy>
@@ -179,21 +187,21 @@ export default {
     width:312px;
     height:49px;
     padding: 0px 12px;
-    p {
-        display: inline-block;
-        position: relative;
-        height:16px;
-        font-size:14px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:16px;
-        margin: 16px 0px;
-    }
-    button {
-        margin-top: 11px;
-        padding:0px;
-        float: right;
-    }
+}
+.view-p {
+    display: inline-block;
+    position: relative;
+    font-size:14px;
+    padding:0px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:16px;
+    margin: 16px 0px;
+}
+.view-button {
+    margin-top: 11px;
+    padding:0px;
+    float: right;
 }
 </style>

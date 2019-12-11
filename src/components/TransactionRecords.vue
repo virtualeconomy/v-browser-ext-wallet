@@ -2,7 +2,7 @@
     <div class="records">
         <div class="his-pane">
             <p class="his-txt">History</p>
-            <div class="view"><p>View on Explorer</p><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+            <div class="view"><b-btn class="view-p" variant="white" @click="viewOnExplorer">View on Explorer</b-btn><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         </div>
         <div class="scroll"
              :style="{'max-height': '192px'}">
@@ -168,10 +168,10 @@ export default {
     float: right;
     margin-top: 5px;
 }
-.view p {
+.view-p {
     position: relative;
     left: 6px;
-    height: 14px;
+    padding: 0px;
     font-size:12px;
     font-family:SFProText-Medium,SFProText;
     font-weight:500;
