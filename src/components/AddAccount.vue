@@ -69,7 +69,7 @@ export default {
         }),
         accountNumber() {
             let num = this.wallet.walletAmount + 1
-            if (num > 10) {} return 'Up to 10 accounts'
+            if (num > 10) return 'Up to 10 accounts'
             return 'Account ' + num
         },
         isSubmitDisabled() {

@@ -253,6 +253,7 @@ export default {
                 password: this.password,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
+            this.$store.commit('account/initializeAccount')
             this.$store.commit('wallet/updateWallet', savedInfo)
             this.pageId = 'success'
         },

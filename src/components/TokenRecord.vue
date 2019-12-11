@@ -54,6 +54,11 @@ export default {
             default: '',
             require: true
         },
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         address: {
             type: String,
             default: '',
@@ -69,17 +74,15 @@ export default {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
             chain: state => state.API.chain,
-            tokenRecords: state => state.account.tokenRecords,
             selectedToken: state => state.account.selectedToken
         })
     },
-    created() {
-    },
     methods: {
         hide() {
-            var tmp = this.tokenRecords
+            let tmp = this.tokenRecords
             Vue.delete(tmp, this.tokenId)
-            this.$store.commit('account/updateToken', tmp)
+            const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
+            this.$store.commit('account/updateToken', updateInfo)
         },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
