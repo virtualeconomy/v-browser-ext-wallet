@@ -87,20 +87,8 @@ button:focus {
 .navbar-brand {
     margin-right: 22px !important;
 }
-.dropdown-menu {
-    outline: 0 rgba(247,247,252,1) !important;
-}
-.popover {
-    outline: 0 rgba(247,247,252,1) !important;
-}
 .nav-link {
     padding: 0.5rem 0px !important;
-}
-.tab-content > .tab-pane {
-    outline: 0 rgba(247,247,252,1) !important;
-}
-.form-group {
-    outline: 0 rgba(247,247,252,1) !important;
 }
 :focus{
     outline: 0 rgba(247,247,252,1) !important;
