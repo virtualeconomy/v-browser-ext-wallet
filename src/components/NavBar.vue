@@ -56,6 +56,7 @@
                   <canvas class="avatar col pr-0 canvas"
                           width="36"
                           height="36"
+                          @click="showDropdown"
                           :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </template>
               <div class="scroll"
@@ -157,6 +158,9 @@ export default {
         About
     },
     methods: {
+        showDropdown() {
+            this.$refs.popover.$emit('close')
+        },
         logout() {
             this.$store.commit('wallet/updatePassword', false)
             this.$router.push('/login')

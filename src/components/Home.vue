@@ -1,5 +1,6 @@
 <template>
-    <div class="home">
+    <div class="home"
+         @mousemove=resetSessionClearTimeout>
         <nav-bar v-show="showNav"
                  class="nav-bar"
                  :addresses="addresses"
@@ -96,6 +97,7 @@ export default {
             accountName: '',
             balances: {},
             tokenBalances: {},
+            sessionClearTimeout: void 0,
             showNav: true
         }
     },
@@ -182,7 +184,30 @@ export default {
             this.accountName = this.accountNames[this.selectedAccount]
         }
     },
+    mounted() {
+        this.setSessionClearTimeout()
+    },
+    beforeDestroy() {
+        clearTimeout(this.sessionClearTimeout)
+    },
     methods: {
+        setSessionClearTimeout() {
+            let oldTimeout = 5
+            try {
+                const newTimeout = this.wallet.sessionTimeout
+                oldTimeout = newTimeout || oldTimeout
+            } catch (e) {
+                oldTimeout = 5
+            }
+            this.sessionClearTimeout = setTimeout(() => {
+                this.$store.commit('wallet/updatePassword', false)
+                this.$router.push('/login')
+            }, oldTimeout * 60 * 1000)
+        },
+        resetSessionClearTimeout() {
+            clearTimeout(this.sessionClearTimeout)
+            this.setSessionClearTimeout()
+        },
         changePage(pageName) {
             this.page = pageName
         },

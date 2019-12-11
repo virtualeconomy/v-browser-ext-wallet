@@ -5,7 +5,7 @@
             <div class="view"><p>View on Explorer</p><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         </div>
         <div class="scroll"
-             :style="{height: '192px'}">
+             :style="{'max-height': '192px'}">
             <transaction-record v-for="txRecord in txRecords"
                                 :tx-record="txRecord"
                                 :address="address"
