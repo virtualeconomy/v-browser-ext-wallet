@@ -100,7 +100,7 @@
         </div>
         <div class="details">
             <label>Total</label>
-            <p> {{ selectedToken === 'VSYS' ? amount + txFee : amount + ' ' + tokenName + ' + ' + txFee }}<span> VSYS</span></p>
+            <p> {{ selectedToken === 'VSYS' ? totalVSYS : amount + ' ' + tokenName + ' + ' + txFee }}<span> VSYS</span></p>
         </div>
         <div class="details" style="height: 72px;">
             <label style="margin-top: 28px;">Description</label>
@@ -142,11 +142,11 @@ export default {
     name: "Send",
     data: function() {
       return {
-          recipient: 'AUAztxsft2v6rmjRRb72nLea6BNyRHHWpUR',
-          amount: 12,
+          recipient: '',
+          amount: 0,
           unity: VSYS_PRECISION,
           isSplit: false,
-          description: 'This is my first send VSYS',
+          description: '',
           pageId: 0,
           txFee: this.selectedToken === 'VSYS' ? TX_FEE : CONTRACT_EXEC_FEE
       }
@@ -214,6 +214,9 @@ export default {
             } else {
                 return "../../static/icons/token/other.svg"
             }
+        },
+        totalVSYS() {
+            return BigNumber(this.amount).plus(this.txFee)
         },
         assetBalance() {
             let amount = 0
