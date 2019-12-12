@@ -128,51 +128,53 @@ export default {
     width: 480px;
     position: relative;
     display: block;
-    top: 28px;
+    top: 24px;
 }
 .back {
-    height: 50px;
+    height: 40px;
 }
 .back-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 .back-link {
-    width: 39px;
-    height: 19px;
-    font-size: 16px;
-    font-family: SFProText-Regular, SFProText;
-    font-weight: 400;
-    color: rgba(169, 169, 176, 1);
-    line-height: 19px;
-    padding: 2px 0px;
-    margin-bottom: 4px;
-}
-.p1 {
-    height:40px;
-    font-size:32px;
-    font-family:SFProDisplay-Medium,SFProDisplay;
-    font-weight:500;
-    color:rgba(50,50,51,1);
-    line-height:40px;
-}
-.p2 {
-    height:21px;
+    width:33px;
+    height:16px;
     font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:19px;
+    padding: 0px;
+    margin-bottom: 4px;
+}
+.p1 {
+    height:34px;
+    font-size:28px;
+    font-family:SFProDisplay-Medium,SFProDisplay;
+    font-weight:500;
     color:rgba(50,50,51,1);
-    line-height:21px;
+    line-height:34px;
+    margin-bottom: 12px;
+}
+.p2 {
+    height:18px;
+    font-size:14px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:18px;
+    margin-bottom: 48px;
 }
 .wordpad {
-    margin-top: 46px;
     width:480px;
-    min-height: 205px;
+    min-height: 176px;
     background:rgba(255,255,255,1);
-    border-radius:7px;
+    border-radius:6px;
     border:1px solid rgba(230,230,237,1);
     line-height: 335%;
-    padding: 26px 26px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
 }
 .unselectable {
     -moz-user-select: -moz-none;
@@ -182,50 +184,50 @@ export default {
     user-select: none;
 }
 .word {
-    margin-right: 6px;
     background:rgba(255,255,255,1);
-    border-radius:5px;
+    border-radius:4px;
     border:1px solid rgba(230,230,237,1);
-    font-size:19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
+    line-height:19px;
     letter-spacing: 0;
-    padding: 9px 28px;
+    padding: 7px 20px;
+    height:36px;
 }
 .word-btn {
-    font-size:19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
-    margin-top: 10px;
+    line-height:19px;
+    margin-top: 12px;
     height: 36px;
     letter-spacing: 0;
+    border-radius: 4px;
+    border:1px solid rgba(230,230,237,1);
 }
 .wordarea {
     text-align: center;
 }
 .untap {
-    width:117px;
-    height:42px;
     background:rgba(255,255,255,1);
-    border-radius:5px;
-    border:1px solid rgba(230,230,237,1);
 }
 .tap {
     opacity: 1;
     color:rgba(255,255,255,1);
-    width:117px;
-    height:42px;
     background:rgba(50,50,51,1);
-    border-radius:5px;
 }
 .input-height {
     width: 100%;
-    margin-top: 26px;
-    height: 51px;
+    margin-top: 48px;
+    height: 44px;
+    font-size:16px;
+    font-family:SFProText-Medium,SFProText;
+    font-weight:500;
+    color:rgba(255,255,255,1);
+    line-height:19px;
 }
 .error-message {
     width: 100%;

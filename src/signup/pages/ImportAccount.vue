@@ -10,7 +10,7 @@
                            @click="back('/SignupEntry')">Back</b-btn>
                 </div>
                 <p class="import-intro-1">Import an Account with Seed Phase</p>
-                <p class="import-intro-2">Enter your secret twelve word phrase here to restore your vault.</p>
+                <p class="import-intro-2">Enter your secret fifteen word phrase here to restore your vault.</p>
                 <ul class="form-group"
                     style="height: 48px !important; margin-bottom: 0px;">
                     <li style="margin-bottom: 5px;" v-for="error in validator.errors"

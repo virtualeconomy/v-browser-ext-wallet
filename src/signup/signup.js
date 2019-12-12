@@ -9,7 +9,7 @@ import store from '../store'
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
 
-router.push('/SignupEntry')
+router.push('/create')
 new Vue({
     el: '#app',
     store,
