@@ -40,7 +40,7 @@
                     <input
                             type="password"
                             name="password"
-                            class="form-control input-height"
+                            class="form-control"
                             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
                             v-model="password"
                             :readonly="registering"
@@ -54,16 +54,19 @@
                     <input
                             type="password"
                             name="password"
-                            class="form-control input-height"
+                            class="form-control"
                             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
                             :readonly="registering"
                             @input="checkPasswordMatch(password, password2)"
                             @keyup.enter="importEnter"
                             v-model="password2">
+                    <img v-if="password2 && !isPassMatchErrors"
+                         class="check-right"
+                         src="../../../static/icons/ic_check_green.svg">
                 </div>
                 <div class="form-group password-form">
                     <label>Choose Network</label>
-                    <b-form-select class="form-control input-height select"
+                    <b-form-select class="form-control select"
                                    :options="networkOptions"
                                    v-model="networkByte">
                     </b-form-select>
@@ -326,11 +329,13 @@ export default {
         line-height:16px;
         margin-bottom: 12px;
     }
+    input {
+        height:48px;
+        background:rgba(255,255,255,1);
+        border-radius:6px;
+        border:1px solid rgba(230,230,237,1);
+    }
     margin-bottom: 32px;
-}
-.input-height {
-    width: 100%;
-    height: 48px;
 }
 .back {
     height: 40px;
@@ -372,7 +377,7 @@ export default {
         font-weight:500;
         color:rgba(255,255,255,1);
         line-height:19px;
-        margin-top: 41px;padding: 0px;
+        margin-top: 41px;
     }
 }
 .select {
@@ -402,8 +407,6 @@ export default {
 }
 .form-control:disabled, .non-square{
     padding: 20px 15px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
 }
 .seed {
     height:19px;

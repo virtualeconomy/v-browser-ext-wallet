@@ -11,7 +11,7 @@
                 </div>
                 <p class="create-password">Create Password</p>
                 <ul class="form-group"
-                    :class="{'error-messages':!this.validator.errors.length > 0}">
+                    style="height: 48px !important; margin-bottom: 0px;">
                     <li style="margin-bottom: 5px;" v-for="error in validator.errors"
                         :key="error.name">
                         <small class="form-text text-danger">
@@ -19,12 +19,12 @@
                         </small>
                     </li>
                 </ul>
-                <div class="form-group first-group">
+                <div class="form-group password-form">
                     <label>New Password (min 8chars)</label>
                     <input
                       type="password"
                       name="password"
-                      class="form-control input-height"
+                      class="form-control"
                       :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
                       v-model="password"
                       :readonly="registering"
@@ -38,23 +38,25 @@
                     <input
                       type="password"
                       name="password"
-                      class="form-control input-height"
+                      class="form-control"
                       :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
                       :readonly="registering"
                       @input="checkPasswordMatch(password, password2)"
                       @keyup.enter="registerEnter"
                       v-model="password2">
+                    <img v-if="password2 && !isPassMatchErrors"
+                         class="check-right"
+                         src="../../../static/icons/ic_check_green.svg">
                 </div>
                 <div class="form-group password-form">
                     <label>Choose Network</label>
-                    <b-form-select class="form-control input-height select"
+                    <b-form-select class="form-control select"
                                    :options="networkOptions"
                                    v-model="networkByte">
                     </b-form-select>
                 </div>
                 <div class="terms">
                     <img id="img_read"
-                         style="margin-top: -3px;"
                          @click="changeIcon"
                          src="../../../static/icons/ic_select_border.svg">
                       &nbsp;I have read and agree to the <a class='vsys-color'
@@ -235,7 +237,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .layout-main {
     width: 100%;
     height: 100%;
@@ -249,36 +251,39 @@ export default {
     align-items:center;
 }
 .create-account {
-    width: 560px;
+    width: 480px;
     position: relative;
-    top: 28px;
+    top: 24px;
 }
 .create-password {
-    height:40px;
-    font-size:33px;
+    height:34px;
+    font-size:28px;
     font-family:SFProDisplay-Medium,SFProDisplay;
     font-weight:500;
     color:rgba(50,50,51,1);
-    line-height:40px;
+    line-height:34px;
+    margin-bottom: 0px;
 }
 .password-form {
-    margin-top: 37px;
-}
-.password-form label {
-    height:19px;
-    font-size:16px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(50,50,51,1);
-    line-height:19px;
-}
-.input-height {
-    width: 100%;
-    margin-top: 14px;
-    height: 56px;
+    label {
+        height:16px;
+        font-size:14px;
+        font-family:SFProText-Regular,SFProText;
+        font-weight:400;
+        color:rgba(50,50,51,1);
+        line-height:16px;
+        margin-bottom: 12px;
+    }
+    input {
+        height:48px;
+        background:rgba(255,255,255,1);
+        border-radius:6px;
+        border:1px solid rgba(230,230,237,1);
+    }
+    margin-bottom: 32px;
 }
 .back {
-    height: 60px;
+    height: 40px;
 }
 .back-icon {
     width: 12px;
@@ -292,47 +297,57 @@ export default {
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:19px;
-    padding: 2px 0px;
+    padding: 0px;
     margin-bottom: 4px;
 }
 .terms {
-    font-size:19px;
+    height: 19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
-    margin-top: 37px;
-
+    line-height:19px;
+    img {
+        height: 20px;
+        width: 20px;
+        margin-top: -2px;
+    }
+    button {
+        height:44px;
+        background:rgba(255,136,55,1);
+        border-radius:4px;
+        font-size:16px;
+        padding-top: 12px !important;
+        font-family:SFProText-Medium,SFProText;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        line-height:19px;
+        margin-top: 41px;
+    }
 }
 .select {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 530px center #fff;
-    background-size: 12px;
+    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 454px center #fff;
+    background-size: 10px;
     padding-left: 19px;
-    font-size:19px;
+    font-size:16px;
     font-weight:400;
-    line-height:22px;
+    line-height:19px;
 }
 .select option {
-    width:71px;
-    height:22px;
-    font-size:19px;
+    width:61px;
+    height:19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
+    line-height:19px;
 }
 .check-right {
     float: right;
     margin-top: -30px;
     margin-right: 16px;
-}
-.error-messages {
-    margin-bottom: 18px;
-}
-.form-group label {
-    font-family:SFProText-Regular,SFProText;
 }
 </style>
