@@ -59,11 +59,6 @@ export default {
             require: true,
             default: function() {}
         },
-        address: {
-            type: String,
-            default: '',
-            require: true
-        },
         balance: {
             type: String,
             default: '',

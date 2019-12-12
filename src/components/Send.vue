@@ -162,10 +162,10 @@ export default {
             require: true,
             default: 'Failed'
         },
-        balances: {
-            type: Object,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,
@@ -221,7 +221,7 @@ export default {
         assetBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
-                amount = String(this.balances[this.address])
+                amount = this.vsysBalance
             } else {
                 amount = String(this.tokenBalances[this.selectedToken].value)
             }
@@ -262,9 +262,9 @@ export default {
         },
         isSufficient() {
             if (this.selectedToken === 'VSYS') {
-                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.balances[this.address]).minus(TX_FEE))
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.vsysBalance).minus(TX_FEE))
             } else {
-                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken].value)) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.balances[this.address]))
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken].value)) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.vsysBalance))
             }
         },
         isValidDescription() {

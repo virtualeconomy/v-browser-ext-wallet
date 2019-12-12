@@ -203,6 +203,8 @@ export default {
     }
     button {
         padding: 0px;
+        margin-top: 4px;
+        float: right;
     }
 }
 .hidden {

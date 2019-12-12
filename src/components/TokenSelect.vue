@@ -48,14 +48,12 @@
                 <div class="scroll"
                      :style="{height: '176px'}">
                     <TokenRecord :token-id="'VSYS'"
-                                 :address="address"
-                                 :balance="balances[address]"
+                                 :balance="vsysBalance"
                                  :token-symbol="'VSYS'"
                                  :token-records="tokenRecords"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                     <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
-                                 :address="address"
                                  :balance="tokenBalances[tokenId].value"
                                  :token-id="tokenId"
                                  :token-records="tokenRecords"
@@ -113,10 +111,10 @@ export default {
             default: function() {
             }
         },
-        balances: {
-            type: Object,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,

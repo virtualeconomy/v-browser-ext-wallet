@@ -4,6 +4,7 @@
              centered
              ref="addAccountModal"
              hide-footer
+             @hidden="reset"
              hide-header>
         <button class="add-close btn-close close"
                 @click="close">
@@ -61,6 +62,9 @@ export default {
         },
         close() {
             this.$refs.addAccountModal.hide()
+        },
+        reset() {
+            this.inputName = ''
         }
     },
     computed: {

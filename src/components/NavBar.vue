@@ -43,7 +43,7 @@
                                   :account-names="accountNames"
                                   :token-balances="tokenBalances"
                                   :token-records="tokenRecords"
-                                  :balances="balances"
+                                  :vsys-balance="vsysBalance"
                                   :selected-token="selectedToken"
                                   @changePage="changePage"
                                   @selectSucceed="selectSucceed"></token-select>
@@ -73,7 +73,7 @@
                               :data-jdenticon-hash="avatarDataHex(address)"></canvas>
                       <div style="display: inline-block; margin-left: 10px; height: 35px;">
                           <p class="address-item">{{ accountNames[index] }}</p>
-                          <p class="amount-item">{{ showBalance(balances[address]) + ' ' + tokenName}}</p>
+                          <p class="amount-item">{{ showBalance(accountBalances[address]) + ' ' + tokenName}}</p>
                       </div>
                       <img v-if="index === selectedAccount"
                            class="select"
@@ -102,18 +102,33 @@ import jdenticon from 'jdenticon'
 import converters from '../js-v-sdk/src/utils/converters.js'
 import Details from './Details.vue'
 import AddAccount from './AddAccount.vue'
+import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Settings from './Settings.vue'
 import About from './About.vue'
 import TokenSelect from "./TokenSelect.vue"
+import BigNumber from 'bignumber.js'
+import Vue from 'vue'
 import { mapState } from 'vuex'
 export default {
     name: "NavBar",
+    created() {
+        this.getAccountBalances()
+    },
     mounted() {
       jdenticon()
     },
     data() {
         return {
-            pop: false
+            pop: false,
+            accountBalances: {}
+        }
+    },
+    watch: {
+        selectedToken(now, old) {
+            this.getAccountBalances()
+        },
+        walletAmount(now, old) {
+            this.getAccountBalances()
         }
     },
     props: {
@@ -122,20 +137,15 @@ export default {
             require: true,
             default: function() {}
         },
-        balances: {
-            type: Object,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,
             require: true,
             default: function() {}
-        },
-        selectedAccount: {
-            type: Number,
-            require: true,
-            default: 0
         },
         tokenRecords: {
             type: Object,
@@ -143,11 +153,6 @@ export default {
             default: function() {}
         },
         tokenName: {
-            type: String,
-            require: true,
-            default: 'VSYS'
-        },
-        selectedToken: {
             type: String,
             require: true,
             default: 'VSYS'
@@ -161,6 +166,23 @@ export default {
         About
     },
     methods: {
+        getAccountBalances() {
+            if (this.selectedToken === 'VSYS') {
+                for (const addr in this.addresses) {
+                    this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
+                        let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+                        Vue.set(this.accountBalances, this.addresses[addr], value)
+                    })
+                }
+            } else {
+                for (const addr in this.addresses) {
+                    this.chain.getTokenBalance(this.addresses[addr], this.selectedToken).then(response => {
+                        let value = BigNumber(response.balance).dividedBy(response.unity)
+                        Vue.set(this.accountBalances, this.addresses[addr], value)
+                    })
+                }
+            }
+        },
         showDropdown() {
             this.$refs.popover.$emit('close')
         },
@@ -201,7 +223,11 @@ export default {
     },
     computed: {
         ...mapState({
-            accountNames: state => state.account.accountNames
+            walletAmount: state => state.wallet.walletAmount,
+            chain: state => state.API.chain,
+            accountNames: state => state.account.accountNames,
+            selectedToken: state => state.account.selectedToken,
+            selectedAccount: state => state.account.selectedAccount
         }),
         addressShow() {
             const addrChars = this.addresses[this.selectedAccount].split('')

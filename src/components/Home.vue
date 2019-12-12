@@ -4,11 +4,10 @@
         <nav-bar v-show="showNav"
                  class="nav-bar"
                  :addresses="addresses"
+                 :vsys-balance="vsysBalance"
                  :token-balances="tokenBalances"
-                 :balances="balances"
                  :token-records="tokenRecords"
-                 :selected-token="selectedToken"
-                 :selected-account="selectedAccount"
+                 :token-name="tokenName"
                  @changePage="changePage"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
@@ -44,7 +43,7 @@
             <Send @changePage="changePage"
                   :address="address"
                   :account-name="accountNames[selectedAccount]"
-                  :balances="balances"
+                  :vsys-balance="vsysBalance"
                   :token-balances="tokenBalances"
                   :network-byte="networkByte"
                   :token-name="tokenName"
@@ -87,7 +86,7 @@ export default {
         this.getTokenRecords()
         this.$store.commit('API/updateAPI', this.networkByte)
         this.getAddresses()
-        this.getBalances()
+        this.getVSYS()
         this.getTokenBalances()
         this.accountName = this.accountNames[this.selectedAccount]
     },
@@ -97,7 +96,7 @@ export default {
             addresses: [],
             address: '',
             accountName: '',
-            balances: {},
+            vsysBalance: '0',
             tokenBalances: {},
             tokenRecords: {},
             sessionClearTimeout: void 0,
@@ -141,11 +140,7 @@ export default {
         accountBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
-                if (this.balances[this.address]) {
-                    amount = String(this.balances[this.address])
-                } else {
-                    amount = '0'
-                }
+                amount = this.vsysBalance
             } else {
                 if (this.tokenBalances[this.selectedToken]) {
                     amount = String(this.tokenBalances[this.selectedToken].value)
@@ -153,30 +148,27 @@ export default {
                     amount = '0'
                 }
             }
-            if (amount.length >= 14) {
-                let index = amount.indexOf('.')
-                amount = amount.slice(0, index + 3) + '...'
-            }
             return amount
         }
     },
     watch: {
         walletAmount(now, old) {
             this.getAddresses()
-            this.getBalances()
+            this.getVSYS()
             this.getTokenBalances()
         },
         selectedAccount(now ,old) {
             this.address = this.addresses[this.selectedAccount]
-            this.getBalances()
+            this.getVSYS()
             this.getTokenBalances()
         },
         selectedToken(now, old) {
+            this.getVSYS()
             this.getTokenBalances()
         },
         page(now, old) {
             if (now === 'home') {
-                this.getBalances()
+                this.getVSYS()
                 this.getTokenBalances()
             }
         },
@@ -185,7 +177,8 @@ export default {
             this.$store.commit('API/updateAPI', this.networkByte)
             this.getAddresses()
             this.$store.commit('account/updateSelectedToken', 'VSYS')
-            this.getBalances()
+            this.getVSYS()
+            this.getTokenBalances()
             this.accountName = this.accountNames[this.selectedAccount]
         }
     },
@@ -217,6 +210,7 @@ export default {
                 this.$store.commit('wallet/updatePassword', false)
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
+
         },
         resetSessionClearTimeout() {
             clearTimeout(this.sessionClearTimeout)
@@ -241,15 +235,12 @@ export default {
             }
             this.address = this.addresses[this.selectedAccount]
         },
-        getBalances() {
-            for (const addr in this.addresses) {
-                this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
-                    let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
-                    Vue.set(this.balances, this.addresses[addr], value)
-                    }, respError => {
-                        Vue.set(this.balances, this.addresses[addr], value)
-                    })
-                }
+        getVSYS() {
+            this.chain.getBalanceDetail(this.address).then(response => {
+                this.vsysBalance = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+            }, respError => {
+                this.vsysBalance = '0'
+            })
         },
         getTokenBalances() {
             for (let tokenId in this.tokenRecords) {
