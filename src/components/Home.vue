@@ -1,20 +1,19 @@
 <template>
-    <div class="home">
+    <div class="home"
+         @mousemove=resetSessionClearTimeout>
         <nav-bar v-show="showNav"
                  class="nav-bar"
                  :addresses="addresses"
-                 :account-names="accountNames"
+                 :vsys-balance="vsysBalance"
                  :token-balances="tokenBalances"
-                 :balances="balances"
-                 :selected-token="selectedToken"
+                 :token-records="tokenRecords"
                  :token-name="tokenName"
-                 :selected-account="selectedAccount"
                  @changePage="changePage"></nav-bar>
         <div v-if="page === 'home'"
              class="account-content">
             <div>
                 <img class="token-icon"
-                     :src="tokenSvg(tokenName)">
+                     :src="tokenSvg">
             </div>
             <div class="balance">
                 <p class="token-balance">{{ accountBalance }}<span class="unity">{{ ' ' + tokenName }}</span> </p >
@@ -37,13 +36,14 @@
                                  :address="address"></transaction-records>
         </div>
         <div v-else-if="page === 'addToken'">
-            <add-token @changePage="changePage"></add-token>
+            <add-token :token-records="tokenRecords"
+                       @changePage="changePage"></add-token>
         </div>
         <div v-else-if="page === 'send'">
             <Send @changePage="changePage"
                   :address="address"
                   :account-name="accountNames[selectedAccount]"
-                  :balances="balances"
+                  :vsys-balance="vsysBalance"
                   :token-balances="tokenBalances"
                   :network-byte="networkByte"
                   :token-name="tokenName"
@@ -83,9 +83,10 @@ export default {
         if (this.wallet.password === false) {
             this.$router.push('/login')
         }
+        this.getTokenRecords()
         this.$store.commit('API/updateAPI', this.networkByte)
         this.getAddresses()
-        this.getBalances()
+        this.getVSYS()
         this.getTokenBalances()
         this.accountName = this.accountNames[this.selectedAccount]
     },
@@ -95,8 +96,10 @@ export default {
             addresses: [],
             address: '',
             accountName: '',
-            balances: {},
+            vsysBalance: '0',
             tokenBalances: {},
+            tokenRecords: {},
+            sessionClearTimeout: void 0,
             showNav: true
         }
     },
@@ -108,7 +111,8 @@ export default {
             selectedAccount: state => state.account.selectedAccount,
             accountNames: state => state.account.accountNames,
             walletAmount: state => state.wallet.walletAmount,
-            tokenRecords: state => state.account.tokenRecords,
+            testnetTokenRecords: state => state.account.testnetTokenRecords,
+            mainnetTokenRecords: state => state.account.mainnetTokenRecords,
             selectedToken: state => state.account.selectedToken,
             tokenRecords: state => state.account.tokenRecords
         }),
@@ -123,14 +127,20 @@ export default {
                 return this.tokenRecords[this.selectedToken]
             }
         },
+        tokenSvg() {
+            let name = this.tokenName
+            if (name === 'VSYS'){
+                return "../../static/icons/token/" + name + ".png"
+            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
+                return "../../static/icons/token/" + name + ".svg"
+            } else {
+                return "../../static/icons/token/other.svg"
+            }
+        },
         accountBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
-                if (this.balances[this.address]) {
-                    amount = String(this.balances[this.address])
-                } else {
-                    amount = '0'
-                }
+                amount = this.vsysBalance
             } else {
                 if (this.tokenBalances[this.selectedToken]) {
                     amount = String(this.tokenBalances[this.selectedToken].value)
@@ -138,21 +148,73 @@ export default {
                     amount = '0'
                 }
             }
-            if (amount.length >= 14) {
-                let index = amount.indexOf('.')
-                amount = amount.slice(0, index + 3) + '...'
-            }
             return amount
         }
     },
     watch: {
         walletAmount(now, old) {
             this.getAddresses()
+            this.getVSYS()
+            this.getTokenBalances()
+        },
+        selectedAccount(now ,old) {
+            this.address = this.addresses[this.selectedAccount]
+            this.getVSYS()
+            this.getTokenBalances()
+        },
+        selectedToken(now, old) {
+            this.getVSYS()
+            this.getTokenBalances()
+        },
+        page(now, old) {
+            if (now === 'home') {
+                this.getVSYS()
+                this.getTokenBalances()
+            }
+        },
+        networkByte(now, old) {
+            this.getTokenRecords()
+            this.$store.commit('API/updateAPI', this.networkByte)
+            this.getAddresses()
+            this.$store.commit('account/updateSelectedToken', 'VSYS')
+            this.getVSYS()
+            this.getTokenBalances()
+            this.accountName = this.accountNames[this.selectedAccount]
         }
     },
+    mounted() {
+        this.setSessionClearTimeout()
+    },
+    beforeDestroy() {
+        clearTimeout(this.sessionClearTimeout)
+    },
     methods: {
-        send() {
-            this.page = 'send'
+        getTokenRecords() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                this.tokenRecords = this.testnetTokenRecords
+            } else if (String.fromCharCode(this.networkByte) === 'M') {
+                this.tokenRecords = this.mainnetTokenRecords
+            } else {
+                this.tokenRecords = {}
+            }
+        },
+        setSessionClearTimeout() {
+            let oldTimeout = 5
+            try {
+                const newTimeout = this.wallet.sessionTimeout
+                oldTimeout = newTimeout || oldTimeout
+            } catch (e) {
+                oldTimeout = 5
+            }
+            this.sessionClearTimeout = setTimeout(() => {
+                this.$store.commit('wallet/updatePassword', false)
+                this.$router.push('/login')
+            }, oldTimeout * 60 * 1000)
+
+        },
+        resetSessionClearTimeout() {
+            clearTimeout(this.sessionClearTimeout)
+            this.setSessionClearTimeout()
         },
         changePage(pageName) {
             this.page = pageName
@@ -173,15 +235,12 @@ export default {
             }
             this.address = this.addresses[this.selectedAccount]
         },
-        getBalances() {
-            for (const addr in this.addresses) {
-                this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
-                    let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
-                    Vue.set(this.balances, this.addresses[addr], value)
-                    }, respError => {
-                        Vue.set(this.balances, this.addresses[addr], value)
-                    })
-                }
+        getVSYS() {
+            this.chain.getBalanceDetail(this.address).then(response => {
+                this.vsysBalance = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+            }, respError => {
+                this.vsysBalance = '0'
+            })
         },
         getTokenBalances() {
             for (let tokenId in this.tokenRecords) {
@@ -191,14 +250,8 @@ export default {
                 })
             }
         },
-        tokenSvg(name) {
-            if (name === 'VSYS'){
-                return "../../static/icons/token/" + name + ".png"
-            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
-                return "../../static/icons/token/" + name + ".svg"
-            } else {
-                return "../../static/icons/token/other.svg"
-            }
+        send() {
+            this.page = 'send'
         },
         deposit() {
             this.page = 'deposit'
@@ -252,7 +305,7 @@ export default {
 }
 .btn {
     width:100%;
-    height:96px;
+    height:85px;
 }
 .btn-deposit {
     display:inline-block;

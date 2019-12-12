@@ -3,11 +3,12 @@
         <div class="content">
             <div class="detail-part">
                 <div>
-                    <img width="56px"
-                         height="56px"
-                         src="../../static/icons/ic_v_logo@3x.png">
+                    <canvas class="canvas-item"
+                            width="56"
+                            height="56"
+                            :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </div>
-                <div class="account-name"><span class="name">{{accountNames[selectedAccount]}}</span></div>
+                <div class="account-name"><span class="name">{{ accountNames[selectedAccount] }}</span></div>
                 <div class="details-copy">
                     <div class="details">
                         <div class="inline-p">
@@ -16,20 +17,24 @@
                                  src="../../static/icons/ic_about_small_yellow@2x.png">
                         </div>
                         <div class="detail-word-p">
-                            <b-btn class="vsys-color text-decoration-none detail-word" variant="link"
-                                   @click="goDetails"
-                                   v-b-modal.details>Details</b-btn>
+                            <b-btn class="vsys-color text-decoration-none detail-word"
+                                   variant="link"
+                                   @click="details">Details</b-btn>
                         </div>
                     </div>
                     <div class="copy">
-                        <div class="inline-p"><span class="p3"
-                                                    id="addrToCopy"
-                                                    ref="addrToCopy">{{addressShow}}</span></div>
+                        <div class="inline-p"><span class="p3">{{ addressShow }}</span></div>
+                        <textarea v-model="address"
+                                  ref="addrToCopy"
+                                  class="hidden"
+                                  readonly>
+                        </textarea>
                         <div class="copy-icon-p">
-                            <b-btn class="copy-icon" variant="link"
+                            <b-btn class="copy-icon"
+                                   variant="link"
                                    id="addr-cpy"
                                    v-b-popover.click.topright="'Copied!'"
-                                   @click="copyAddress('addr-cpy', 'addrToCopy')">
+                                   @click="copyAddress">
                                 <img width="12px"
                                      height="12px"
                                      src="../../static/icons/ic_copy@2x.png">
@@ -43,15 +48,15 @@
                 <div class="scroll"
                      :style="{height: '176px'}">
                     <TokenRecord :token-id="'VSYS'"
-                                 :address="addresses[selectedAccount]"
-                                 :balance="balances[addresses[selectedAccount]]"
+                                 :balance="vsysBalance"
                                  :token-symbol="'VSYS'"
+                                 :token-records="tokenRecords"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                     <TokenRecord v-for="(idx, tokenId) in tokenRecords"
                                  :key="idx"
-                                 :address="addresses[selectedAccount]"
-                                 :balance="tokenBalances[tokenId]"
+                                 :balance="tokenBalances[tokenId].value"
                                  :token-id="tokenId"
+                                 :token-records="tokenRecords"
                                  :token-symbol="tokenRecords[tokenId]"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                 </div>
@@ -71,32 +76,23 @@
                 </div>
             </div>
         </div>
-        <Details></Details>
     </div>
 </template>
 
 <script>
-import Vue from 'vue'
+import jdenticon from 'jdenticon'
 import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
 import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
-import Details from "src/components/Details.vue";
 export default {
     name: "TokenSelect",
+    mounted() {
+        jdenticon()
+    },
     components: {
-        Details,
         TokenRecord,
         AddToken
-    },
-    data() {
-        return {
-            tokenName: 'VSYS',
-            tokenBalance: 3097.7997,
-            addTokenPage: 'addToken'
-        }
-    },
-    created() {
     },
     props: {
         addresses: {
@@ -115,20 +111,25 @@ export default {
             default: function() {
             }
         },
-        balances: {
-            type: Object,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,
             require: true,
             default: function() {}
         },
-        tokenName: {
+        address: {
             type: String,
             require: true,
-            default: 'VSYS'
+            default: ''
+        },
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
         },
         selectedToken: {
             type: String,
@@ -138,27 +139,31 @@ export default {
     },
     methods: {
         addToken() {
-            this.$emit('changePage', this.addTokenPage)
+            this.$emit('changePage', 'addToken')
         },
-        copyAddress(buttonId, refName) {
-            this.$refs[refName].select()
+        copyAddress() {
+            this.$refs.addrToCopy.select()
             window.document.execCommand('copy')
-            this.$root.$emit('bv::show::popover', buttonId)
+            this.$root.$emit('bv::show::popover', 'addr-cpy')
             setTimeout(() => {
-                this.$root.$emit('bv::hide::popover', buttonId)
+                this.$root.$emit('bv::hide::popover', 'addr-cpy')
             }, 400)
+        },
+        details() {
+            this.$root.$emit('bv::show::modal', 'details')
+            this.$emit('selectSucceed')
         },
         avatarDataHex(address) {
             return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         },
         selectSucceed() {
             this.$emit('selectSucceed')
+        },
+        avatarDataHex(address) {
+            return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         }
     },
     computed: {
-        ...mapState({
-            tokenRecords: state => state.account.tokenRecords
-        }),
         addressShow() {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
@@ -175,12 +180,14 @@ export default {
     max-width: 340px;
 }
 .content {
-    text-align:center
+    text-align:center;
 }
 .detail-part {
     position: relative;
     top: 27px;
     width: 100%;
+}
+.canvas-item {
 }
 .accounts-part {
     width: 100%;
@@ -310,5 +317,14 @@ export default {
     position: relative;
     top: 12px;
     padding-bottom: 76px;
+}
+.hidden {
+    font-size: 12pt;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: -9999px;
+    top: 0px;
 }
 </style>

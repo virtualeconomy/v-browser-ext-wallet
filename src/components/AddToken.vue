@@ -8,7 +8,7 @@
                  bg-variant="white"
                  border-variant="primary">
                 <b-tabs @input="tokenTabChange">
-                    <b-tab>
+                    <b-tab active>
                         <template slot="title">
                             <div><span>Verified Token</span></div>
                         </template>
@@ -52,7 +52,7 @@
                             </b-row>
                         </div>
                     </b-tab>
-                    <b-tab active>
+                    <b-tab>
                         <template slot="title">
                             <div><span>Custom Token</span></div>
                         </template>
@@ -113,27 +113,42 @@
 <script>
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import CertifiedTokens from '../utils/certify.js'
+import certiify from '../utils/certify.js'
 export default {
     name: "AddToken",
     components: {
     },
     data: function() {
         return {
-            activeTab: 'custom',
+            activeTab: 'verified',
             tokenId: '',
             tokenSymbol: '',
             tokenInfo: {},
-            certifiedTokens: CertifiedTokens.certifiedTokens(),
+            certifiedTokens: {},
             selectedVerifiedToken: '',
             selectedVerifiedSymbol: '',
             responseErr: false
         }
     },
+    created() {
+        this.getCertifiedTokens()
+    },
+    props: {
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
+        }
+    },
+    watch: {
+        networkByte(now, old) {
+            this.getCertifiedTokens()
+        }
+    },
     computed: {
         ...mapState({
             chain: state => state.API.chain,
-            tokenRecords: state => state.account.tokenRecords
+            networkByte: state => state.wallet.networkByte
         }),
         isSubmitDisabled() {
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
@@ -145,6 +160,15 @@ export default {
         }
     },
     methods: {
+        getCertifiedTokens() {
+            if (String.fromCharCode(this.networkByte) === 'T') {
+                this.certifiedTokens = certiify.certifiedTokensList['Testnet']
+            } else if (String.fromCharCode(this.networkByte) === 'M') {
+                this.certifiedTokens = certiify.certifiedTokensList['Mainnet']
+            } else {
+                this.certifiedTokens = {}
+            }
+        },
         tokenTabChange(tabIndex) {
             if (tabIndex === 0) {
                 this.activeTab = 'verified'
@@ -167,7 +191,9 @@ export default {
                         return
                     }
                     Vue.set(tmp, tokenId, tokenSymbol)
-                    this.$store.commit('account/updateToken', tmp)
+                    const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
+                    this.$store.commit('account/updateToken', updateInfo)
+                    this.$store.commit('account/updateSelectedToken', tokenId)
                     this.$emit('changePage', 'home')
                 }, respError => {
                     this.responseErr = true

@@ -3,12 +3,15 @@
         <b-navbar class="nav-item">
             <b-navbar-brand>
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><img class="v-logo" src="../../static/icons/ic_v_logo@3x(1).png"></b-btn>
             </b-navbar-brand>
             <b-navbar-nav class="account">
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><p class="account-name">{{ accountNames[selectedAccount] }}</p></b-btn>
                 <b-btn class="logo-btn"
+                       variant="white"
                        @click="updatePopover"><p class="account-address">{{ addressShow }}</p></b-btn>
                 <div class="tokens-detail">
                     <b-button id="popover-1"
@@ -35,12 +38,13 @@
                            :show.sync="pop">
                     <token-select class="token-select"
                                   :addresses="addresses"
+                                  :address="addresses[selectedAccount]"
                                   :selected-account="selectedAccount"
                                   :account-names="accountNames"
                                   :token-balances="tokenBalances"
-                                  :balances="balances"
+                                  :token-records="tokenRecords"
+                                  :vsys-balance="vsysBalance"
                                   :selected-token="selectedToken"
-                                  :token-name="tokenName"
                                   @changePage="changePage"
                                   @selectSucceed="selectSucceed"></token-select>
                 </b-popover>
@@ -53,25 +57,30 @@
                   <canvas class="avatar col pr-0 canvas"
                           width="36"
                           height="36"
+                          @click="showDropdown"
                           :data-jdenticon-hash="avatarDataHex(addresses[selectedAccount])"></canvas>
                 </template>
-              <b-dropdown-item-button class="button"
-                                      :class="{'selected-account': index === selectedAccount}"
-                                      @click="select(index)"
-                                      v-for="(address, index) in addresses">
+              <div class="scroll"
+                   :style="{'min-height': 'auto', 'max-height': '200px'}">
+                  <b-dropdown-item-button class="button"
+                                          variant="white"
+                                          :class="{'selected-account': index === selectedAccount}"
+                                          @click="select(index)"
+                                          v-for="(address, index) in addresses">
                       <canvas class="canvas-item"
                               width="32"
                               height="32"
                               :data-jdenticon-hash="avatarDataHex(address)"></canvas>
                       <div style="display: inline-block; margin-left: 10px; height: 35px;">
                           <p class="address-item">{{ accountNames[index] }}</p>
-                          <p class="amount-item">{{ showBalance(balances[address]) + ' ' + tokenName}}</p>
+                          <p class="amount-item">{{ showBalance(accountBalances[address]) + ' ' + tokenName}}</p>
                       </div>
                       <img v-if="index === selectedAccount"
                            class="select"
                            width="10px"
                            height="8px" src="../../static/icons/ic_selected@2x.png">
-              </b-dropdown-item-button>
+                  </b-dropdown-item-button>
+              </div>
               <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
@@ -80,7 +89,9 @@
             </b-navbar-nav>
         </b-navbar>
       <AddAccount></AddAccount>
-      <Details></Details>
+      <Details :address="addresses[selectedAccount]"
+               :selected-account="selectedAccount"
+               :account-name="accountNames[selectedAccount]"></Details>
       <Settings></Settings>
       <About></About>
     </div>
@@ -91,22 +102,33 @@ import jdenticon from 'jdenticon'
 import converters from '../js-v-sdk/src/utils/converters.js'
 import Details from './Details.vue'
 import AddAccount from './AddAccount.vue'
+import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Settings from './Settings.vue'
 import About from './About.vue'
 import TokenSelect from "./TokenSelect.vue"
+import BigNumber from 'bignumber.js'
+import Vue from 'vue'
+import { mapState } from 'vuex'
 export default {
     name: "NavBar",
+    created() {
+        this.getAccountBalances()
+    },
     mounted() {
       jdenticon()
     },
     data() {
         return {
-            Records: {
-                'test': 999,
-            },
-            avtHash: '555077584842597e4246',
-            arrPos: 'down',
-            pop: false
+            pop: false,
+            accountBalances: {}
+        }
+    },
+    watch: {
+        selectedToken(now, old) {
+            this.getAccountBalances()
+        },
+        walletAmount(now, old) {
+            this.getAccountBalances()
         }
     },
     props: {
@@ -115,33 +137,22 @@ export default {
             require: true,
             default: function() {}
         },
-        accountNames: {
-            type: Array,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {
-            }
-        },
-        balances: {
-            type: Object,
-            require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,
             require: true,
             default: function() {}
         },
-        selectedAccount: {
-            type: Number,
+        tokenRecords: {
+            type: Object,
             require: true,
-            default: 0
+            default: function() {}
         },
         tokenName: {
-            type: String,
-            require: true,
-            default: 'VSYS'
-        },
-        selectedToken: {
             type: String,
             require: true,
             default: 'VSYS'
@@ -155,6 +166,26 @@ export default {
         About
     },
     methods: {
+        getAccountBalances() {
+            if (this.selectedToken === 'VSYS') {
+                for (const addr in this.addresses) {
+                    this.chain.getBalanceDetail(this.addresses[addr]).then(response => {
+                        let value = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
+                        Vue.set(this.accountBalances, this.addresses[addr], value)
+                    })
+                }
+            } else {
+                for (const addr in this.addresses) {
+                    this.chain.getTokenBalance(this.addresses[addr], this.selectedToken).then(response => {
+                        let value = BigNumber(response.balance).dividedBy(response.unity)
+                        Vue.set(this.accountBalances, this.addresses[addr], value)
+                    })
+                }
+            }
+        },
+        showDropdown() {
+            this.$refs.popover.$emit('close')
+        },
         logout() {
             this.$store.commit('wallet/updatePassword', false)
             this.$router.push('/login')
@@ -173,17 +204,12 @@ export default {
         select(index) {
             this.$store.commit('account/updateSelectedAccount', index)
         },
-        changeArrPos() {
-            this.arrPos = this.arrPos === 'down' ? 'up' : 'down';
-        },
         changePage(data) {
             this.$refs.popover.$emit('close')
-            this.arrPos = 'down'
             this.$emit('changePage', data)
         },
         selectSucceed() {
             this.$refs.popover.$emit('close')
-            this.arrPos = 'down'
         },
         updatePopover() {
             if(this.pop) {
@@ -196,6 +222,13 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            walletAmount: state => state.wallet.walletAmount,
+            chain: state => state.API.chain,
+            accountNames: state => state.account.accountNames,
+            selectedToken: state => state.account.selectedToken,
+            selectedAccount: state => state.account.selectedAccount
+        }),
         addressShow() {
             const addrChars = this.addresses[this.selectedAccount].split('')
             addrChars.splice(6, 23, '...')
@@ -260,17 +293,16 @@ export default {
 }
 .canvas {
     padding-right: 0px !important;
-    margin-top: 6px;
+    margin-top: 5px;
 }
 .nav-item {
     height: 60px;
-    padding-right: 6px;
     background:#FFFFFF;
 }
 .account {
     text-align: center;
     flex-direction: column !important;
-    margin-left: 76px;
+    margin: 0 auto;
 }
 .account-name {
     font-size: 16px;
@@ -311,6 +343,10 @@ export default {
     line-height:13px;
     margin-bottom: 4px;
 }
+.selected-account {
+    border-radius:4px;
+    border:1px solid rgba(255,136,55,1) !important;
+}
 .select {
     margin-top: -25px;
     margin-left: 25px;
@@ -331,5 +367,14 @@ export default {
     z-index:1000;
     max-width: 340px;
 }
-
+.ml-auto {
+    margin-left: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
+}
 </style>

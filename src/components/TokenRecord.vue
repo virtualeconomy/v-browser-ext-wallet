@@ -1,5 +1,5 @@
 <template>
-    <b-btn class="record-unit"
+    <b-btn :class="[selectedToken==tokenId ? 'selected-record-unit' : 'record-unit']"
            @click="addConfirm"
            fluid>
         <div class="record-icon">
@@ -54,10 +54,10 @@ export default {
             default: '',
             require: true
         },
-        address: {
-            type: String,
-            default: '',
-            require: true
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
         },
         balance: {
             type: String,
@@ -69,16 +69,15 @@ export default {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
             chain: state => state.API.chain,
-            tokenRecords: state => state.account.tokenRecords
+            selectedToken: state => state.account.selectedToken
         })
-    },
-    created() {
     },
     methods: {
         hide() {
-            var tmp = this.tokenRecords
+            let tmp = this.tokenRecords
             Vue.delete(tmp, this.tokenId)
-            this.$store.commit('account/updateToken', tmp)
+            const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
+            this.$store.commit('account/updateToken', updateInfo)
         },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
@@ -102,7 +101,6 @@ export default {
         },
         showBalance(balance) {
             let amount = String(balance)
-            console.log('amount', amount)
             if (amount.length >= 13) {
                 let index = amount.indexOf('.') === -1 ? 7 : amount.indexOf('.')
                 amount = amount.slice(0, index + 3) + '...'
@@ -125,6 +123,16 @@ export default {
     border: rgba(255,255,255,1);
 }
 .record-unit:active, .record-unit:focus, .record-unit:active:focus {
+    width:320px;
+    height:88px;
+    background:rgba(233,233,242,1);
+    border-radius:4px;
+    border:rgba(233,233,242,1);
+    padding-left: 20px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
+.selected-record-unit, .selected-record-unit:hover, .selected-record-unit:active, .selected-record-unit:focus, .selected-record-unit:active:focus {
     width:320px;
     height:88px;
     background:rgba(233,233,242,1);
@@ -177,8 +185,9 @@ export default {
     padding: 0 0;
 }
 .record-detail {
+    float: left;
     display: inline-block;
+    padding-left: 15px;
     padding-top: 15px;
-    min-width: 150px;
 }
 </style>

@@ -11,17 +11,6 @@ var certifiedTokensList = {
         'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': {'name': 'DLL', 'support_split': false, 'unity': 100000000 }
     },
 }
-
-const NETWORK_BYTE = store.state.wallet.networkByte;
-var certifiedTokens;
-if (String.fromCharCode(NETWORK_BYTE) === 'T') {
-    certifiedTokens = certifiedTokensList['Testnet']
-} else {
-    certifiedTokens = certifiedTokensList['Mainnet']
-}
-
 export default{
-    certifiedTokens() {
-        return certifiedTokens
-    }
+    certifiedTokensList
 }

@@ -100,7 +100,7 @@
         </div>
         <div class="details">
             <label>Total</label>
-            <p> {{ selectedToken === 'VSYS' ? amount + txFee : amount + ' ' + tokenName + ' + ' + txFee }}<span> VSYS</span></p>
+            <p> {{ selectedToken === 'VSYS' ? totalVSYS : amount + ' ' + tokenName + ' + ' + txFee }}<span> VSYS</span></p>
         </div>
         <div class="details" style="height: 72px;">
             <label style="margin-top: 28px;">Description</label>
@@ -142,11 +142,11 @@ export default {
     name: "Send",
     data: function() {
       return {
-          recipient: 'AUAztxsft2v6rmjRRb72nLea6BNyRHHWpUR',
-          amount: 12,
+          recipient: '',
+          amount: 0,
           unity: VSYS_PRECISION,
           isSplit: false,
-          description: 'This is my first send VSYS',
+          description: '',
           pageId: 0,
           txFee: this.selectedToken === 'VSYS' ? TX_FEE : CONTRACT_EXEC_FEE
       }
@@ -162,10 +162,10 @@ export default {
             require: true,
             default: 'Failed'
         },
-        balances: {
-            type: Object,
+        vsysBalance: {
+            type: String,
             require: true,
-            default: function() {}
+            default: '0'
         },
         tokenBalances: {
             type: Object,
@@ -215,12 +215,15 @@ export default {
                 return "../../static/icons/token/other.svg"
             }
         },
+        totalVSYS() {
+            return BigNumber(this.amount).plus(this.txFee)
+        },
         assetBalance() {
             let amount = 0
             if (this.selectedToken === 'VSYS') {
-                amount = String(this.balances[this.address])
+                amount = this.vsysBalance
             } else {
-                amount = String(this.tokenBalances[this.selectedToken])
+                amount = String(this.tokenBalances[this.selectedToken].value)
             }
             if (amount.length >= 16) {
                 let index = amount.indexOf('.')
@@ -259,9 +262,9 @@ export default {
         },
         isSufficient() {
             if (this.selectedToken === 'VSYS') {
-                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.balances[this.address]).minus(TX_FEE))
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.vsysBalance).minus(TX_FEE))
             } else {
-                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken])) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.balances[this.address]))
+                return BigNumber(this.amount).isLessThanOrEqualTo(BigNumber(this.tokenBalances[this.selectedToken].value)) && BigNumber(CONTRACT_EXEC_FEE).isLessThanOrEqualTo(BigNumber(this.vsysBalance))
             }
         },
         isValidDescription() {
@@ -291,7 +294,7 @@ export default {
             if (this.secretInfo) {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
             }
-        },
+        }
     },
     methods: {
         getTokenInfo() {

@@ -4,8 +4,9 @@ export default {
     state: {
         accountNames: ['Account 1'],
         selectedAccount: 0,
-        selectedToken: 'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3',
-        tokenRecords: {}
+        selectedToken: 'VSYS',
+        testnetTokenRecords: {},
+        mainnetTokenRecords: {}
     },
 
     mutations: {
@@ -16,10 +17,27 @@ export default {
             state.selectedAccount = index
         },
         updateToken(state, tokenRecordsInfo) {
-            state.tokenRecords = tokenRecordsInfo
+            if (String.fromCharCode(tokenRecordsInfo.networkByte) === 'M') {
+                state.mainnetTokenRecords = tokenRecordsInfo.tokens
+            } else {
+                state.testnetTokenRecords = tokenRecordsInfo.tokens
+            }
         },
         updateSelectedToken(state, tokenId) {
             state.selectedToken = tokenId
+        },
+        updateAccountName(state, accountNames) {
+            let temp = state.accountNames
+            temp[accountNames.index] = accountNames.name
+            state.accountNames = null
+            state.accountNames = temp
+        },
+        initializeAccount(state) {
+            state.accountNames = ['Account 1']
+            state.selectedAccount = 0
+            state.selectedToken = 'VSYS'
+            state.testnetTokenRecords = {}
+            state.mainnetTokenRecords = {}
         }
     }
 

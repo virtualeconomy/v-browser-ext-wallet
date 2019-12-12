@@ -253,6 +253,7 @@ export default {
                 password: this.password,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
+            this.$store.commit('account/initializeAccount')
             this.$store.commit('wallet/updateWallet', savedInfo)
             this.pageId = 'success'
         },
@@ -267,124 +268,123 @@ export default {
 </script>
 
 <style scoped>
-    .layout-main {
-        width: 100%;
-        height: 100%;
-        min-width: 200px;
-        position: absolute;
-        background-color: rgba(247,247,252,1);
-    }
-    .content {
-        height: 100%;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        background-color: rgba(247,247,252,1);
-    }
-    .import-intro-1 {
-        height: 30px;
-        font-size:32px;
-        font-family:SFProDisplay-Medium,SFProDisplay;
-        font-weight:500;
-        color:rgba(50,50,51,1);
-        line-height:40px;
-        position: relative;
-    }
-    .import-intro-2 {
-        width:494px;
-        font-size:15px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:21px;
-        position: relative;
-    }
-    .import-account {
-        width: 560px;
-        position: relative;
-        top: -50px;
-    }
-    .password-form {
-        margin-top: 25px;
-    }
-    .password-form label {
-        height:19px;
-        font-size:16px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:19px;
-        margin-bottom: 14px;
-    }
-    .input-height {
-        width: 100%;
-        height: 56px;
-    }
-    .back {
-        height: 40px;
-    }
-    .back-icon {
-        width: 14px;
-        height: 14px;
-    }
-    .back-link {
-        width:39px;
-        height:19px;
-        font-size:16px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(169,169,176,1);
-        line-height:19px;
-        padding: 2px 0px;
-        margin-bottom: 4px;
-    }
-    .terms {
-        font-size:19px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:22px;
-        margin-top: 25px;
-    }
-    .select {
-        appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
-        background: url("../../../static/icons/ic_arrow_down_gray@2x.png") no-repeat scroll 530px center #fff;
-        background-size: 12px;
-        padding-left: 19px;
-        font-size:19px;
-        font-weight:400;
-        line-height:22px;
-    }
-    .select option {
-        width:71px;
-        height:22px;
-        font-size:19px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:22px;
-    }
-    .check-right {
-        float: right;
-        margin-top: -30px;
-        margin-right: 16px;
-    }
-    .error-messages {
-        margin-top: 40px;
-    }
-    .form-control:disabled, .non-square{
-        padding: 20px 15px;
-        border-bottom-left-radius: 0px;
-        border-bottom-right-radius: 0px;
-    }
-    .seed {
-        height:22px;
-        font-size:19px;
-        font-family:SFProText-Regular,SFProText;
-        font-weight:400;
-        color:rgba(50,50,51,1);
-        line-height:22px;
-    }
+.layout-main {
+    width: 100%;
+    height: 100%;
+    min-width: 200px;
+    position: absolute;
+    background-color: rgba(247,247,252,1);
+}
+.content {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-color: rgba(247,247,252,1);
+}
+.import-intro-1 {
+    height: 30px;
+    font-size:32px;
+    font-family:SFProDisplay-Medium,SFProDisplay;
+    font-weight:500;
+    color:rgba(50,50,51,1);
+    line-height:40px;
+    position: relative;
+}
+.import-intro-2 {
+    width:494px;
+    font-size:15px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:21px;
+    position: relative;
+}
+.import-account {
+    width: 560px;
+    position: relative;
+    top: 28px;
+}
+.password-form {
+    margin-top: 25px;
+}
+.password-form label {
+    height:19px;
+    font-size:16px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:19px;
+    margin-bottom: 14px;
+}
+.input-height {
+    width: 100%;
+    height: 56px;
+}
+.back {
+    height: 40px;
+}
+.back-icon {
+    width: 14px;
+    height: 14px;
+}
+.back-link {
+    width:39px;
+    height:19px;
+    font-size:16px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(169,169,176,1);
+    line-height:19px;
+    padding: 2px 0px;
+    margin-bottom: 4px;
+}
+.terms {
+    font-size:19px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:22px;
+    margin-top: 25px;
+}
+.select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: url("../../../static/icons/ic_arrow_down_gray@2x.png") no-repeat scroll 530px center #fff;
+    background-size: 12px;
+    padding-left: 19px;
+    font-size:19px;
+    font-weight:400;
+    line-height:22px;
+}
+.select option {
+    width:71px;
+    height:22px;
+    font-size:19px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:22px;
+}
+.check-right {
+    float: right;
+    margin-top: -30px;
+    margin-right: 16px;
+}
+.error-messages {
+    margin-top: 40px;
+}
+.form-control:disabled, .non-square{
+    padding: 20px 15px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.seed {
+    height:22px;
+    font-size:19px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:22px;
+}
 </style>

@@ -4,6 +4,7 @@
              centered
              ref="addAccountModal"
              hide-footer
+             @hidden="reset"
              hide-header>
         <button class="add-close btn-close close"
                 @click="close">
@@ -61,6 +62,9 @@ export default {
         },
         close() {
             this.$refs.addAccountModal.hide()
+        },
+        reset() {
+            this.inputName = ''
         }
     },
     computed: {
@@ -69,10 +73,12 @@ export default {
         }),
         accountNumber() {
             let num = this.wallet.walletAmount + 1
+            if (num > 10) return 'Up to 10 accounts'
             return 'Account ' + num
         },
         isSubmitDisabled() {
             let name = this.inputName.trim()
+            if (name.length >= 12) return true
             return name === ''
         }
     }

@@ -2,13 +2,16 @@
     <div class="records">
         <div class="his-pane">
             <p class="his-txt">History</p>
-            <div class="view"><p>View on Explorer</p><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+            <div class="view"><b-btn class="view-p" variant="white" @click="viewOnExplorer">View on Explorer</b-btn><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
         </div>
-        <transaction-record v-for="txRecord in txRecords"
-                            :tx-record="txRecord"
-                            :address="address"
-                            :current-height="currentHeight"
-                            class="transaction-record"></transaction-record>
+        <div class="scroll"
+             :style="{'max-height': '192px'}">
+            <transaction-record v-for="txRecord in txRecords"
+                                :tx-record="txRecord"
+                                :address="address"
+                                :current-height="currentHeight"
+                                class="transaction-record"></transaction-record>
+        </div>
         <img height="50"
              width="50"
              class="wait-icon"
@@ -37,8 +40,8 @@ export default {
         TransactionRecord
     },
     created() {
-        this.getTxRecords()
         this.getCurrentHeight()
+        this.getTxRecords()
     },
     data: function() {
         return {
@@ -74,6 +77,12 @@ export default {
             default: function() {}
         }
     },
+    watch: {
+        address(now, old) {
+            this.getCurrentHeight()
+            this.getTxRecords()
+        }
+    },
     computed: {
         ...mapState({
             chain: state => state.API.chain
@@ -97,7 +106,8 @@ export default {
         getTxRecords() {
             this.showDisable = true
             const addr = this.address
-            this.chain.getTxHistory(addr, 3).then(response => {
+            let dataLength = 10
+            this.chain.getTxHistory(addr, dataLength).then(response => {
                 this.response = response[0]
                 let count = 0
                 this.txRecords = this.response.reduce((recList, recItem) => {
@@ -158,10 +168,10 @@ export default {
     float: right;
     margin-top: 5px;
 }
-.view p {
+.view-p {
     position: relative;
     left: 6px;
-    height: 14px;
+    padding: 0px;
     font-size:12px;
     font-family:SFProText-Medium,SFProText;
     font-weight:500;
@@ -183,5 +193,10 @@ export default {
 }
 .wait-icon {
     margin-top: 80px;
+}
+.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
 }
 </style>
