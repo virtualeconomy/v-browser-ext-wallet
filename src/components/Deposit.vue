@@ -18,7 +18,7 @@
                v-b-popover.click.topright="'Copied!'"
                @click="copyAddr"
                variant="link">
-            <img width="22" height="22" src="../../static/icons/ic_copy@2x.png">
+            <img width="22" height="22" src="../../static/icons/ic_copy.png">
         </b-btn>
         <div id="address-qrcode">
             <img :src="getQrCodeImg">

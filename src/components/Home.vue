@@ -22,11 +22,11 @@
                 <b-button class="btn-deposit"
                           @click="deposit">
                     <img class="icon-btn"
-                         src="../../static/icons/ic_deposit@3x.png"><b class="deposit-txt">Deposit</b></b-button>
+                         src="../../static/icons/ic_deposit.png"><b class="deposit-txt">Deposit</b></b-button>
                 <b-button class="btn-send"
                           @click="send">
                     <img class="icon-btn"
-                         src="../../static/icons/ic_send@3x.png"><b class="send-txt">Send</b></b-button>
+                         src="../../static/icons/ic_send.png"><b class="send-txt">Send</b></b-button>
             </div>
             <transaction-records class="transaction-records"
                                  :network-byte="networkByte"
@@ -66,7 +66,7 @@ import TransactionRecords from './TransactionRecords.vue'
 import { mapState } from 'vuex'
 import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Vue from 'vue'
-import seedLib from '../libs/seed.js'
+import seedLib from '../utils/seed.js'
 import BigNumber from 'bignumber.js'
 import AddToken from './AddToken.vue'
 

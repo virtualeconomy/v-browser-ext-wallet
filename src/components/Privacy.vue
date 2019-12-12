@@ -6,7 +6,7 @@
              hide-footer
              hide-header>
         <div class="back">
-            <img class="back-icon" src="../../static/icons/ic_back@2x.png"/>
+            <img class="back-icon" src="../../static/icons/ic_back.png"/>
             <b-btn class="back-link text-decoration-none" variant="link"
                    @click="back">Back</b-btn>
         </div>
@@ -93,7 +93,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import seedLib from '../libs/seed.js'
+import seedLib from '../utils/seed.js'
 export default {
     name: "Privacy",
     data: function() {

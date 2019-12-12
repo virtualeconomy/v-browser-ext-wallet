@@ -7,7 +7,7 @@
              hide-header>
         <button class="btn-close close settings-close"
                 @click="close">
-            <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
+            <img width="12" height="12" src="../../static/icons/ic_close.png">
         </button>
         <div class="settings">
             <p class="p1">Settings</p>
@@ -158,7 +158,7 @@ export default {
     -moz-appearance: none;
     -webkit-appearance: none;
     font-family:SFProText-Regular,SFProText;
-    background: url("../../static/icons/ic_arrow_down_gray@2x.png") no-repeat scroll 285px center #fff;
+    background: url("../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 285px center #fff;
     background-size: 12px;
     padding-left: 12px;
     font-size:14px;

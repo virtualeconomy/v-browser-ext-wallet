@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import seedLib from '../libs/seed.js'
+import seedLib from '../utils/seed.js'
 import { mapState } from 'vuex'
 export default {
     name: "Login",

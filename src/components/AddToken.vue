@@ -19,11 +19,11 @@
                                     <div v-for="(certifiedToken, tokenId) in certifiedTokens"
                                          :key="tokenId">
                                         <b-btn class="token-unit"
-                                               @click="addVerifiedToken(tokenId, certifiedToken['name'])">
+                                               @click="addVerifiedToken(tokenId, certifiedToken)">
                                             <div class="token-svg"><img width="56px"
                                                                         height="56px"
-                                                                        :src="certifiedTokenSvg(certifiedToken['name'])"></div>
-                                            <div class="cer-name"><span>{{certifiedToken['name']}}</span></div>
+                                                                        :src="certifiedTokenSvg(certifiedToken)"></div>
+                                            <div class="cer-name"><span>{{certifiedToken}}</span></div>
                                             <div class="notice" v-if="isExistedToken(tokenId)">Already added!</div>
                                         </b-btn>
                                     </div>
@@ -113,17 +113,14 @@
 <script>
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import certiify from '../utils/certify.js'
+import certify from '../utils/certify.js'
 export default {
     name: "AddToken",
-    components: {
-    },
     data: function() {
         return {
             activeTab: 'verified',
             tokenId: '',
             tokenSymbol: '',
-            tokenInfo: {},
             certifiedTokens: {},
             selectedVerifiedToken: '',
             selectedVerifiedSymbol: '',
@@ -162,9 +159,9 @@ export default {
     methods: {
         getCertifiedTokens() {
             if (String.fromCharCode(this.networkByte) === 'T') {
-                this.certifiedTokens = certiify.certifiedTokensList['Testnet']
+                this.certifiedTokens = certify.certifiedTokensList['Testnet']
             } else if (String.fromCharCode(this.networkByte) === 'M') {
-                this.certifiedTokens = certiify.certifiedTokensList['Mainnet']
+                this.certifiedTokens = certify.certifiedTokensList['Mainnet']
             } else {
                 this.certifiedTokens = {}
             }

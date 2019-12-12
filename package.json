@@ -6,7 +6,12 @@
     "build": "webpack --progress",
     "watch": "webpack --progress --watch"
   },
-  "author": "No.96",
+  "author": {
+    "name": "V SYSTEMS",
+    "email": "info@v.systems",
+    "url": "https://www.v.systems/"
+  },
+  "private": true,
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.4",
@@ -40,7 +45,6 @@
     "vuex": "^3.0.1",
     "vuex-persist": "^1.4.3",
     "vue-m-validator": "^1.0.5",
-    "vue-ls": "^3.0.5",
     "base-58": "0.0.1",
     "bignumber.js": "^7.2.1"
   }

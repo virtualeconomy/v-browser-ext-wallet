@@ -21,7 +21,7 @@
                     <div class="more-icon">
                         <img width="20px"
                              height="20px"
-                             src="../../static/icons/ic_more@2x.png">
+                             src="../../static/icons/ic_more.png">
                     </div>
                 </template>
                 <b-dropdown-item @click="hide"><span>Hide Token</span></b-dropdown-item>

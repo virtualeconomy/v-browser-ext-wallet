@@ -14,7 +14,7 @@
                         <div class="inline-p">
                             <img width="14px"
                                  height="14px"
-                                 src="../../static/icons/ic_about_small_yellow@2x.png">
+                                 src="../../static/icons/ic_about_small_yellow.png">
                         </div>
                         <div class="detail-word-p">
                             <b-btn class="vsys-color text-decoration-none detail-word"
@@ -37,7 +37,7 @@
                                    @click="copyAddress">
                                 <img width="12px"
                                      height="12px"
-                                     src="../../static/icons/ic_copy@2x.png">
+                                     src="../../static/icons/ic_copy.png">
                             </b-btn>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                     <div class="inline-p">
                         <img width="12px"
                              height="12px"
-                             src="../../static/icons/ic_add_token@2x.png">
+                             src="../../static/icons/ic_add_token.png">
                     </div>
                     <div class="add-word-p">
                         <b-btn class="vsys-color text-decoration-none add-word" variant="link" @click="addToken">Add Token</b-btn>
