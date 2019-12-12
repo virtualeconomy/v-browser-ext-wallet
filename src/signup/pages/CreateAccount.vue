@@ -281,12 +281,12 @@ export default {
     height: 60px;
 }
 .back-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 .back-link {
-    width:39px;
-    height:19px;
+    width:33px;
+    height:16px;
     font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
@@ -330,8 +330,7 @@ export default {
     margin-right: 16px;
 }
 .error-messages {
-    /*margin-bottom: -30px;*/
-    margin-top: 50px;
+    margin-bottom: 18px;
 }
 .form-group label {
     font-family:SFProText-Regular,SFProText;

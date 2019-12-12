@@ -27,7 +27,7 @@ export default {
 .success {
     justify-content: center;
     align-items: center;
-    width: 560px;
+    width: 480px;
     text-align: center;
     position: relative;
     top: 28px;

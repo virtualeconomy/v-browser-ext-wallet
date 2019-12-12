@@ -22,11 +22,6 @@
         "persistent": false,
         "scripts": ["background.main.js"]
     },
-    "content_scripts": [
-    {
-        "js": ["content.main.js"],
-        "run_at": "document_end"
-    }],
     "permissions": [
         "http://*/*",
         "https://*/*",

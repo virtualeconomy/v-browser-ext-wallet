@@ -125,7 +125,7 @@ export default {
 
 <style scoped>
 .confirm-back-up {
-    width: 560px;
+    width: 480px;
     position: relative;
     display: block;
     top: 28px;
@@ -166,7 +166,7 @@ export default {
 }
 .wordpad {
     margin-top: 46px;
-    width:560px;
+    width:480px;
     min-height: 205px;
     background:rgba(255,255,255,1);
     border-radius:7px;

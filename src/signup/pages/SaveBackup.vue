@@ -84,7 +84,7 @@ export default {
 
 <style scoped>
 .save-back-up {
-    width: 560px;
+    width: 480px;
     position: relative;
     display: block;
     top: 28px;

@@ -8,7 +8,7 @@ import jdenticon from 'jdenticon'
 import store from '../store'
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
-if (store.state.wallet.info === false) {
+if (true) {
     chrome.runtime.sendMessage({
         method: 'showAlert'
     }, function(response) {});

@@ -12,7 +12,7 @@
                 <p class="import-intro-1">Import an Account with Seed Phase</p>
                 <p class="import-intro-2">Enter your secret twelve word phrase here to restore your vault.</p>
                 <ul class="form-group"
-                    :class="{'error-messages':!this.validator.errors.length > 0}">
+                    style="height: 48px !important; margin-bottom: 0px;">
                     <li style="margin-bottom: 5px;" v-for="error in validator.errors"
                         :key="error.name">
                         <small class="form-text text-danger">
@@ -20,7 +20,7 @@
                         </small>
                     </li>
                 </ul>
-                <div class="form-group first-group">
+                <div class="form-group seed-form">
                     <label>Wallet Seed</label>
                     <b-form-textarea
                             class="non-square seed"
@@ -70,15 +70,13 @@
                 </div>
                 <div class="terms">
                     <img id="img_read"
-                         style="margin-top: -3px;"
                          @click="changeIcon"
                          src="../../../static/icons/ic_select_border.svg">
                     &nbsp;I have read and agree to the <a class='vsys-color'
                                                           href="#"
                                                           @click="openTerms()">Terms of Service<br></a>
                     <b-button
-                            class="input-height form-control"
-                            style="margin-top: 20px;padding: 0px;"
+                            class="form-control"
                             :disabled="isSubmitDisabled"
                             :variant="'warning'"
                             :size="'lg'"
@@ -267,7 +265,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .layout-main {
     width: 100%;
     height: 100%;
@@ -282,97 +280,125 @@ export default {
     background-color: rgba(247,247,252,1);
 }
 .import-intro-1 {
-    height: 30px;
-    font-size:32px;
+    height: 34px;
+    font-size: 28px;
     font-family:SFProDisplay-Medium,SFProDisplay;
     font-weight:500;
     color:rgba(50,50,51,1);
-    line-height:40px;
+    line-height:34px;
     position: relative;
+    margin-bottom: 12px;
 }
 .import-intro-2 {
-    width:494px;
-    font-size:15px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(50,50,51,1);
-    line-height:21px;
+    height: 18px;
+    font-size: 14px;
+    font-family: SFProText-Regular,SFProText;
+    font-weight: 400;
+    color: rgba(50,50,51,1);
+    line-height: 18px;
     position: relative;
+    margin-bottom: 0px;
 }
 .import-account {
-    width: 560px;
+    width: 480px;
     position: relative;
-    top: 28px;
+    top: 24px;
+}
+.seed-form {
+    label {
+        height:16px;
+        font-size:14px;
+        font-family:SFProText-Regular,SFProText;
+        font-weight:400;
+        color:rgba(50,50,51,1);
+        line-height:16px;
+        margin-bottom: 12px;
+    }
+    margin-bottom: 32px;
 }
 .password-form {
-    margin-top: 25px;
-}
-.password-form label {
-    height:19px;
-    font-size:16px;
-    font-family:SFProText-Regular,SFProText;
-    font-weight:400;
-    color:rgba(50,50,51,1);
-    line-height:19px;
-    margin-bottom: 14px;
+    label {
+        height:16px;
+        font-size:14px;
+        font-family:SFProText-Regular,SFProText;
+        font-weight:400;
+        color:rgba(50,50,51,1);
+        line-height:16px;
+        margin-bottom: 12px;
+    }
+    margin-bottom: 32px;
 }
 .input-height {
     width: 100%;
-    height: 56px;
+    height: 48px;
 }
 .back {
     height: 40px;
 }
 .back-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 .back-link {
-    width:39px;
-    height:19px;
+    width:33px;
+    height:16px;
     font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(169,169,176,1);
     line-height:19px;
-    padding: 2px 0px;
+    padding: 0px;
     margin-bottom: 4px;
 }
 .terms {
-    font-size:19px;
+    height: 19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
-    margin-top: 25px;
+    line-height:19px;
+    img {
+        height: 20px;
+        width: 20px;
+        margin-top: -2px;
+    }
+    button {
+        height:44px;
+        background:rgba(255,136,55,1);
+        border-radius:4px;
+        font-size:16px;
+        padding-top: 12px !important;
+        font-family:SFProText-Medium,SFProText;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        line-height:19px;
+        margin-top: 41px;padding: 0px;
+    }
 }
 .select {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 530px center #fff;
-    background-size: 12px;
+    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 454px center #fff;
+    background-size: 10px;
     padding-left: 19px;
-    font-size:19px;
+    font-size:16px;
     font-weight:400;
-    line-height:22px;
+    line-height:19px;
 }
 .select option {
-    width:71px;
-    height:22px;
-    font-size:19px;
+    width:61px;
+    height:19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
     color:rgba(50,50,51,1);
-    line-height:22px;
+    line-height:19px;
 }
 .check-right {
     float: right;
     margin-top: -30px;
     margin-right: 16px;
-}
-.error-messages {
-    margin-top: 40px;
 }
 .form-control:disabled, .non-square{
     padding: 20px 15px;
@@ -380,11 +406,11 @@ export default {
     border-bottom-right-radius: 0px;
 }
 .seed {
-    height:22px;
-    font-size:19px;
+    height:19px;
+    font-size:16px;
     font-family:SFProText-Regular,SFProText;
     font-weight:400;
+    line-height:19px;
     color:rgba(50,50,51,1);
-    line-height:22px;
 }
 </style>
