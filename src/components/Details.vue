@@ -8,14 +8,14 @@
              @hidden="updateAccountName"
              hide-header>
         <button class="close btn-close" @click="close">
-            <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
+            <img width="12" height="12" src="../../static/icons/ic_close.png">
         </button>
         <div class="account-content">
             <b-input id="accountName"
                      readonly
                      v-model="inputName"
                      type="text"></b-input><b-btn @click="editAccountName"
-                                                  variant="link"><img width="12" height="12" src="../../static/icons/ic_edit@2x.png"/></b-btn>
+                                                  variant="link"><img width="12" height="12" src="../../static/icons/ic_edit.png"/></b-btn>
         </div>
         <img :src="getQrCodeImg"/>
         <div class="address"><p>{{ address }}</p>
@@ -29,7 +29,7 @@
                 v-b-popover.click.top="'Copied!'"
                 @click="copyAddress"
                 variant="link">
-            <img width="12" height="12" src="../../static/icons/ic_copy@2x.png"></b-btn>
+            <img width="12" height="12" src="../../static/icons/ic_copy.png"></b-btn>
         </div>
         <div class="view">
             <b-btn variant="white"
@@ -37,14 +37,14 @@
                    @click="viewOnExplorer">View on Explorer</b-btn>
             <b-btn class="view-button"
                    variant="link"
-                   @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+                   @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right.png"/></b-btn></div>
         <div class="view">
             <b-btn variant="white"
                    class="view-p"
                    v-b-modal.privacy>Export Private Key / Seed</b-btn>
             <b-btn class="view-button"
                    v-b-modal.privacy
-                   variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+                   variant="link"><img width="6" height="10" src="../../static/icons/ic_arrow_right.png"/></b-btn></div>
         <Privacy :address="address"
                  :account-name="accountName"
                  @close="close"></Privacy>

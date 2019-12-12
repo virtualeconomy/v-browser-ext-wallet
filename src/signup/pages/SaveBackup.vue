@@ -2,7 +2,7 @@
     <div>
     <div class="save-back-up">
         <div class="back">
-            <img class = "back-icon" src="../../../static/icons/ic_back@2x.png"/>
+            <img class = "back-icon" src="../../../static/icons/ic_back.png"/>
             <b-btn class="back-link text-decoration-none" variant="link"
                    @click="changePage('create')">Back</b-btn>
         </div>
@@ -55,9 +55,8 @@
 </template>
 
 <script>
-import seedLib from '../../libs/seed'
+import seedLib from '../../utils/seed.js'
 import { mapState } from 'vuex'
-import Vue from 'vue'
 export default {
     name: "SaveBackup",
     methods: {

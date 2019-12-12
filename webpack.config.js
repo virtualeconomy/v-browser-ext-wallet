@@ -24,7 +24,7 @@ module.exports = {
             template: 'src/option/option.html',
             inject: 'body',
             chunks: ["option"],
-            minify: { //压缩
+            minify: {
                 removeComments: true,
                 collapseWhitespace: true,
             }
@@ -34,7 +34,7 @@ module.exports = {
             template: 'src/popup/popup.html',
             inject: 'body',
             chunks: ["popup"],
-            minify: { //压缩
+            minify: {
                 removeComments: true,
                 collapseWhitespace: true,
             }
@@ -44,7 +44,7 @@ module.exports = {
             template: 'src/signup/signup.html',
             inject: 'body',
             chunks: ["signup"],
-            minify: { //压缩
+            minify: {
                 removeComments: true,
                 collapseWhitespace: true,
             }

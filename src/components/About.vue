@@ -10,7 +10,7 @@
       class="close btn-close"
       @click="closeModal">
       <img width="12" height="12"
-           src="../../static/icons/ic_close@2x.png">
+           src="../../static/icons/ic_close.png">
     </button>
     <div class="about-container">
       <div class="image-illustration">

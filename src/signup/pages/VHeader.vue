@@ -2,7 +2,7 @@
     <div class="v-header">
         <div style="width: 560px;">
             <img class="logo"
-                 src="../../../static/icons/V_Wallet_Logo@2x.png"/>
+                 src="../../../static/icons/V_Wallet_Logo.png"/>
         </div>
     </div>
 </template>

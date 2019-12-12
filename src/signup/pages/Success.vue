@@ -2,13 +2,11 @@
     <div class="success">
         <p class="p1">Congratulations!</p>
         <p class="p2">Your account has been created. Please click icon to use the wallet.</p>
-        <img class = "tip-img" src="../../../static/icons/tip.png"/>
-        <b-button
-                class="input-height"
-                :variant="'warning'"
-                :size="'lg'"
-                :block=true
-                @click="closePage">
+        <img src="../../../static/icons/tip.png"/>
+        <b-button :variant="'warning'"
+                  :size="'lg'"
+                  :block=true
+                  @click="closePage">
             Close
         </b-button>
     </div>
@@ -25,14 +23,25 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .success {
-    justify-content:center;
-    align-items:center;
+    justify-content: center;
+    align-items: center;
     width: 560px;
     text-align: center;
     position: relative;
-    top: -70px;
+    top: 28px;
+    img {
+        width: 80%;
+        position: relative;
+        top: 20px;
+    }
+    button {
+        width: 280px;
+        margin-left: 140px;
+        margin-top: 50px;
+        height: 50px;
+    }
 }
 .p1 {
     height:40px;
@@ -49,16 +58,5 @@ export default {
     font-weight:400;
     color:rgba(50,50,51,1);
     line-height:21px;
-}
-.tip-img {
-    width: 80%;
-    position: relative;
-    top: 20px;
-}
-.input-height {
-    width: 280px;
-    margin-left: 140px;
-    margin-top: 50px;
-    height: 50px;
 }
 </style>

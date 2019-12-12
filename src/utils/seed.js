@@ -4,7 +4,7 @@
 // Object.defineProperty(exports, "__esModule", { value: true });
 import Base58 from 'base-58';
 import crypto_1 from '../js-v-sdk/src/utils/crypto'
-var logger_1 = require("../utils/logger");
+var logger_1 = require("./logger");
 var seedDictionary_1 = require("./seedDictionary");
 import Account from '../js-v-sdk/src/account'
 const NETWORK_BYTE = 'T'.charCodeAt(0);

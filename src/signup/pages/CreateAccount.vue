@@ -5,7 +5,7 @@
             <div v-if="pageId==='create'"
                  class="create-account">
                 <div class="back">
-                    <img class = "back-icon" src="../../../static/icons/ic_back@2x.png"/>
+                    <img class = "back-icon" src="../../../static/icons/ic_back.png"/>
                     <b-btn class="back-link text-decoration-none" variant="link"
                            @click="back('/SignupEntry')">Back</b-btn>
                 </div>
@@ -82,9 +82,8 @@
 </template>
 
 <script>
-import seedLib from '../../libs/seed.js'
+import seedLib from '../../utils/seed.js'
 import VHeader from './VHeader.vue'
-import Vue from 'vue'
 import validator from 'vue-m-validator'
 import icon1 from '../../../static/icons/ic_select_solid.svg'
 import icon2 from '../../../static/icons/ic_select_border.svg'
@@ -309,7 +308,7 @@ export default {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    background: url("../../../static/icons/ic_arrow_down_gray@2x.png") no-repeat scroll 530px center #fff;
+    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 530px center #fff;
     background-size: 12px;
     padding-left: 19px;
     font-size:19px;

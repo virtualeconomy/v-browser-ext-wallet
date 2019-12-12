@@ -2,7 +2,7 @@
     <div class="records">
         <div class="his-pane">
             <p class="his-txt">History</p>
-            <div class="view"><b-btn class="view-p" variant="white" @click="viewOnExplorer">View on Explorer</b-btn><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right@2x.png"/></b-btn></div>
+            <div class="view"><b-btn class="view-p" variant="white" @click="viewOnExplorer">View on Explorer</b-btn><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right.png"/></b-btn></div>
         </div>
         <div class="scroll"
              :style="{'max-height': '192px'}">

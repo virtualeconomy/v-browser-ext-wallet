@@ -66,7 +66,7 @@
     </div>
     <div v-else-if="pageId === 1">
         <div class="edit">
-            <img class = "edit-icon" src="../../static/icons/ic_back@2x.png"/>
+            <img class = "edit-icon" src="../../static/icons/ic_back.png"/>
             <b-btn class="edit-link text-decoration-none" variant="link"
                    @click="edit">Edit</b-btn>
         </div>
@@ -76,7 +76,7 @@
                     height="24"
                     :data-jdenticon-hash="avatarDataHex(address)"></canvas>
             <p class="account-name">{{ accountName }}</p>
-            <img style="display: inline-block; float: left; margin: 12px 0px 12px 26px;" width="32" height="32" src="../../static/icons/ic_arrow_line@2x.png"/>
+            <img style="display: inline-block; float: left; margin: 12px 0px 12px 26px;" width="32" height="32" src="../../static/icons/ic_arrow_line.png"/>
             <canvas class="avatar2"
                     width="24"
                     height="24"
@@ -130,7 +130,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import seedLib from '../libs/seed.js'
+import seedLib from '../utils/seed.js'
 import Transaction from '../js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import jdenticon from 'jdenticon'

@@ -8,7 +8,7 @@
              hide-header>
         <button class="add-close btn-close close"
                 @click="close">
-            <img width="12" height="12" src="../../static/icons/ic_close@2x.png">
+            <img width="12" height="12" src="../../static/icons/ic_close.png">
         </button>
         <div class="add-account">
             <p class="p1">New Account</p>

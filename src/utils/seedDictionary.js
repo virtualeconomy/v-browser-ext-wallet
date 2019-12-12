@@ -1,6 +1,4 @@
 "use strict";
-// Derived from waves-api
-//
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = [
     'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse', 'access',

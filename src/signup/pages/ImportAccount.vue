@@ -5,7 +5,7 @@
             <div v-if="pageId==='import'"
                  class="import-account">
                 <div class="back">
-                    <img class = "back-icon" src="../../../static/icons/ic_back@2x.png">
+                    <img class = "back-icon" src="../../../static/icons/ic_back.png">
                     <b-btn class="back-link text-decoration-none" variant="link"
                            @click="back('/SignupEntry')">Back</b-btn>
                 </div>
@@ -99,7 +99,7 @@ import validator from 'vue-m-validator'
 import icon1 from '../../../static/icons/ic_select_solid.svg'
 import icon2 from '../../../static/icons/ic_select_border.svg'
 import Success from './Success.vue'
-import seedLib from '../../libs/seed.js'
+import seedLib from '../../utils/seed.js'
 export default {
     name: "ImportAccount",
     data: function() {
@@ -350,7 +350,7 @@ export default {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    background: url("../../../static/icons/ic_arrow_down_gray@2x.png") no-repeat scroll 530px center #fff;
+    background: url("../../../static/icons/ic_arrow_down_gray.png") no-repeat scroll 530px center #fff;
     background-size: 12px;
     padding-left: 19px;
     font-size:19px;

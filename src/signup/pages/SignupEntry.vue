@@ -3,7 +3,7 @@
         <div class="v-header-container">
             <div class="v-header">
                 <img class="v-logo"
-                    src="../../../static/icons/V_Wallet_Logo@2x.png"></div>
+                    src="../../../static/icons/V_Wallet_Logo.png"></div>
         </div>
         <div class="select-body">
             <div class="new-part">
@@ -11,7 +11,7 @@
             </div>
             <div class="import-create-part">
                 <div><img class="import-create-icon"
-                          src="../../../static/icons/ic_import_big@2x.png"></div>
+                          src="../../../static/icons/ic_import_big.png"></div>
                 <div><span class="txt-1">No, I already have a seed phrase</span></div>
                 <div><span class="txt-2">Import your existing wallet using a 12 word seed phrase</span></div>
                 <div>
@@ -21,7 +21,7 @@
             </div>
             <div class="import-create-part">
                 <div><img class="import-create-icon"
-                          src="../../../static/icons/ic_add_account@2x.png"></div>
+                          src="../../../static/icons/ic_add_account.png"></div>
                 <div><span class="txt-1">Yes, let's get set up!</span></div>
                 <div><span class="txt-2">This will create a new wallet and seed phrase</span></div>
                 <div>

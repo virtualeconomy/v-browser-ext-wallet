@@ -22,11 +22,11 @@
                         <div><img v-if="pop===false"
                                   width="10px"
                                   height="6px"
-                                  src="../../static/icons/ic_arrow_down_yellow@3x.png"/></div>
+                                  src="../../static/icons/ic_arrow_down_yellow.png"/></div>
                         <div><img v-if="pop===true"
                                   width="10px"
                                   height="6px"
-                                  src="../../static/icons/ic_arrow_up_yellow@2x.png"/></div>
+                                  src="../../static/icons/ic_arrow_up_yellow.png"/></div>
                     </b-button>
                 </div>
                 <b-popover ref="popover"
@@ -78,13 +78,13 @@
                       <img v-if="index === selectedAccount"
                            class="select"
                            width="10px"
-                           height="8px" src="../../static/icons/ic_selected@2x.png">
+                           height="8px" src="../../static/icons/ic_selected.png">
                   </b-dropdown-item-button>
               </div>
-              <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account@2x.png"><span class="text">Add Account</span></b-dropdown-item>
-              <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about@2x.png"><span class="text">About</span></b-dropdown-item>
-              <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting@2x.png"><span class="text">Settings</span></b-dropdown-item>
-              <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout@2x.png"><span class="text">Log Out</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account.png"><span class="text">Add Account</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about.png"><span class="text">About</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting.png"><span class="text">Settings</span></b-dropdown-item>
+              <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-navbar>
