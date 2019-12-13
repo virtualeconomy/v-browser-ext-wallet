@@ -30,7 +30,7 @@ export default {
     width: 480px;
     text-align: center;
     position: relative;
-    top: 28px;
+    top: 24px;
     img {
         width: 80%;
         position: relative;
@@ -38,7 +38,7 @@ export default {
     }
     button {
         width: 280px;
-        margin-left: 140px;
+        margin-left: 104px;
         margin-top: 50px;
         height: 50px;
     }
