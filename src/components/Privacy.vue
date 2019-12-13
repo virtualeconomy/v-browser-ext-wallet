@@ -126,8 +126,10 @@ export default {
             selectedAccount: state => state.account.selectedAccount,
         }),
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            if (this.wallet.password) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            }
         },
         getPrivateKey() {
             return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase, this.selectedAccount, this.networkByte).keyPair.privateKey

@@ -83,7 +83,6 @@
 import jdenticon from 'jdenticon'
 import TokenRecord from "./TokenRecord.vue"
 import converters from '../js-v-sdk/src/utils/converters.js'
-import { mapState } from 'vuex'
 import AddToken from './AddToken.vue'
 export default {
     name: "TokenSelect",

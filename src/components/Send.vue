@@ -1,5 +1,6 @@
 <template>
-    <div v-if="pageId === 0"
+    <div>
+    <div v-show="pageId === 0"
          class="send-content">
         <div>
             <p class="p1">Send {{ tokenName }}</p>
@@ -64,7 +65,7 @@
             </b-row>
         </b-form-group>
     </div>
-    <div v-else-if="pageId === 1">
+    <div v-show="pageId === 1">
         <div class="edit">
             <img class = "edit-icon" src="../../static/icons/ic_back.png"/>
             <b-btn class="edit-link text-decoration-none" variant="link"
@@ -77,11 +78,11 @@
                     :data-jdenticon-hash="avatarDataHex(address)"></canvas>
             <p class="account-name">{{ accountName }}</p>
             <img style="display: inline-block; float: left; margin: 12px 0px 12px 26px;" width="32" height="32" src="../../static/icons/ic_arrow_line.png"/>
-            <canvas class="avatar2"
-                    width="24"
-                    height="24"
-                    :data-jdenticon-hash="avatarDataHex(address)"></canvas>
-            <p class="account-name">{{ recipient }}</p>
+            <!--<canvas class="avatar2"-->
+                    <!--width="24"-->
+                    <!--height="24"-->
+                    <!--:data-jdenticon-hash="avatarDataHex(recipient)"></canvas>-->
+            <p class="recipient-name">{{ addressShow }}</p>
         </div>
         <div style="background: rgba(247,247,252,1);">
             <div style="margin: 16px 0px 24px 16px">
@@ -126,6 +127,7 @@
                 </b-button>
             </b-col>
         </b-row>
+    </div>
     </div>
 </template>
 <script>
@@ -284,8 +286,10 @@ export default {
             return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            if (this.wallet.password) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            }
         },
         getKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase, this.selectedAccount, this.networkByte).keyPair
@@ -294,6 +298,11 @@ export default {
             if (this.secretInfo) {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
             }
+        },
+        addressShow() {
+            const addrChars = this.recipient.split('')
+            addrChars.splice(6, 22, '...')
+            return addrChars.join('')
         }
     },
     methods: {
@@ -543,6 +552,19 @@ export default {
     color:rgba(50,50,51,1);
     line-height:16px;
     margin: 20px 0px;
+}
+.recipient-name {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 130px;
+    float: left;
+    font-size:14px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:16px;
+    margin: 20px 0px 20px 15px;
 }
 .details {
     height: 98px;

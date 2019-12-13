@@ -1,7 +1,7 @@
 <template>
     <div class="home"
          @mousemove=resetSessionClearTimeout>
-        <nav-bar v-show="showNav"
+        <nav-bar v-if="showNav"
                  class="nav-bar"
                  :addresses="addresses"
                  :vsys-balance="vsysBalance"
@@ -93,7 +93,7 @@ export default {
     data: function() {
         return {
             page: 'home',
-            addresses: [],
+            addresses: {},
             address: '',
             accountName: '',
             vsysBalance: '0',
@@ -117,8 +117,10 @@ export default {
             tokenRecords: state => state.account.tokenRecords
         }),
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            if (this.wallet.password) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            }
         },
         tokenName() {
             if (this.selectedToken === 'VSYS') {
@@ -156,6 +158,8 @@ export default {
             this.getAddresses()
             this.getVSYS()
             this.getTokenBalances()
+            this.showNav = false
+            this.$nextTick(() => (this.showNav = true))
         },
         selectedAccount(now ,old) {
             this.address = this.addresses[this.selectedAccount]
@@ -180,6 +184,8 @@ export default {
             this.getVSYS()
             this.getTokenBalances()
             this.accountName = this.accountNames[this.selectedAccount]
+            this.showNav = false
+            this.$nextTick(() => (this.showNav = true))
         }
     },
     mounted() {
@@ -228,6 +234,7 @@ export default {
             }
         },
         getAddresses() {
+            this.addresses = {}
             let seedPhrase = this.getSeedPhrase()
             for (let index = 0; index < this.walletAmount; index++) {
                 let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index, this.networkByte)

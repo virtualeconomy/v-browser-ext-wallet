@@ -82,8 +82,10 @@ export default {
             wallet: state => state.wallet
         }),
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            if (this.wallet.password) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+            }
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)

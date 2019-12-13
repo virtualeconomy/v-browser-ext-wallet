@@ -129,6 +129,9 @@ export default {
         },
         walletAmount(now, old) {
             this.getAccountBalances()
+        },
+        networkByte(now, old) {
+            this.getAccountBalances()
         }
     },
     props: {
@@ -223,6 +226,7 @@ export default {
     },
     computed: {
         ...mapState({
+            networkByte: state => state.wallet.networkByte,
             walletAmount: state => state.wallet.walletAmount,
             chain: state => state.API.chain,
             accountNames: state => state.account.accountNames,
