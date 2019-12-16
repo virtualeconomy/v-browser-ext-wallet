@@ -81,7 +81,6 @@ export default {
         },
         isSubmitDisabled() {
             let name = this.inputName.trim()
-            if (name.length >= 12) return true
             return name.length >= 12 || this.wallet.walletAmount > 9
         }
     }

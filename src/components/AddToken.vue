@@ -66,7 +66,13 @@
                                               placeholder="Please input Token ID"
                                               onfocus="this.select()"></b-form-input>
                                 <b-form-invalid-feedback id="inputTokenLiveFeedback"
-                                                         style="margin-top: -20px">
+                                                         style="margin-top: -20px"
+                                                         v-if="isVerifiedToken(tokenId)">
+                                    It's verified Token!
+                                </b-form-invalid-feedback>
+                                <b-form-invalid-feedback id="inputTokenLiveFeedback"
+                                                         style="margin-top: -20px"
+                                                         v-else>
                                     Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
                                 </b-form-invalid-feedback>
                                 <label>Token Symbol</label>
@@ -150,9 +156,9 @@ export default {
         isSubmitDisabled() {
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
             if (this.activeTab === 'verified') {
-                return tokenId in this.tokenRecords
+                return this.isExistedToken(tokenId)
             } else {
-                return tokenId.length <= 0 && this.isValidSymbol(this.tokenSymbol)
+                return tokenId.length <= 0 || !this.isValidSymbol(this.tokenSymbol) || this.isVerifiedToken(tokenId)
             }
         }
     },
@@ -215,10 +221,13 @@ export default {
             return symbol.length <= 5 && Regx.test(symbol)
         },
         isValidToken(tokenId) {
-            if (tokenId.length === 0 || this.responseErr === false) {
+            if (tokenId.length === 0) {
                 return void 0
             }
-            return !this.responseErr
+            return !this.responseErr && !this.isVerifiedToken(tokenId)
+        },
+        isVerifiedToken(tokenId) {
+            return tokenId in this.certifiedTokens
         }
     }
 }
@@ -240,9 +249,6 @@ export default {
     font-weight:500;
     color:rgba(50,50,51,1);
     line-height:29px;
-}
-.f-records {
-    /*padding-bottom: 120px;*/
 }
 .page {
     padding: 0px 0px;

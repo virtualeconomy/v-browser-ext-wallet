@@ -1,5 +1,5 @@
 <template>
-    <b-btn :class="[selectedToken==tokenId ? 'selected-record-unit' : 'record-unit']"
+    <b-btn :class="[ selectedToken == tokenId ? 'selected-record-unit' : 'record-unit']"
            @click="addConfirm"
            fluid>
         <div class="record-icon">
@@ -77,6 +77,12 @@ export default {
             let tmp = this.tokenRecords
             Vue.delete(tmp, this.tokenId)
             const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
+            if (this.tokenId === this.selectedToken) {
+                this.tokenId = 'VSYS'
+            } else {
+                this.tokenId = this.selectedToken
+            }
+            this.$store.commit('account/updateSelectedToken', 'VSYS')
             this.$store.commit('account/updateToken', updateInfo)
         },
         viewOnExplorer() {
