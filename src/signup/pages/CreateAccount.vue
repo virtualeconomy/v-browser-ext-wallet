@@ -20,7 +20,7 @@
                     </li>
                 </ul>
                 <div class="form-group password-form">
-                    <label>New Password (min 8chars)</label>
+                    <label>New Password (minimum 8 characters)</label>
                     <input
                       type="password"
                       name="password"

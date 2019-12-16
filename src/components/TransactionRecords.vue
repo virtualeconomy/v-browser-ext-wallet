@@ -6,7 +6,8 @@
         </div>
         <div class="scroll"
              :style="{'max-height': '192px'}">
-            <transaction-record v-for="txRecord in txRecords"
+            <transaction-record v-for="(txRecord, idx) in txRecords"
+                                :key="idx"
                                 :tx-record="txRecord"
                                 :address="address"
                                 :current-height="currentHeight"

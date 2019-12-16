@@ -93,3 +93,6 @@ button:focus {
 :focus{
     outline: 0 rgba(247,247,252,1) !important;
 }
+.dropdown-item:hover {
+    padding-bottom: 1px !important;
+}

@@ -165,6 +165,8 @@ export default {
             this.address = this.addresses[this.selectedAccount]
             this.getVSYS()
             this.getTokenBalances()
+            this.showNav = false
+            this.$nextTick(() => (this.showNav = true))
         },
         selectedToken(now, old) {
             this.getVSYS()

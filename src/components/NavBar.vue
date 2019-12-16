@@ -64,9 +64,10 @@
                    :style="{'min-height': 'auto', 'max-height': '200px'}">
                   <b-dropdown-item-button class="button"
                                           variant="white"
+                                          v-for="(address, index) in addresses"
                                           :class="{'selected-account': index === selectedAccount}"
                                           @click="select(index)"
-                                          v-for="(address, index) in addresses">
+                                          :key="index">
                       <canvas class="canvas-item"
                               width="32"
                               height="32"

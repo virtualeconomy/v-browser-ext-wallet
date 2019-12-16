@@ -36,7 +36,7 @@
                     </b-form-textarea>
                 </div>
                 <div class="form-group password-form">
-                    <label>New Password (min 8chars)</label>
+                    <label>New Password (minimum 8 characters)</label>
                     <input
                             type="password"
                             name="password"
@@ -378,6 +378,7 @@ export default {
         color:rgba(255,255,255,1);
         line-height:19px;
         margin-top: 41px;
+        margin-bottom: 64px;
     }
 }
 .select {
