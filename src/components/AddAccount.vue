@@ -56,7 +56,10 @@ export default {
     },
     methods: {
         createAccount() {
-            this.$store.commit('account/addAccount', this.inputName)
+            let name = this.inputName.trim()
+            let num = this.wallet.walletAmount + 1
+            if (name === '') name = 'Account ' + num
+            this.$store.commit('account/addAccount', name)
             this.$store.commit('wallet/updateWalletAmount')
             this.$refs.addAccountModal.hide()
         },
@@ -79,7 +82,7 @@ export default {
         isSubmitDisabled() {
             let name = this.inputName.trim()
             if (name.length >= 12) return true
-            return name === ''
+            return name.length >= 12 || this.wallet.walletAmount > 9
         }
     }
 }
