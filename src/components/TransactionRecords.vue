@@ -2,6 +2,10 @@
     <div class="records">
         <div class="his-pane">
             <p class="his-txt">History</p>
+            <b-btn class="refresh-icon"
+                   variant="link"
+                   @click="refresh"
+                   v-if="!showDisable"><img width="20" height="20" src="../../static/icons/refresh.svg"/></b-btn>
             <div class="view"><b-btn class="view-p" variant="white" @click="viewOnExplorer">View on Explorer</b-btn><b-btn variant="link" @click="viewOnExplorer"><img width="6" height="10" src="../../static/icons/ic_arrow_right.png"/></b-btn></div>
         </div>
         <div class="scroll"
@@ -97,6 +101,10 @@ export default {
                 this.currentHeight = 0
             })
         },
+        refresh() {
+            this.getCurrentHeight()
+            this.getTxRecords()
+        },
         viewOnExplorer() {
             if (String.fromCharCode(this.networkByte) === 'T') {
                 window.open(ADDRESS_TEST_EXPLORER + this.address)
@@ -105,6 +113,7 @@ export default {
             }
         },
         getTxRecords() {
+            this.txRecords = {}
             this.showDisable = true
             const addr = this.address
             let dataLength = 10
@@ -194,6 +203,10 @@ export default {
 }
 .wait-icon {
     margin-top: 80px;
+}
+.refresh-icon {
+    padding: 0 0;
+    display:inline-block;
 }
 .scroll {
     overflow-y: scroll;
