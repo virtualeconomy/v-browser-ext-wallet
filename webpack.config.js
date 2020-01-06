@@ -9,7 +9,8 @@ module.exports = {
         'background':'./src/background/background.js',
         'content':'./src/content/content.js',
         'option':'./src/option/option.js',
-        'popup':'./src/popup/popup.js'
+        'popup':'./src/popup/popup.js',
+        'signup': './src/signup/signup.js'
     },
     output:{
         path: path.resolve(__dirname, './dist'),
@@ -23,7 +24,7 @@ module.exports = {
             template: 'src/option/option.html',
             inject: 'body',
             chunks: ["option"],
-            minify: { //压缩
+            minify: {
                 removeComments: true,
                 collapseWhitespace: true,
             }
@@ -33,7 +34,17 @@ module.exports = {
             template: 'src/popup/popup.html',
             inject: 'body',
             chunks: ["popup"],
-            minify: { //压缩
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'signup.html',
+            template: 'src/signup/signup.html',
+            inject: 'body',
+            chunks: ["signup"],
+            minify: {
                 removeComments: true,
                 collapseWhitespace: true,
             }
@@ -50,6 +61,10 @@ module.exports = {
             {
                 test: /\.vue$/,
                 use:'vue-loader'
+            },
+            {
+                test: /\.less$/,
+                loader: "vue-style-loader!css-loader!less-loader"
             },
             {
                 test:/\.js$/,

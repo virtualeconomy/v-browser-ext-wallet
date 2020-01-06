@@ -4,15 +4,15 @@
     "version": "1.0.0",
     "description": "the browser extension for V wallet",
     "icons": {
-        "16":"static/img/icon.png",
-        "19":"static/img/icon.png",
-        "38":"static/img/icon.png",
-        "48": "static/img/icon.png",
-		"128": "static/img/icon.png"
+        "16":"static/icons/ic_v_logo@3x(1).png",
+        "19":"static/icons/ic_v_logo@3x(1).png",
+        "38":"static/icons/ic_v_logo@3x(1).png",
+        "48": "static/icons/ic_v_logo@3x(1).png",
+		"128": "static/icons/ic_v_logo@3x(1).png"
     },
     "browser_action":
     {
-        "default_icon": "static/img/icon.png",
+        "default_icon": "static/icons/ic_v_logo@3x(1).png",
         "default_title": "V Wallet Extension",
         "default_popup": "popup.html"
     },
@@ -22,15 +22,10 @@
         "persistent": false,
         "scripts": ["background.main.js"]
     },
-    "content_scripts": [
-    {
-        "matches": ["https://*.baidu.com/*", "http://*.baidu.com/*"],
-        "js": ["content.main.js"],
-        "run_at": "document_end"
-    }],
     "permissions": [
         "http://*/*",
         "https://*/*",
         "<all_urls>"
-    ]
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

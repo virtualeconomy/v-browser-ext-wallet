@@ -6,7 +6,12 @@
     "build": "webpack --progress",
     "watch": "webpack --progress --watch"
   },
-  "author": "No.96",
+  "author": {
+    "name": "V SYSTEMS",
+    "email": "info@v.systems",
+    "url": "https://www.v.systems/"
+  },
+  "private": true,
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.4",
@@ -24,13 +29,23 @@
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.31.0",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
     "webpack-cli": "^3.3.2"
   },
   "dependencies": {
     "@babel/runtime": "^7.4.4",
     "bootstrap": "^4.3.1",
-    "bootstrap-vue": "2.0.0-rc.28",
+    "bootstrap-vue": "^2.0.0-rc.28",
+    "jdenticon": "^2.2.0",
+    "jr-qrcode": "^1.1.1",
+    "js-v-sdk": "./src/js-v-sdk",
+    "vue": "^2.6.10",
     "vue-router": "^3.0.1",
-    "vue": "^2.6.10"
+    "vuex": "^3.0.1",
+    "vuex-persist": "^1.4.3",
+    "vue-m-validator": "^1.0.5",
+    "base-58": "0.0.1",
+    "bignumber.js": "^7.2.1"
   }
 }

@@ -1,0 +1,98 @@
+@font-face {
+    font-family: 'Roboto-Regular';
+    src: url('/static/fonts/Roboto-Regular.ttf') format('truetype');
+}
+html, body, #app {
+    font-family: 'Roboto-Regular' !important;
+    background:rgba(247,247,252,1);
+}
+.details-dialog {
+    text-align: center;
+    padding-bottom: 32px !important;
+}
+.vsys-color {
+    color: #FF8837 !important;
+}
+.btn-warning {
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+}
+.btn-warning:focus {
+    box-shadow: none !important;
+}
+.btn-warning:hover {
+    background-color: #EB7D34 !important;
+    box-shadow: none !important;
+    color: #FFF !important;
+}
+.btn-warning:not(:disabled):not(.disabled):active, .btn-warning:not(:disabled):not(.disabled).active, .show > .btn-warning.dropdown-toggle {
+    background-color: #EB7D34 !important;
+    box-shadow: none !important;
+    color: #FFF !important;
+}
+.btn-warning.disabled, .btn-warning:disabled {
+    color: #FFF !important;
+    background-color: #FF8737 !important;
+    border-color: #ffc107 !important;
+}
+input:focus {
+    caret-color: #FF8737 !important;
+}
+.form-control:focus {
+    border-color: rgb(255, 190, 150) !important;
+    box-shadow: none !important;
+}
+button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.popover {
+    max-width: 344px !important;
+    background-color: rgba(255,255,255,1) !important;
+    box-shadow:0px 4px 8px 0px rgba(50,50,51,0.06); !important;
+    border: 1px solid rgba(240,240,245,1) !important;
+    border-radius: 6px 0px 0px 0px !important;
+}
+.nav-tabs .nav-link.active {
+    letter-spacing: 0 !important;
+    border: none !important;
+    border-bottom: 2px solid rgba(255,136,55,1) !important;
+    background: none !important;
+    font-size:14px !important;
+    font-family:SFProText-Medium,SFProText !important;
+    font-weight:500 !important;
+    color: rgba(255,136,55,1) !important;
+    line-height:16px !important;
+    outline: 0 white !important;
+    margin-right: 24px;
+}
+.nav-tabs {
+    margin: 0 24px;
+    outline: 0 white !important;
+}
+.nav-tabs .nav-link {
+    padding: 0 !important;
+    padding-bottom: 12px !important;
+    font-size: 14px !important;
+    border: none !important;
+    color: rgba(169,169,176,1) !important;
+    letter-spacing: 0 !important;
+    font-family:SFProText-Regular,SFProText !important;
+    font-weight:400 !important;
+    line-height:16px !important;
+    outline: 0 white !important;
+    margin-right: 24px;
+}
+.navbar-brand {
+    margin-right: 22px !important;
+}
+.nav-link {
+    padding: 0.5rem 0px !important;
+}
+:focus{
+    outline: 0 rgba(247,247,252,1) !important;
+}
+.dropdown-item:hover {
+    padding-bottom: 1px !important;
+}
