@@ -5,7 +5,7 @@ import common from "js-v-sdk/src/utils/common.js"
 import seedLib from "src/utils/seed"
 import { MAINNET_IP, TESTNET_IP } from "../store/network"
 import BigNumber from "bignumber.js"
-import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX } from "js-v-sdk/src/constants"
+import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX } from "js-v-sdk/src/constants"
 import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
 import { constants } from "src/js-v-sdk/src";
