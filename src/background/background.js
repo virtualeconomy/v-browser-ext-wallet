@@ -261,59 +261,6 @@ async function resolveRequset(request) {
             }
             break
         case "withdrawToken":
-            if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.amount) {
-                res.result = false
-                res.message = "Invalid params!"
-                break
-            }
-            if (request.params.publicKey !== seed.keyPair.publicKey) {
-                res.result = false
-                res.message = "Inconsistent publicKey!"
-                break
-            }
-            params = request.params
-            let isSplit, unity
-            tokenId = common.contractIDToTokenID(params.contractId)
-            try {
-                let response = await chain.getContractInfo(params.contractId)
-                isSplit = response.type === 'TokenContractWithSplit'
-            } catch(respError) {
-                res.result = false
-                res.message = "Failed to get Contract Info"
-                console.log(respError)
-            }
-            try {
-                let response = await chain.getTokenInfo(tokenId)
-                if (!response.hasOwnProperty('error') && response.unity) {
-                    unity = BigNumber(response.unity)
-                } else {
-                    res.result = false
-                    res.message = "Failed to get Token Unit"
-                }
-            } catch(respError) {
-                res.result = false
-                res.message = "Failed to get Token Info"
-                console.log(respError)
-            }
-            tra = new Transaction(networkByte)
-            data_generator = new TokenContractDataGenerator()
-            timestamp = Date.now() * 1e6
-            attachment = ""
-            function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
-            function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
-            tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment);
-            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            signature = apiAccount.getSignature(tra.toBytes())
-            sendTx = tra.toJsonForSendingTx(signature)
-            try {
-                let response = await chain.sendExecuteContractTx(sendTx)
-                res.transactionId = response.id
-            } catch(respError) {
-                res.result = false
-                res.message =  "Failed to withdraw token"
-                console.log(respError)
-            }
-            break
         case "depositToken":
             if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.amount) {
                 res.result = false
@@ -326,14 +273,30 @@ async function resolveRequset(request) {
                 break
             }
             params = request.params
-            tokenId = common.contractIDToTokenID(params.contractId)
+            let isSplit, unity
+            let tokenContract
             try {
                 let response = await chain.getContractInfo(params.contractId)
+                let contractInfo = response.info
+                tokenId = false
+                for (let i = 0; i < contractInfo.length; i++) {
+                    if (contractInfo[i]["name"] === 'tokenId' && contractInfo[i]["type"] === 'TokenId') {
+                        tokenId = contractInfo[i]["data"]
+                    }
+                }
+                if (!tokenId) {
+                    res.result = false
+                    res.message = "Could not find token info in this Contract"
+                    break
+                }
+                tokenContract = common.tokenIDToContractID(tokenId)
+                response = await chain.getContractInfo(tokenContract)
                 isSplit = response.type === 'TokenContractWithSplit'
             } catch(respError) {
                 res.result = false
                 res.message = "Failed to get Contract Info"
                 console.log(respError)
+                break
             }
             try {
                 let response = await chain.getTokenInfo(tokenId)
@@ -342,19 +305,30 @@ async function resolveRequset(request) {
                 } else {
                     res.result = false
                     res.message = "Failed to get Token Unit"
+                    break
                 }
             } catch(respError) {
                 res.result = false
                 res.message = "Failed to get Token Info"
                 console.log(respError)
+                break
             }
             tra = new Transaction(networkByte)
             data_generator = new TokenContractDataGenerator()
             timestamp = Date.now() * 1e6
             attachment = ""
-            function_index = isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
-            function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
-            tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment);
+            if (method === "withdrawToken") {
+                function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
+                function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
+            } else if (method === "depositToken") {
+                function_index = isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
+                function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
+            } else {
+                res.result = false
+                res.message =  "Invalid method"
+                break
+            }
+            tra.buildExecuteContractTx(params.publicKey, tokenContract, function_index, function_data, timestamp, attachment);
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
             signature = apiAccount.getSignature(tra.toBytes())
             sendTx = tra.toJsonForSendingTx(signature)
@@ -363,7 +337,7 @@ async function resolveRequset(request) {
                 res.transactionId = response.id
             } catch(respError) {
                 res.result = false
-                res.message =  "Failed to deposit token"
+                res.message =  "Failed to " + method
                 console.log(respError)
             }
             break
