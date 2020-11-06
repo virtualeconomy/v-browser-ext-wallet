@@ -8,6 +8,7 @@ module.exports = {
     entry:{
         'background':'./src/background/background.js',
         'content':'./src/content/content.js',
+        'inpage':'./src/inpage/inpage.js',
         'option':'./src/option/option.js',
         'popup':'./src/popup/popup.js',
         'signup': './src/signup/signup.js'

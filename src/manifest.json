@@ -22,6 +22,16 @@
         "persistent": false,
         "scripts": ["background.main.js"]
     },
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "css": ["./static/common.css"],
+            "js": ["content.main.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        "inpage.main.js"
+    ],
     "permissions": [
         "http://*/*",
         "https://*/*",
