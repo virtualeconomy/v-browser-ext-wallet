@@ -5,8 +5,10 @@ import common from "js-v-sdk/src/utils/common.js"
 import seedLib from "src/utils/seed"
 import { MAINNET_IP, TESTNET_IP } from "../store/network"
 import BigNumber from "bignumber.js"
-import { VSYS_PRECISION } from "js-v-sdk/src/constants"
-import Transaction from "src/js-v-sdk/src/transaction";
+import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX } from "js-v-sdk/src/constants"
+import Transaction from "src/js-v-sdk/src/transaction"
+import { TokenContractDataGenerator, LockContractDataGenerator, PaymentChannelContractDataGenerator} from "src/js-v-sdk/src/data"
+import { constants } from "src/js-v-sdk/src";
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action) {
@@ -148,7 +150,7 @@ async function resolveRequset(request) {
                 res.message = "Invalid params!"
                 break
             }
-            const tokenId = request.params.tokenId
+            let tokenId = request.params.tokenId
             const tokenSymbol = request.params.tokenSymbol
             try {
                 let response = await chain.getTokenInfo(tokenId)
@@ -174,7 +176,7 @@ async function resolveRequset(request) {
                 res.message = "Inconsistent publicKey!"
                 break
             }
-            const params = request.params
+            let params = request.params
             let tra = new Transaction(networkByte)
             if (!request.params.tokenId) {
                 tra.buildPaymentTx(params.publicKey, params.recipient, params.amount, params.description, Date.now() * 1e6)
@@ -247,9 +249,48 @@ async function resolveRequset(request) {
                 res.message = "Inconsistent publicKey!"
                 break
             }
+            params = request.params
+            let isSplit, unity
+            tokenId = common.contractIDToTokenID(params.contractId)
+            try {
+                let response = await chain.getContractInfo(params.contractId)
+                isSplit = response.type === 'TokenContractWithSplit'
+            } catch(respError) {
+                res.result = false
+                res.message = "Failed to get Contract Info"
+                console.log(respError)
+            }
+            try {
+                let response = await chain.getTokenInfo(tokenId)
+                if (!response.hasOwnProperty('error') && response.unity) {
+                    unity = BigNumber(response.unity)
+                } else {
+                    res.result = false
+                    res.message = "Failed to get Token Unit"
+                }
+            } catch(respError) {
+                res.result = false
+                res.message = "Failed to get Token Info"
+                console.log(respError)
+            }
+            tra = new Transaction(networkByte)
+            let data_generator = new TokenContractDataGenerator()
+            let timestamp = Date.now() * 1e6
+            let attachment = ""
+            let function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
+            let function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
+            tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment);
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            //TODO
-            res.transactionId = "2dSYyPQuh44J6ExxxxxxxNcEU4q4iLiVcahVc4n"
+            signature = apiAccount.getSignature(tra.toBytes())
+            sendTx = tra.toJsonForSendingTx(signature)
+            try {
+                let response = await chain.sendExecuteContractTx(sendTx)
+                res.transactionId = response.id
+            } catch(respError) {
+                res.result = false
+                res.message =  "Failed to withdraw token"
+                console.log(respError)
+            }
             break
         case "depositToken":
             if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.amount) {
@@ -262,8 +303,47 @@ async function resolveRequset(request) {
                 res.message = "Inconsistent publicKey!"
                 break
             }
-            //TODO
-            res.transactionId = "2dSYyPQuh44J6ExxxxxxxNcEU4q4iLiVcahVc4n"
+            params = request.params
+            tokenId = common.contractIDToTokenID(params.contractId)
+            try {
+                let response = await chain.getContractInfo(params.contractId)
+                isSplit = response.type === 'TokenContractWithSplit'
+            } catch(respError) {
+                res.result = false
+                res.message = "Failed to get Contract Info"
+                console.log(respError)
+            }
+            try {
+                let response = await chain.getTokenInfo(tokenId)
+                if (!response.hasOwnProperty('error') && response.unity) {
+                    unity = BigNumber(response.unity)
+                } else {
+                    res.result = false
+                    res.message = "Failed to get Token Unit"
+                }
+            } catch(respError) {
+                res.result = false
+                res.message = "Failed to get Token Info"
+                console.log(respError)
+            }
+            tra = new Transaction(networkByte)
+            data_generator = new TokenContractDataGenerator()
+            timestamp = Date.now() * 1e6
+            attachment = ""
+            function_index = isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
+            function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
+            tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment);
+            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+            signature = apiAccount.getSignature(tra.toBytes())
+            sendTx = tra.toJsonForSendingTx(signature)
+            try {
+                let response = await chain.sendExecuteContractTx(sendTx)
+                res.transactionId = response.id
+            } catch(respError) {
+                res.result = false
+                res.message =  "Failed to deposit token"
+                console.log(respError)
+            }
             break
     }
     return res
