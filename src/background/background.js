@@ -14,15 +14,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         switch (action) {
             case "vsys-request":
                 const data = request.force
-                let res = resolveRequset(data)
-                sendResponse(res)
+                resolveRequset(data).then(sendResponse)
                 return true
         }
     }
     if (request.method && request.method === 'showAlert') {
         chrome.tabs.create({ url: chrome.extension.getURL('signup.html')})
     }
-    console.log(request, sender, sendResponse)
+    //console.log(request, sender, sendResponse)
 })
 
 function getData() {
@@ -54,7 +53,7 @@ function getSeed(wallet, selectedAccount) {
     return seedLib.fromExistingPhrasesWithIndex(seedPhrase, selectedAccount, wallet.networkByte)
 }
 
-function resolveRequset(request) {
+async function resolveRequset(request) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
     let apiAccount = new Account(networkByte)
     let chain
@@ -87,14 +86,15 @@ function resolveRequset(request) {
             break
         case "amount":
             res.address = seed.address
-            chain.getBalanceDetail(res.address).then(response => {
+            let response = await chain.getBalanceDetail(res.address)
+            try {
                 res.amount = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
-                console.log(res.amount, 'net')
-            }, respError => {
+                // console.log(res.amount, 'net')
+            } catch(respError) {
                 res.result = false
                 res.message = "Failed to get amount from chain"
                 console.log(respError, 'net')
-            })
+            }
             break
         case "tokenAmount":
             if (!request.params || !request.params.tokenId) {
@@ -130,6 +130,7 @@ function resolveRequset(request) {
                     tokenId: tokenId,
                     contractId: common.tokenIDToContractID(tokenId)
                 }
+                //TODO: save ContractInfo in local storage when add token in watch list
                 chain.getContractInfo(token.contractId).then( res => {
                         token.contractType = res.type
                     }
