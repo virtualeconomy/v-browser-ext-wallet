@@ -86,14 +86,14 @@ async function resolveRequset(request) {
             break
         case "amount":
             res.address = seed.address
-            let response = await chain.getBalanceDetail(res.address)
             try {
+                let response = await chain.getBalanceDetail(res.address)
                 res.amount = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
-                // console.log(res.amount, 'net')
+                // console.log(res.amount)
             } catch(respError) {
                 res.result = false
                 res.message = "Failed to get amount from chain"
-                console.log(respError, 'net')
+                console.log(respError)
             }
             break
         case "tokenAmount":
@@ -104,14 +104,14 @@ async function resolveRequset(request) {
             }
             res.address = seed.address
             res.tokenId = request.params.tokenId
-            chain.getTokenBalance(res.address, res.tokenId).then(response => {
+            try {
+                let response = await chain.getTokenBalance(res.address, res.tokenId)
                 res.amount = BigNumber(response.balance).dividedBy(response.unity).toString()
-                console.log(res.amount, 'net')
-            }, respError => {
+            } catch(respError) {
                 res.result = false
                 res.message = "Failed to get tokenAmount from chain"
-                console.log(respError, 'net')
-            })
+                console.log(respError)
+            }
             break
         case "watchedTokens":
             let tokenRecords
@@ -130,11 +130,14 @@ async function resolveRequset(request) {
                     tokenId: tokenId,
                     contractId: common.tokenIDToContractID(tokenId)
                 }
-                //TODO: save ContractInfo in local storage when add token in watch list
-                chain.getContractInfo(token.contractId).then( res => {
-                        token.contractType = res.type
-                    }
-                )
+                try {
+                    //TODO: save ContractInfo in local storage when add token in watch list
+                    let response = await chain.getContractInfo(token.contractId)
+                    token.contractType = response.type
+                } catch(respError) {
+                    token.contractType = "Unknown"
+                    console.log(respError)
+                }
                 tokens.push(token)
             }
             res.token = tokens
@@ -147,17 +150,18 @@ async function resolveRequset(request) {
             }
             const tokenId = request.params.tokenId
             const tokenSymbol = request.params.tokenSymbol
-            chain.getTokenInfo(tokenId).then(response => {
+            try {
+                let response = await chain.getTokenInfo(tokenId)
                 if (response.hasOwnProperty('error')) {
                     res.result = false
                     res.message = "Invalid token!"
                 } else {
                     addToken(tokenId, tokenSymbol, networkByte)
                 }
-            }, respError => {
+            } catch(respError) {
                 res.result = false
                 res.message = "Invalid token!"
-            })
+            }
             break
         case "send":
             if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
@@ -177,35 +181,50 @@ async function resolveRequset(request) {
             } else {
                 let contractId = common.tokenIDToContractID(params.tokenId)
                 let isSplit, unity
-                chain.getContractInfo(contractId).then(response => {
+                try {
+                    let response = await chain.getContractInfo(contractId)
                     isSplit = response.type === 'TokenContractWithSplit'
-                }, respError => {
-                })
-                chain.getTokenInfo(params.tokenId).then(response => {
-                    if (!response.hasOwnProperty('error')) {
+                } catch(respError) {
+                    res.result = false
+                    res.message = "Failed to get Contract Info"
+                    console.log(respError)
+                }
+                try {
+                    let response = await chain.getTokenInfo(params.tokenId)
+                    if (!response.hasOwnProperty('error') && response.unity) {
                         unity = BigNumber(response.unity)
+                    } else {
+                        res.result = false
+                        res.message = "Failed to get Token Unit"
                     }
-                }, respError => {
-                })
+                } catch(respError) {
+                    res.result = false
+                    res.message = "Failed to get Token Info"
+                    console.log(respError)
+                }
                 tra.buildSendTokenTx(params.publicKey, params.tokenId, params.recipient, params.amount, unity, isSplit, params.description)
             }
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
             let signature = apiAccount.getSignature(tra.toBytes())
             let sendTx = tra.toJsonForSendingTx(signature)
             if (!request.params.tokenId) {
-                chain.sendPaymentTx(sendTx).then(response => {
+                try {
+                    let response = await chain.sendPaymentTx(sendTx)
                     res.transactionId = response.id
-                }, respErr => {
+                } catch(respError) {
                     res.result = false
-                    res.message = respErr
-                })
+                    res.message =  "Failed to send VSYS"
+                    console.log(respError)
+                }
             } else {
-                this.chain.sendExecuteContractTx(sendTx).then(response => {
+                try {
+                    let response = await chain.sendExecuteContractTx(sendTx)
                     res.transactionId = response.id
-                }, respErr => {
+                } catch(respError) {
                     res.result = false
-                    res.message = respErr
-                })
+                    res.message =  "Failed to send Token"
+                    console.log(respError)
+                }
             }
             break
         case "lockToken":
