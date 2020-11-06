@@ -5,9 +5,9 @@ import common from "js-v-sdk/src/utils/common.js"
 import seedLib from "src/utils/seed"
 import { MAINNET_IP, TESTNET_IP } from "../store/network"
 import BigNumber from "bignumber.js"
-import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX } from "js-v-sdk/src/constants"
+import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX } from "js-v-sdk/src/constants"
 import Transaction from "src/js-v-sdk/src/transaction"
-import { TokenContractDataGenerator, LockContractDataGenerator, PaymentChannelContractDataGenerator} from "src/js-v-sdk/src/data"
+import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
 import { constants } from "src/js-v-sdk/src";
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -230,13 +230,35 @@ async function resolveRequset(request) {
             }
             break
         case "lockToken":
-            if (!request.params || !request.params.contractId || !request.params.publicKey) {
+            if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.lockTime) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
             }
-            //TODO
-            res.transactionId = "2dSYyPQuh44J6ExxxxxxxNcEU4q4iLiVcahVc4n"
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
+            params = request.params
+            let data_generator = new LockContractDataGenerator()
+            let function_data = data_generator.createLockData(params.lockTime)
+            let attachment = ""
+            let timestamp = Date.now() * 1e6
+            let function_index = LOCK_CONTRACT_LOCK_FUNCIDX
+            tra = new Transaction(networkByte)
+            tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment)
+            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+            signature = apiAccount.getSignature(tra.toBytes())
+            sendTx = tra.toJsonForSendingTx(signature)
+            try {
+                let response = await chain.sendExecuteContractTx(sendTx)
+                res.transactionId = response.id
+            } catch(respError) {
+                res.result = false
+                res.message =  "Failed to lock token"
+                console.log(respError)
+            }
             break
         case "withdrawToken":
             if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.amount) {
@@ -274,11 +296,11 @@ async function resolveRequset(request) {
                 console.log(respError)
             }
             tra = new Transaction(networkByte)
-            let data_generator = new TokenContractDataGenerator()
-            let timestamp = Date.now() * 1e6
-            let attachment = ""
-            let function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
-            let function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
+            data_generator = new TokenContractDataGenerator()
+            timestamp = Date.now() * 1e6
+            attachment = ""
+            function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
+            function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
             tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment);
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
             signature = apiAccount.getSignature(tra.toBytes())
