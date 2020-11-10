@@ -8,7 +8,6 @@ import BigNumber from "bignumber.js"
 import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX } from "js-v-sdk/src/constants"
 import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
-import { constants } from "src/js-v-sdk/src";
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action) {
@@ -68,6 +67,14 @@ async function resolveRequset(request) {
         result: true,
         message: "OK"
     }
+    const method = request.method
+
+    if (method === "info") {
+        res.name = "V Systems Browser Extension Wallet"
+        res.version = chrome.app.getDetails().version
+        res.network = String.fromCharCode(networkByte) === 'M' ? "Mainnet" : "Testnet"
+        return res
+    }
     if (!wallet.password) {
         res = {
             result: false,
@@ -75,8 +82,6 @@ async function resolveRequset(request) {
         }
         return res
     }
-
-    const method = request.method
     let seed = getSeed(wallet, selectedAccount)
     switch (method) {
         case "address":
