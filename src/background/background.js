@@ -56,16 +56,21 @@ function getSeed(wallet, selectedAccount) {
 
 async function resolveRequset(request) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
+    let res = {
+        result: true,
+        message: "OK"
+    }
+    if (!networkByte) {
+        res.result = false
+        res.message = "account is not created"
+        return res
+    }
     let apiAccount = new Account(networkByte)
     let chain
     if (String.fromCharCode(networkByte) === 'M') {
         chain = new Blockchain(MAINNET_IP, networkByte)
     } else {
         chain = new Blockchain(TESTNET_IP, networkByte)
-    }
-    let res = {
-        result: true,
-        message: "OK"
     }
     const method = request.method
 
