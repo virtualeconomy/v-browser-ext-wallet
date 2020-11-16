@@ -1,7 +1,7 @@
 
 
 let providerHandle
-const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken"]
+const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList']
 class vsys {
     request(data) {
         return new Promise((resolve, reject) => {

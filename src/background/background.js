@@ -10,18 +10,22 @@ import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
 import { constants } from "src/js-v-sdk/src";
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action) {
         const action = request.action
         switch (action) {
             case "vsys-request":
                 const data = request.force
-                resolveRequset(data).then(sendResponse)
+                const webListData = {
+                    siteName: request.origin,
+                    siteIcon: request.siteImage,
+                }
+                resolveRequset(data, webListData).then(sendResponse)
                 return true
         }
     }
     if (request.method && request.method === 'showAlert') {
-        chrome.tabs.create({ url: chrome.extension.getURL('signup.html')})
+        chrome.tabs.create({ url: chrome.extension.getURL('signup.html') })
     }
     //console.log(request, sender, sendResponse)
 })
@@ -55,7 +59,16 @@ function getSeed(wallet, selectedAccount) {
     return seedLib.fromExistingPhrasesWithIndex(seedPhrase, selectedAccount, wallet.networkByte)
 }
 
-async function resolveRequset(request) {
+function addWebList(siteData) {
+    let storage = JSON.parse(window.localStorage.getItem("vuex"))
+    if (siteData) {
+        storage.wallet.webList.push(siteData)
+        window.localStorage.setItem("vuex", JSON.stringify(storage))
+    }
+}
+
+
+async function resolveRequset(request, webListData) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
     let apiAccount = new Account(networkByte)
     let chain
@@ -75,6 +88,18 @@ async function resolveRequset(request) {
         }
         return res
     }
+    if (wallet.webList.findIndex(item => item.siteName == webListData.siteName) == -1 || wallet.webList == []) {
+        if (confirm("Trust this site '" + webListData.siteName + "'?")) {
+            addWebList(webListData)
+            res.message = 'trust this site'
+        } else {
+            res.message = 'distrust this site'
+            res.result =  false
+            return res
+        }
+    } else {
+        res.message = 'This site has been added to the  webList'
+    }
 
     const method = request.method
     let seed = getSeed(wallet, selectedAccount)
@@ -92,7 +117,7 @@ async function resolveRequset(request) {
                 let response = await chain.getBalanceDetail(res.address)
                 res.amount = BigNumber(response.available).dividedBy(VSYS_PRECISION).toString()
                 // console.log(res.amount)
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
                 res.message = "Failed to get amount from chain"
                 console.log(respError)
@@ -109,7 +134,7 @@ async function resolveRequset(request) {
             try {
                 let response = await chain.getTokenBalance(res.address, res.tokenId)
                 res.amount = BigNumber(response.balance).dividedBy(response.unity).toString()
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
                 res.message = "Failed to get tokenAmount from chain"
                 console.log(respError)
@@ -136,7 +161,7 @@ async function resolveRequset(request) {
                     //TODO: save ContractInfo in local storage when add token in watch list
                     let response = await chain.getContractInfo(token.contractId)
                     token.contractType = response.type
-                } catch(respError) {
+                } catch (respError) {
                     token.contractType = "Unknown"
                     console.log(respError)
                 }
@@ -160,7 +185,7 @@ async function resolveRequset(request) {
                 } else {
                     addToken(tokenId, tokenSymbol, networkByte)
                 }
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
                 res.message = "Invalid token!"
             }
@@ -186,7 +211,7 @@ async function resolveRequset(request) {
                 try {
                     let response = await chain.getContractInfo(contractId)
                     isSplit = response.type === 'TokenContractWithSplit'
-                } catch(respError) {
+                } catch (respError) {
                     res.result = false
                     res.message = "Failed to get Contract Info"
                     console.log(respError)
@@ -199,7 +224,7 @@ async function resolveRequset(request) {
                         res.result = false
                         res.message = "Failed to get Token Unit"
                     }
-                } catch(respError) {
+                } catch (respError) {
                     res.result = false
                     res.message = "Failed to get Token Info"
                     console.log(respError)
@@ -213,18 +238,18 @@ async function resolveRequset(request) {
                 try {
                     let response = await chain.sendPaymentTx(sendTx)
                     res.transactionId = response.id
-                } catch(respError) {
+                } catch (respError) {
                     res.result = false
-                    res.message =  "Failed to send VSYS"
+                    res.message = "Failed to send VSYS"
                     console.log(respError)
                 }
             } else {
                 try {
                     let response = await chain.sendExecuteContractTx(sendTx)
                     res.transactionId = response.id
-                } catch(respError) {
+                } catch (respError) {
                     res.result = false
-                    res.message =  "Failed to send Token"
+                    res.message = "Failed to send Token"
                     console.log(respError)
                 }
             }
@@ -254,9 +279,9 @@ async function resolveRequset(request) {
             try {
                 let response = await chain.sendExecuteContractTx(sendTx)
                 res.transactionId = response.id
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
-                res.message =  "Failed to lock token"
+                res.message = "Failed to lock token"
                 console.log(respError)
             }
             break
@@ -292,7 +317,7 @@ async function resolveRequset(request) {
                 tokenContract = common.tokenIDToContractID(tokenId)
                 response = await chain.getContractInfo(tokenContract)
                 isSplit = response.type === 'TokenContractWithSplit'
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
                 res.message = "Failed to get Contract Info"
                 console.log(respError)
@@ -307,7 +332,7 @@ async function resolveRequset(request) {
                     res.message = "Failed to get Token Unit"
                     break
                 }
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
                 res.message = "Failed to get Token Info"
                 console.log(respError)
@@ -325,7 +350,7 @@ async function resolveRequset(request) {
                 function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
             } else {
                 res.result = false
-                res.message =  "Invalid method"
+                res.message = "Invalid method"
                 break
             }
             tra.buildExecuteContractTx(params.publicKey, tokenContract, function_index, function_data, timestamp, attachment);
@@ -335,9 +360,9 @@ async function resolveRequset(request) {
             try {
                 let response = await chain.sendExecuteContractTx(sendTx)
                 res.transactionId = response.id
-            } catch(respError) {
+            } catch (respError) {
                 res.result = false
-                res.message =  "Failed to " + method
+                res.message = "Failed to " + method
                 console.log(respError)
             }
             break

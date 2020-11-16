@@ -1,5 +1,3 @@
-
-
 function injectScript (content) {
     try {
         const container = document.head || document.documentElement

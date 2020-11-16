@@ -85,6 +85,7 @@
               <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting.png"><span class="text">Settings</span></b-dropdown-item>
+              <b-dropdown-item v-b-modal.webList href="#" class="drop-down"><img class="icon" src="../../static/icons/web.png"><span class="text">WebLists</span></b-dropdown-item>
               <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
@@ -94,6 +95,7 @@
                :selected-account="selectedAccount"
                :account-name="accountNames[selectedAccount]"></Details>
       <Settings></Settings>
+      <WebList></WebList>
       <About></About>
     </div>
 </template>
@@ -105,6 +107,7 @@ import Details from './Details.vue'
 import AddAccount from './AddAccount.vue'
 import { VSYS_PRECISION } from '../js-v-sdk/src/constants'
 import Settings from './Settings.vue'
+import WebList from './WebList.vue'
 import About from './About.vue'
 import TokenSelect from "./TokenSelect.vue"
 import BigNumber from 'bignumber.js'
@@ -167,7 +170,8 @@ export default {
         AddAccount,
         TokenSelect,
         Settings,
-        About
+        About,
+        WebList
     },
     methods: {
         getAccountBalances() {
