@@ -8,7 +8,6 @@ import BigNumber from "bignumber.js"
 import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX } from "js-v-sdk/src/constants"
 import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
-import { constants } from "src/js-v-sdk/src";
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action) {
@@ -70,6 +69,15 @@ function addWebList(siteData) {
 
 async function resolveRequset(request, webListData) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
+    let res = {
+        result: true,
+        message: "OK"
+    }
+    if (!networkByte) {
+        res.result = false
+        res.message = "account is not created"
+        return res
+    }
     let apiAccount = new Account(networkByte)
     let chain
     if (String.fromCharCode(networkByte) === 'M') {
@@ -77,9 +85,13 @@ async function resolveRequset(request, webListData) {
     } else {
         chain = new Blockchain(TESTNET_IP, networkByte)
     }
-    let res = {
-        result: true,
-        message: "OK"
+    const method = request.method
+
+    if (method === "info") {
+        res.name = "V Systems Browser Extension Wallet"
+        res.version = chrome.app.getDetails().version
+        res.network = String.fromCharCode(networkByte) === 'M' ? "Mainnet" : "Testnet"
+        return res
     }
     if (!wallet.password) {
         res = {
