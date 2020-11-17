@@ -113,7 +113,6 @@ async function resolveRequset(request, webListData) {
         res.message = 'This site has been added to the  webList'
     }
 
-    const method = request.method
     let seed = getSeed(wallet, selectedAccount)
     switch (method) {
         case "address":
