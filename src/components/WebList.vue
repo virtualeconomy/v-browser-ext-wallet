@@ -4,11 +4,11 @@
       <img width="12" height="12" src="../../static/icons/ic_close.png" />
     </button>
     <div class="webLists">
-      <p class="p1">WebLists</p>
+      <p class="p1">Trusted Websites</p>
       <div class="table" v-for="(item,index) in storage.wallet.webList" :key="index">
         <div class="content">
           <img :src="item.siteIcon" v-if="item.siteIcon!=null" class="icon" alt />
-          <div class="no_icon icon" v-else>{{item.siteName.slice(4,5).toUpperCase()}}</div>
+          <div class="no_icon icon" v-else>{{item.iconText}}</div>
           <div class="name">{{item.siteName}}</div>
         </div>
         <img src="../../static/icons/trash.png" class="trash" alt @click="deleteDomain(index)" />
@@ -22,6 +22,21 @@ export default {
   name: "WebList",
   created() {
     this.storage = JSON.parse(window.localStorage.getItem("vuex"));
+    this.storage.wallet.webList.map(item => {
+      if (item.siteName.indexOf("www.") != -1) {
+        item.iconText = item.siteName.slice(4, 5).toUpperCase();
+      } else {
+        let re = /\./g;
+        if (item.siteName.match(re).length > 1) {
+          let reg = /([^.]+\.)?([^\.]+\..+)/;
+          let m = item.siteName.match(reg);
+          if (m.length > 2) {
+            item.siteName = m[2];
+          }
+        }
+        item.iconText = item.siteName.slice(0, 1).toUpperCase();
+      }
+    });
   },
   data: function() {
     return {
@@ -79,13 +94,13 @@ export default {
   width: 25px;
   height: 25px;
 }
-.no_icon{
-    border-radius: 50%;
-    border: 1px solid #f5f5f5;
-    text-align: center;
-    line-height: 25px;
+.no_icon {
+  border-radius: 50%;
+  border: 1px solid #f5f5f5;
+  text-align: center;
+  line-height: 25px;
 }
-.name{
-    width: 70%;
+.name {
+  width: 70%;
 }
 </style>

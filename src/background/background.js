@@ -93,14 +93,11 @@ async function resolveRequset(request, webListData) {
             addWebList(webListData)
             res.message = 'trust this site'
         } else {
-            res.message = 'distrust this site'
+            res.message = 'User denied the website access extension wallet'
             res.result =  false
             return res
         }
-    } else {
-        res.message = 'This site has been added to the  webList'
-    }
-
+    } 
     const method = request.method
     let seed = getSeed(wallet, selectedAccount)
     switch (method) {
