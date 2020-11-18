@@ -1,8 +1,13 @@
 
 
 let providerHandle
-const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList']
+const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList', "info"]
 class vsys {
+
+    constructor() {
+        this.isInstalled = true
+    }
+
     request(data) {
         return new Promise((resolve, reject) => {
             if (!data || !data.method) {
