@@ -23,19 +23,9 @@ export default {
   created() {
     this.storage = JSON.parse(window.localStorage.getItem("vuex"));
     this.storage.wallet.webList.map(item => {
-      if (item.siteName.indexOf("www.") != -1) {
-        item.iconText = item.siteName.slice(4, 5).toUpperCase();
-      } else {
-        let re = /\./g;
-        if (item.siteName.match(re).length > 1) {
-          let reg = /([^.]+\.)?([^\.]+\..+)/;
-          let m = item.siteName.match(reg);
-          if (m.length > 2) {
-            item.siteName = m[2];
-          }
-        }
-        item.iconText = item.siteName.slice(0, 1).toUpperCase();
-      }
+      item.iconText = this.getTopDomain(item.siteName)
+        .slice(0, 1)
+        .toUpperCase();
     });
   },
   data: function() {
@@ -50,6 +40,16 @@ export default {
     },
     close() {
       this.$refs.webListModal.hide();
+    },
+    getTopDomain(domian) {
+      let re = /\./g;
+      let reg = /([^.]+\.)?([^\.]+\..+)/;
+      let m = domian.match(reg);
+      if (m[2].match(re).length > 1) {
+        return this.getTopDomain(m[2]);
+      } else {
+        return m[2];
+      }
     }
   }
 };
@@ -81,7 +81,7 @@ export default {
   align-items: center;
 }
 .content {
-  width: 65%;
+  width: 80%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -101,6 +101,9 @@ export default {
   line-height: 25px;
 }
 .name {
-  width: 70%;
+  width: 80%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

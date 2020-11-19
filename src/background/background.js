@@ -110,7 +110,6 @@ async function resolveRequset(request, webListData) {
             return res
         }
     } 
-    const method = request.method
     let seed = getSeed(wallet, selectedAccount)
     switch (method) {
         case "address":
