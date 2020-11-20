@@ -1,5 +1,3 @@
-
-
 function injectScript (content) {
     try {
         const container = document.head || document.documentElement
@@ -12,6 +10,7 @@ function injectScript (content) {
 }
 
 let file = chrome.extension.getURL("inpage.main.js")
+console.log(file)
 let s = document.createElement('script')
 s.type = 'text/javascript'
 s.src = file
@@ -22,6 +21,7 @@ function listenForProviderRequest () {
         if (source !== window || !data || !data.target || data.target !== 'vsys-inpage' || !data.type) { return }
         switch (data.type) {
             case 'vsys-request':
+                console.log(data.data, 'vsys-request')
                 chrome.runtime.sendMessage({
                     action: 'vsys-request',
                     force: data.data,
