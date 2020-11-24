@@ -21,7 +21,6 @@ function listenForProviderRequest () {
         if (source !== window || !data || !data.target || data.target !== 'vsys-inpage' || !data.type) { return }
         switch (data.type) {
             case 'vsys-request':
-                console.log(data.data, 'vsys-request')
                 chrome.runtime.sendMessage({
                     action: 'vsys-request',
                     force: data.data,

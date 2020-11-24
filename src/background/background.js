@@ -7,7 +7,8 @@ import { MAINNET_IP, TESTNET_IP } from "../store/network"
 import BigNumber from "bignumber.js"
 import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT_LOCK_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX } from "js-v-sdk/src/constants"
 import Transaction from "src/js-v-sdk/src/transaction"
-import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
+import { TokenContractDataGenerator, LockContractDataGenerator, getContractFunctionIndex, NonFungibleTokenContractDataGenerator } from "src/js-v-sdk/src/data"
+import * as ContractType from "src/js-v-sdk/src/contract_type"
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action) {
@@ -103,13 +104,12 @@ async function resolveRequset(request, webListData) {
     if (wallet.webList.findIndex(item => item.siteName == webListData.siteName) == -1 || wallet.webList == []) {
         if (confirm("Trust this site '" + webListData.siteName + "'?")) {
             addWebList(webListData)
-            res.message = 'trust this site'
         } else {
             res.message = 'User denied the website access extension wallet'
             res.result =  false
             return res
         }
-    } 
+    }
     let seed = getSeed(wallet, selectedAccount)
     switch (method) {
         case "address":
@@ -185,13 +185,30 @@ async function resolveRequset(request, webListData) {
             }
             let tokenId = request.params.tokenId
             const tokenSymbol = request.params.tokenSymbol
+            let contractId = common.tokenIDToContractID(tokenId)
             try {
-                let response = await chain.getTokenInfo(tokenId)
+                let response = await chain.getContractInfo(contractId)
                 if (response.hasOwnProperty('error')) {
                     res.result = false
-                    res.message = "Invalid token!"
+                    res.message = 'Invalid token!'
                 } else {
-                    addToken(tokenId, tokenSymbol, networkByte)
+                    if (response.type !== 'NonFungibleContract' && response.type !== 'TokenContract' && response.type !== 'TokenContractWithSplit') {
+                        res.result = false
+                        res.message = 'Invalid token!'
+                    } else {
+                        let tokenType = 'Token '
+                        if (response.type === 'NonFungibleContract') {
+                            tokenType = 'NFT '
+                        } else if (response.type === 'TokenContractWithSplit') {
+                            tokenType = 'Splittable Token '
+                        }
+                        if (confirm("Add " + tokenType + tokenId + " to your extension wallet?")) {
+                            addToken(tokenId, tokenSymbol, networkByte)
+                        } else {
+                            res.message = 'User denied to add token'
+                            res.result =  false
+                        }
+                    }
                 }
             } catch (respError) {
                 res.result = false
@@ -262,6 +279,66 @@ async function resolveRequset(request, webListData) {
                 }
             }
             break
+        case "sendNFT":
+            if (!request.params || !request.params.publicKey || !request.params.recipient || !request.params.tokenId || !request.params.description) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
+            params = request.params
+            contractId = common.tokenIDToContractID(params.tokenId)
+            try {
+                let response = await chain.getContractInfo(contractId)
+                if (response.type !== 'NonFungibleContract') {
+                    res.result = false
+                    res.message = 'Not NFT token'
+                    return res
+                }
+                console.log(response)
+            } catch (respError) {
+                res.result = false
+                res.message = "Failed to get Contract Info"
+                console.log(respError)
+            }
+            try {
+                let response = await chain.getTokenInfo(params.tokenId)
+                if (response.hasOwnProperty('error')) {
+                    res.result = false
+                    res.message = response.message
+                    console.log(response)
+                    return res
+                }
+            } catch (respError) {
+                res.result = false
+                res.message = "Failed to get Token Info"
+                console.log(respError)
+                return res
+            }
+            tra = new Transaction(networkByte)
+            let data_generator = new NonFungibleTokenContractDataGenerator()
+            let timestamp = Date.now() * 1e6
+            let attachment = params.description
+            let function_index = getContractFunctionIndex(ContractType.NFT, 'SEND')
+            let token_index = common.getTokenIndex(params.tokenId)
+            let function_data = data_generator.createSendData(params.recipient, token_index)
+            tra.buildExecuteContractTx(params.publicKey, contractId, function_index, function_data, timestamp, attachment)
+            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+            signature = apiAccount.getSignature(tra.toBytes())
+            let contract_tx = tra.toJsonForSendingTx(signature)
+            try {
+                let response = await chain.sendExecuteContractTx(contract_tx)
+                res.transactionId = response.id
+            } catch (respError) {
+                res.result = false
+                res.message = "Failed to send NFT Token"
+                console.log(respError)
+            }
+            break
         case "lockToken":
             if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.lockTime) {
                 res.result = false
@@ -274,11 +351,11 @@ async function resolveRequset(request, webListData) {
                 break
             }
             params = request.params
-            let data_generator = new LockContractDataGenerator()
-            let function_data = data_generator.createLockData(params.lockTime)
-            let attachment = ""
-            let timestamp = Date.now() * 1e6
-            let function_index = LOCK_CONTRACT_LOCK_FUNCIDX
+            data_generator = new LockContractDataGenerator()
+            function_data = data_generator.createLockData(params.lockTime)
+            attachment = ""
+            timestamp = Date.now() * 1e6
+            function_index = LOCK_CONTRACT_LOCK_FUNCIDX
             tra = new Transaction(networkByte)
             tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment)
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
