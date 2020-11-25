@@ -362,14 +362,14 @@ async function resolveRequset(request, webListData) {
                     let response = await chain.getContractInfo(contractId)
                     if (response.type !== 'NonFungibleContract') {
                         res.result = false
-                        res.message = 'Not NFT token'
+                        res.message = "Not NFT token"
                         return res
                     }
                     console.log(response)
                 } catch (respError) {
                     res.result = false
-                    res.message = "Invalid params!"
-                    break
+                    res.message = "Failed to get Contract Info!"
+                    console.log(respError)
                 }
                 try {
                     let response = await chain.getTokenInfo(params.tokenId)
