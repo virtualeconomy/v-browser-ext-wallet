@@ -12,14 +12,11 @@ import * as ContractType from "src/js-v-sdk/src/contract_type"
 
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
     let interactData = JSON.parse(window.localStorage.getItem('interactData'))
     if (!interactData) {
-        interactData = {
-            isPopupOpened: false
-        }
-        window.localStorage.setItem('interactData', JSON.stringify(interactData))
+        resetInteractData()
     }
-
     if (request.action) {
         const action = request.action
         switch (action) {
@@ -41,7 +38,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 })
 
 chrome.windows.onRemoved.addListener((windowId) => {
-    removeInteractData()
+    chrome.runtime.sendMessage(
+        {
+            method: "confirm",
+            isConfirmed: false
+        },
+        function(response) {}
+    )
+    resetInteractData()
 })
 
 function getData() {
@@ -81,32 +85,35 @@ function addWebList(siteData) {
     }
 }
 
-function removeInteractData() {
-    window.localStorage.removeItem('interactData')
+function resetInteractData() {
+    let interactData = {
+        isPopupOpened: false
+    }
+    window.localStorage.setItem('interactData', JSON.stringify(interactData))
 }
+
 function triggerUi(data) {
     let args = {
         "type": "popup",
         'url': 'option.html'
     }
-    chrome.windows.create(args)
     let interactData = data
     interactData.type = 'confirm'
     interactData.isPopupOpened = true
     window.localStorage.setItem('interactData', JSON.stringify(interactData))
+    chrome.windows.create(args)
 }
 
 function getConfirmResult() {
     return new Promise((resolve, reject) => {
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (request.method && request.method === 'confirm') {
-                removeInteractData()
-                resolve(request.isPopupOpened)
+                resetInteractData()
+                resolve(request.isConfirmed)
             }
         })
     })
 }
-
 
 async function resolveRequset(request, webListData) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
@@ -153,14 +160,15 @@ async function resolveRequset(request, webListData) {
             return res
         }
     }
+
     if (interactData.isPopupOpened) {
         chrome.windows.remove(Number(interactData.windowId));
-        removeInteractData()
+        resetInteractData()
         res.message = 'Popup Closed'
         res.result = false
         return res
     }
-  
+
     let seed = getSeed(wallet, selectedAccount)
 
     switch (method) {
@@ -268,24 +276,20 @@ async function resolveRequset(request, webListData) {
             }
             break
         case "send":
+            if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
             triggerUi(request)
-
             let confirmResult = await getConfirmResult()
-
+            let params = request.params
             if (confirmResult) {
-                if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
-                    res.result = false
-                    res.message = "Invalid params!"
-                    break
-                }
-
-                if (request.params.publicKey !== seed.keyPair.publicKey) {
-                    res.result = false
-                    res.message = "Inconsistent publicKey!"
-                    break
-                }
-
-                let params = request.params
                 let tra = new Transaction(networkByte)
                 if (!request.params.tokenId) {
                     tra.buildPaymentTx(params.publicKey, params.recipient, params.amount, params.description, Date.now() * 1e6)
@@ -338,6 +342,8 @@ async function resolveRequset(request, webListData) {
                     }
                 }
             } else {
+                res.result = false
+                res.message = 'User denied the action'
                 return res
             }
             break
@@ -352,53 +358,62 @@ async function resolveRequset(request, webListData) {
                 res.message = "Inconsistent publicKey!"
                 break
             }
-            params = request.params
-            contractId = common.tokenIDToContractID(params.tokenId)
-            try {
-                let response = await chain.getContractInfo(contractId)
-                if (response.type !== 'NonFungibleContract') {
-                    res.result = false
-                    res.message = 'Not NFT token'
-                    return res
-                }
-                console.log(response)
-            } catch (respError) {
-                res.result = false
-                res.message = "Failed to get Contract Info"
-                console.log(respError)
-            }
-            try {
-                let response = await chain.getTokenInfo(params.tokenId)
-                if (response.hasOwnProperty('error')) {
-                    res.result = false
-                    res.message = response.message
+            triggerUi(request)
+            confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                params = request.params
+                contractId = common.tokenIDToContractID(params.tokenId)
+                try {
+                    let response = await chain.getContractInfo(contractId)
+                    if (response.type !== 'NonFungibleContract') {
+                        res.result = false
+                        res.message = 'Not NFT token'
+                        return res
+                    }
                     console.log(response)
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to get Contract Info"
+                    console.log(respError)
+                }
+                try {
+                    let response = await chain.getTokenInfo(params.tokenId)
+                    if (response.hasOwnProperty('error')) {
+                        res.result = false
+                        res.message = response.message
+                        console.log(response)
+                        return res
+                    }
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to get Token Info"
+                    console.log(respError)
                     return res
                 }
-            } catch (respError) {
+                let tra = new Transaction(networkByte)
+                let data_generator = new NonFungibleTokenContractDataGenerator()
+                let timestamp = Date.now() * 1e6
+                let attachment = params.description
+                let function_index = getContractFunctionIndex(ContractType.NFT, 'SEND')
+                let token_index = common.getTokenIndex(params.tokenId)
+                let function_data = data_generator.createSendData(params.recipient, token_index)
+                tra.buildExecuteContractTx(params.publicKey, contractId, function_index, function_data, timestamp, attachment)
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                let signature = apiAccount.getSignature(tra.toBytes())
+                let contract_tx = tra.toJsonForSendingTx(signature)
+                try {
+                    let response = await chain.sendExecuteContractTx(contract_tx)
+                    res.transactionId = response.id
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to send NFT Token"
+                    console.log(respError)
+                }
+
+            } else {
                 res.result = false
-                res.message = "Failed to get Token Info"
-                console.log(respError)
+                res.message = 'User denied the action'
                 return res
-            }
-            tra = new Transaction(networkByte)
-            let data_generator = new NonFungibleTokenContractDataGenerator()
-            let timestamp = Date.now() * 1e6
-            let attachment = params.description
-            let function_index = getContractFunctionIndex(ContractType.NFT, 'SEND')
-            let token_index = common.getTokenIndex(params.tokenId)
-            let function_data = data_generator.createSendData(params.recipient, token_index)
-            tra.buildExecuteContractTx(params.publicKey, contractId, function_index, function_data, timestamp, attachment)
-            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            signature = apiAccount.getSignature(tra.toBytes())
-            let contract_tx = tra.toJsonForSendingTx(signature)
-            try {
-                let response = await chain.sendExecuteContractTx(contract_tx)
-                res.transactionId = response.id
-            } catch (respError) {
-                res.result = false
-                res.message = "Failed to send NFT Token"
-                console.log(respError)
             }
             break
         case "lockToken":
@@ -413,16 +428,16 @@ async function resolveRequset(request, webListData) {
                 break
             }
             params = request.params
-            data_generator = new LockContractDataGenerator()
-            function_data = data_generator.createLockData(params.lockTime)
-            attachment = ""
-            timestamp = Date.now() * 1e6
-            function_index = LOCK_CONTRACT_LOCK_FUNCIDX
-            tra = new Transaction(networkByte)
+            let data_generator = new LockContractDataGenerator()
+            let function_data = data_generator.createLockData(params.lockTime)
+            let attachment = ""
+            let timestamp = Date.now() * 1e6
+            let function_index = LOCK_CONTRACT_LOCK_FUNCIDX
+            let tra = new Transaction(networkByte)
             tra.buildExecuteContractTx(params.publicKey, params.contractId, function_index, function_data, timestamp, attachment)
             apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            signature = apiAccount.getSignature(tra.toBytes())
-            sendTx = tra.toJsonForSendingTx(signature)
+            let signature = apiAccount.getSignature(tra.toBytes())
+            let sendTx = tra.toJsonForSendingTx(signature)
             try {
                 let response = await chain.sendExecuteContractTx(sendTx)
                 res.transactionId = response.id
@@ -444,73 +459,102 @@ async function resolveRequset(request, webListData) {
                 res.message = "Inconsistent publicKey!"
                 break
             }
-            params = request.params
-            let isSplit, unity
-            let tokenContract
-            try {
-                let response = await chain.getContractInfo(params.contractId)
-                let contractInfo = response.info
-                tokenId = false
-                for (let i = 0; i < contractInfo.length; i++) {
-                    if (contractInfo[i]["name"] === 'tokenId' && contractInfo[i]["type"] === 'TokenId') {
-                        tokenId = contractInfo[i]["data"]
+            triggerUi(request)
+            confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                params = request.params
+                let isSplit, unity, isNFT, tokenIndex
+                let tokenContract
+                try {
+                    let response = await chain.getContractInfo(params.contractId)
+                    let contractInfo = response.info
+                    tokenId = false
+                    for (let i = 0; i < contractInfo.length; i++) {
+                        if (contractInfo[i]["name"] === 'tokenId' && contractInfo[i]["type"] === 'TokenId') {
+                            tokenId = contractInfo[i]["data"]
+                        }
                     }
-                }
-                if (!tokenId) {
+                    if (!tokenId) {
+                        res.result = false
+                        res.message = "Could not find token info in this Contract"
+                        break
+                    }
+                    tokenContract = common.tokenIDToContractID(tokenId)
+                    response = await chain.getContractInfo(tokenContract)
+                    isSplit = response.type === 'TokenContractWithSplit'
+                    isNFT = response.type === 'NonFungibleContract'
+                } catch (respError) {
                     res.result = false
-                    res.message = "Could not find token info in this Contract"
+                    res.message = "Failed to get Contract Info"
+                    console.log(respError)
                     break
                 }
-                tokenContract = common.tokenIDToContractID(tokenId)
-                response = await chain.getContractInfo(tokenContract)
-                isSplit = response.type === 'TokenContractWithSplit'
-            } catch (respError) {
-                res.result = false
-                res.message = "Failed to get Contract Info"
-                console.log(respError)
-                break
-            }
-            try {
-                let response = await chain.getTokenInfo(tokenId)
-                if (!response.hasOwnProperty('error') && response.unity) {
-                    unity = BigNumber(response.unity)
+                try {
+                    let response = await chain.getTokenInfo(tokenId)
+                    if (isNFT) {
+                        if (response.hasOwnProperty('error')) {
+                            res.result = false
+                            res.message = response.message
+                            console.log(response)
+                            return res
+                        }
+                        tokenIndex = common.getTokenIndex(tokenId)
+                    } else {
+                        if (!response.hasOwnProperty('error') && response.unity) {
+                            unity = BigNumber(response.unity)
+                        } else {
+                            res.result = false
+                            res.message = "Failed to get Token Unit"
+                            break
+                        }
+                    }
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to get Token Info"
+                    console.log(respError)
+                    break
+                }
+                tra = new Transaction(networkByte)
+                data_generator = isNFT ? new NonFungibleTokenContractDataGenerator() : new TokenContractDataGenerator()
+                timestamp = Date.now() * 1e6
+                attachment = ""
+                if (method === "withdrawToken") {
+                    if (isNFT) {
+                        function_index = getContractFunctionIndex(ContractType.NFT, 'WITHDRAW')
+                        function_data = data_generator.createWithdrawData(params.contractId, seed.address, tokenIndex)
+                    } else {
+                        function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
+                        function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
+                    }
+                } else if (method === "depositToken") {
+                    if (isNFT) {
+                        function_index = getContractFunctionIndex(ContractType.NFT, 'DEPOSIT')
+                        function_data = data_generator.createDepositData(seed.address, params.contractId, tokenIndex)
+                    } else {
+                        function_index = isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
+                        function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
+                    }
                 } else {
                     res.result = false
-                    res.message = "Failed to get Token Unit"
+                    res.message = "Invalid method"
                     break
                 }
-            } catch (respError) {
-                res.result = false
-                res.message = "Failed to get Token Info"
-                console.log(respError)
-                break
-            }
-            tra = new Transaction(networkByte)
-            data_generator = new TokenContractDataGenerator()
-            timestamp = Date.now() * 1e6
-            attachment = ""
-            if (method === "withdrawToken") {
-                function_index = isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
-                function_data = data_generator.createWithdrawData(params.contractId, seed.address, params.amount, unity)
-            } else if (method === "depositToken") {
-                function_index = isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
-                function_data = data_generator.createDepositData(seed.address, params.contractId, params.amount, unity)
+                tra.buildExecuteContractTx(params.publicKey, tokenContract, function_index, function_data, timestamp, attachment);
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                signature = apiAccount.getSignature(tra.toBytes())
+                sendTx = tra.toJsonForSendingTx(signature)
+                try {
+                    let response = await chain.sendExecuteContractTx(sendTx)
+                    res.transactionId = response.id
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to " + method
+                    console.log(respError)
+                }
             } else {
                 res.result = false
-                res.message = "Invalid method"
-                break
-            }
-            tra.buildExecuteContractTx(params.publicKey, tokenContract, function_index, function_data, timestamp, attachment);
-            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            signature = apiAccount.getSignature(tra.toBytes())
-            sendTx = tra.toJsonForSendingTx(signature)
-            try {
-                let response = await chain.sendExecuteContractTx(sendTx)
-                res.transactionId = response.id
-            } catch (respError) {
-                res.result = false
-                res.message = "Failed to " + method
-                console.log(respError)
+                res.message = 'User denied the action'
+                return res
             }
             break
     }
