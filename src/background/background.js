@@ -9,7 +9,16 @@ import { VSYS_PRECISION, WITHDRAW_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX, LOCK_CONTRACT
 import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator } from "src/js-v-sdk/src/data"
 
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    let interactData = JSON.parse(window.localStorage.getItem('interactData'))
+    if (!interactData) {
+        interactData = {
+            isPopupOpened: false
+        }
+        window.localStorage.setItem('interactData', JSON.stringify(interactData))
+    }
+
     if (request.action) {
         const action = request.action
         switch (action) {
@@ -26,7 +35,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.method && request.method === 'showAlert') {
         chrome.tabs.create({ url: chrome.extension.getURL('signup.html') })
     }
+
     //console.log(request, sender, sendResponse)
+})
+
+chrome.windows.onRemoved.addListener((windowId) => {
+    removeInteractData()
 })
 
 function getData() {
@@ -66,9 +80,37 @@ function addWebList(siteData) {
     }
 }
 
+function removeInteractData() {
+    window.localStorage.removeItem('interactData')
+}
+function triggerUi(data) {
+    let args = {
+        "type": "popup",
+        'url': 'option.html'
+    }
+    chrome.windows.create(args)
+    let interactData = data
+    interactData.type = 'confirm'
+    interactData.isPopupOpened = true
+    window.localStorage.setItem('interactData', JSON.stringify(interactData))
+}
+
+function getConfirmResult() {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+            if (request.method && request.method === 'confirm') {
+                removeInteractData()
+                resolve(request.isPopupOpened)
+            }
+        })
+    })
+}
+
 
 async function resolveRequset(request, webListData) {
     const { wallet, networkByte, selectedAccount, mainnetTokenRecords, testnetTokenRecords } = getData()
+    let interactData = JSON.parse(window.localStorage.getItem('interactData'))
+
     let res = {
         result: true,
         message: "OK"
@@ -100,17 +142,26 @@ async function resolveRequset(request, webListData) {
         }
         return res
     }
+
     if (wallet.webList.findIndex(item => item.siteName == webListData.siteName) == -1 || wallet.webList == []) {
         if (confirm("Trust this site '" + webListData.siteName + "'?")) {
             addWebList(webListData)
             res.message = 'trust this site'
         } else {
             res.message = 'User denied the website access extension wallet'
-            res.result =  false
+            res.result = false
             return res
         }
-    } 
+    }
+    if (interactData.isPopupOpened) {
+        chrome.windows.remove(Number(interactData.windowId));
+        removeInteractData()
+        res.message = 'Popup Closed'
+        res.result = false
+        return res
+    }
     let seed = getSeed(wallet, selectedAccount)
+
     switch (method) {
         case "address":
             res.address = seed.address
@@ -199,67 +250,77 @@ async function resolveRequset(request, webListData) {
             }
             break
         case "send":
-            if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
-                res.result = false
-                res.message = "Invalid params!"
-                break
-            }
-            if (request.params.publicKey !== seed.keyPair.publicKey) {
-                res.result = false
-                res.message = "Inconsistent publicKey!"
-                break
-            }
-            let params = request.params
-            let tra = new Transaction(networkByte)
-            if (!request.params.tokenId) {
-                tra.buildPaymentTx(params.publicKey, params.recipient, params.amount, params.description, Date.now() * 1e6)
-            } else {
-                let contractId = common.tokenIDToContractID(params.tokenId)
-                let isSplit, unity
-                try {
-                    let response = await chain.getContractInfo(contractId)
-                    isSplit = response.type === 'TokenContractWithSplit'
-                } catch (respError) {
+            triggerUi(request)
+
+            let confirmResult = await getConfirmResult()
+
+            if (confirmResult) {
+                if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
                     res.result = false
-                    res.message = "Failed to get Contract Info"
-                    console.log(respError)
+                    res.message = "Invalid params!"
+                    break
                 }
-                try {
-                    let response = await chain.getTokenInfo(params.tokenId)
-                    if (!response.hasOwnProperty('error') && response.unity) {
-                        unity = BigNumber(response.unity)
-                    } else {
+
+                if (request.params.publicKey !== seed.keyPair.publicKey) {
+                    res.result = false
+                    res.message = "Inconsistent publicKey!"
+                    break
+                }
+
+                let params = request.params
+                let tra = new Transaction(networkByte)
+                if (!request.params.tokenId) {
+                    tra.buildPaymentTx(params.publicKey, params.recipient, params.amount, params.description, Date.now() * 1e6)
+                } else {
+                    let contractId = common.tokenIDToContractID(params.tokenId)
+                    let isSplit, unity
+                    try {
+                        let response = await chain.getContractInfo(contractId)
+                        isSplit = response.type === 'TokenContractWithSplit'
+                    } catch (respError) {
                         res.result = false
-                        res.message = "Failed to get Token Unit"
+                        res.message = "Failed to get Contract Info"
+                        console.log(respError)
                     }
-                } catch (respError) {
-                    res.result = false
-                    res.message = "Failed to get Token Info"
-                    console.log(respError)
+                    try {
+                        let response = await chain.getTokenInfo(params.tokenId)
+                        if (!response.hasOwnProperty('error') && response.unity) {
+                            unity = BigNumber(response.unity)
+                        } else {
+                            res.result = false
+                            res.message = "Failed to get Token Unit"
+                        }
+                    } catch (respError) {
+                        res.result = false
+                        res.message = "Failed to get Token Info"
+                        console.log(respError)
+                    }
+                    tra.buildSendTokenTx(params.publicKey, params.tokenId, params.recipient, params.amount, unity, isSplit, params.description)
                 }
-                tra.buildSendTokenTx(params.publicKey, params.tokenId, params.recipient, params.amount, unity, isSplit, params.description)
-            }
-            apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
-            let signature = apiAccount.getSignature(tra.toBytes())
-            let sendTx = tra.toJsonForSendingTx(signature)
-            if (!request.params.tokenId) {
-                try {
-                    let response = await chain.sendPaymentTx(sendTx)
-                    res.transactionId = response.id
-                } catch (respError) {
-                    res.result = false
-                    res.message = "Failed to send VSYS"
-                    console.log(respError)
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                let signature = apiAccount.getSignature(tra.toBytes())
+                let sendTx = tra.toJsonForSendingTx(signature)
+                if (!request.params.tokenId) {
+                    try {
+                        let response = await chain.sendPaymentTx(sendTx)
+                        res.transactionId = response.id
+                    } catch (respError) {
+                        res.result = false
+                        res.message = "Failed to send VSYS"
+                        console.log(respError)
+                    }
+                } else {
+                    try {
+                        let response = await chain.sendExecuteContractTx(sendTx)
+                        res.transactionId = response.id
+                    } catch (respError) {
+                        res.result = false
+                        res.message = "Failed to send Token"
+                        console.log(respError)
+                    }
                 }
             } else {
-                try {
-                    let response = await chain.sendExecuteContractTx(sendTx)
-                    res.transactionId = response.id
-                } catch (respError) {
-                    res.result = false
-                    res.message = "Failed to send Token"
-                    console.log(respError)
-                }
+                return res
             }
             break
         case "lockToken":
@@ -377,3 +438,4 @@ async function resolveRequset(request, webListData) {
     }
     return res
 }
+
