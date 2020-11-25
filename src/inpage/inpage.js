@@ -1,7 +1,7 @@
 
 
 let providerHandle
-const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList', "info"]
+const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList', "info", "sendNFT"]
 class vsys {
 
     constructor() {
