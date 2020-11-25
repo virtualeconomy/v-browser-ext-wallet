@@ -272,6 +272,38 @@ Result:
 }
 ```
 
+### Website Requests NFT Transaction
+
+The JS sample code of request:
+
+``` javascript
+function sendNFTToken() {
+  window.vsys.request({
+      method: 'sendNFT',
+      params:
+        {
+          tokenId: '<NFT Token ID>',
+          publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC',
+          recipient: '<recipient address>',
+          description: '<description>'
+        }
+    })
+    .then((response) => console.log(response))
+    .catch((error) => console.error);
+}
+
+```
+
+Result:
+
+``` 
+{
+	"result": true,
+	"message": "OK",
+	"transactionId": "2dSYyPQuh44J6ExxxxxxxNcEU4q4iLiVcahVc4n"
+}
+```
+
 ### Website Requests Deposit/Withdraw/Lock Token
 
 The JS sample code of request Deposit:
@@ -284,7 +316,8 @@ function depositToken() {
         {
           contractId: '<Contract ID>',
           publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC',
-          amount: '50.6'
+          amount: '50.6',
+          description: '<description>'
         }
     })
     .then((response) => console.log(response))
@@ -302,7 +335,8 @@ function withdrawToken() {
         {
           contractId: '<Contract ID>',
           publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC',
-          amount: '50.6'
+          amount: '50.6',
+          description: '<description>'
         }
     })
     .then((response) => console.log(response))
@@ -320,7 +354,8 @@ function lockToken() {
         {
           contractId: '<Contract ID>',
           lockTime: (Date.now() + 300 * 1000) * 1e6, //Lock 300 seconds
-          publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC'
+          publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC',
+          description: '<description>'
         }
     })
     .then((response) => console.log(response))
