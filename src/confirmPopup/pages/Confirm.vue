@@ -45,7 +45,7 @@ export default {
       chrome.runtime.sendMessage(
         {
           method: "confirm",
-          isPopupOpened: res
+          isConfirmed: res
         },
         function(response) {}
       );

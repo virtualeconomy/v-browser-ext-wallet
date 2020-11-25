@@ -40,7 +40,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 })
 
 chrome.windows.onRemoved.addListener((windowId) => {
-    removeInteractData()
+    let interactData = JSON.parse(window.localStorage.getItem('interactData'))
+    if (windowId == interactData.windowId) {
+        removeInteractData()
+    }
 })
 
 function getData() {
@@ -86,7 +89,7 @@ function removeInteractData() {
 function triggerUi(data) {
     let args = {
         "type": "popup",
-        'url': 'option.html'
+        'url': 'confirmPopup.html'
     }
     chrome.windows.create(args)
     let interactData = data
@@ -100,7 +103,7 @@ function getConfirmResult() {
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (request.method && request.method === 'confirm') {
                 removeInteractData()
-                resolve(request.isPopupOpened)
+                resolve(request.isConfirmed)
             }
         })
     })
