@@ -425,7 +425,7 @@ async function resolveRequset(request, webListData) {
             params = request.params
             let data_generator = new LockContractDataGenerator()
             let function_data = data_generator.createLockData(params.lockTime)
-            let attachment = ""
+            let attachment = request.params.description ? request.params.description : ""
             let timestamp = Date.now() * 1e6
             let function_index = LOCK_CONTRACT_LOCK_FUNCIDX
             let tra = new Transaction(networkByte)
@@ -512,7 +512,7 @@ async function resolveRequset(request, webListData) {
                 tra = new Transaction(networkByte)
                 data_generator = isNFT ? new NonFungibleTokenContractDataGenerator() : new TokenContractDataGenerator()
                 timestamp = Date.now() * 1e6
-                attachment = ""
+                attachment = request.params.description ? request.params.description : ""
                 if (method === "withdrawToken") {
                     if (isNFT) {
                         function_index = getContractFunctionIndex(ContractType.NFT, 'WITHDRAW')
