@@ -47,10 +47,10 @@ export default {
   async created() {
     this.interactData = JSON.parse(window.localStorage.getItem("interactData"));
     if (this.interactData.method == "send") {
-      if (this.interactData.params.tokenId != "" && this.interactData.params.tokenId) {
+      if (this.interactData.params.tokenId && this.interactData.params.tokenId != "") {
         this.interactData.method += " TOKEN";
       } else {
-        this.interactData.method += " VYSY";
+        this.interactData.method += " VSYS";
         delete this.interactData.params.tokenId;
       }
     }
