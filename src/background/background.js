@@ -38,14 +38,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 })
 
 chrome.windows.onRemoved.addListener((windowId) => {
-    chrome.runtime.sendMessage(
-        {
-            method: "confirm",
-            isConfirmed: false
-        },
-        function(response) {}
-    )
-    resetInteractData()
+    let interactData = JSON.parse(window.localStorage.getItem('interactData'))
+    if (windowId == interactData.windowId) {
+        resetInteractData()
+    }
 })
 
 function getData() {
@@ -95,7 +91,7 @@ function resetInteractData() {
 function triggerUi(data) {
     let args = {
         "type": "popup",
-        'url': 'option.html'
+        'url': 'confirmPopup.html'
     }
     let interactData = data
     interactData.type = 'confirm'
@@ -168,7 +164,6 @@ async function resolveRequset(request, webListData) {
         res.result = false
         return res
     }
-
     let seed = getSeed(wallet, selectedAccount)
 
     switch (method) {
@@ -373,8 +368,8 @@ async function resolveRequset(request, webListData) {
                     console.log(response)
                 } catch (respError) {
                     res.result = false
-                    res.message = "Failed to get Contract Info"
-                    console.log(respError)
+                    res.message = "Invalid params!"
+                    break
                 }
                 try {
                     let response = await chain.getTokenInfo(params.tokenId)
