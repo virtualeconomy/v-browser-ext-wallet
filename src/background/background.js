@@ -2,6 +2,9 @@ import store from '../store'
 import Blockchain from "../js-v-sdk/src/blockchain.js"
 import Account from '../js-v-sdk/src/account.js'
 import common from "js-v-sdk/src/utils/common.js"
+import Converters from "src/js-v-sdk/src/utils/converters"
+import Base58 from "base-58"
+import TxUtil from "src/js-v-sdk/src/utils/txUtil"
 import seedLib from "src/utils/seed"
 import { MAINNET_IP, TESTNET_IP } from "../store/network"
 import BigNumber from "bignumber.js"
@@ -278,7 +281,7 @@ async function resolveRequset(request, webListData) {
             }
             break
         case "send":
-            if (!request.params || !request.params.publicKey || !request.params.amount || !request.params.description || !request.params.recipient) {
+            if (!request.params || !request.params.publicKey || !request.params.hasOwnProperty("amount") || !request.params.recipient) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
@@ -350,7 +353,7 @@ async function resolveRequset(request, webListData) {
             }
             break
         case "sendNFT":
-            if (!request.params || !request.params.publicKey || !request.params.recipient || !request.params.tokenId || !request.params.description) {
+            if (!request.params || !request.params.publicKey || !request.params.recipient || !request.params.tokenId) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
@@ -395,7 +398,7 @@ async function resolveRequset(request, webListData) {
                 let tra = new Transaction(networkByte)
                 let data_generator = new NonFungibleTokenContractDataGenerator()
                 let timestamp = Date.now() * 1e6
-                let attachment = params.description
+                let attachment = params.description ? params.description : ""
                 let function_index = getContractFunctionIndex(ContractType.NFT, 'SEND')
                 let token_index = common.getTokenIndex(params.tokenId)
                 let function_data = data_generator.createSendData(params.recipient, token_index)
@@ -432,7 +435,7 @@ async function resolveRequset(request, webListData) {
             params = request.params
             let data_generator = new LockContractDataGenerator()
             let function_data = data_generator.createLockData(params.lockTime)
-            let attachment = request.params.description ? request.params.description : ""
+            let attachment = params.description ? params.description : ""
             let timestamp = Date.now() * 1e6
             let function_index = LOCK_CONTRACT_LOCK_FUNCIDX
             let tra = new Transaction(networkByte)
@@ -451,7 +454,7 @@ async function resolveRequset(request, webListData) {
             break
         case "withdrawToken":
         case "depositToken":
-            if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.amount) {
+            if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.hasOwnProperty("amount")) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
@@ -519,7 +522,7 @@ async function resolveRequset(request, webListData) {
                 tra = new Transaction(networkByte)
                 data_generator = isNFT ? new NonFungibleTokenContractDataGenerator() : new TokenContractDataGenerator()
                 timestamp = Date.now() * 1e6
-                attachment = request.params.description ? request.params.description : ""
+                attachment = params.description ? params.description : ""
                 if (method === "withdrawToken") {
                     if (isNFT) {
                         function_index = getContractFunctionIndex(ContractType.NFT, 'WITHDRAW')
@@ -557,6 +560,121 @@ async function resolveRequset(request, webListData) {
                 res.result = false
                 res.message = 'User denied the action'
                 return res
+            }
+            break
+        case "execContractFunc":
+            if (!request.params || !request.params.contractId || !request.params.publicKey || !request.params.hasOwnProperty("functionIndex") || !request.params.hasOwnProperty("functionData")) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
+            params = request.params
+            attachment = params.attachment ? params.attachment : ""
+            let base_decode_attachment
+            try {
+                base_decode_attachment = Converters.byteArrayToString(Base58.decode(attachment))
+            } catch (err) {
+                res.result = false
+                res.message = 'Invalid attachment'
+                return res
+            }
+            request.params.description = request.params.attachment
+            delete request.params.attachment
+            triggerUi(request)
+            confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                tra = new Transaction(networkByte)
+                timestamp = Date.now() * 1e6
+                let contract_tx = tra.buildExecuteContractTx(params.publicKey, params.contractId, params.functionIndex, params.functionData, timestamp, base_decode_attachment)
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                let field_type = 9 & (255);
+                let bytes = TxUtil.toBytes(contract_tx, field_type)
+                signature = apiAccount.getSignature(bytes)
+                contract_tx['signature'] = signature
+                contract_tx['attachment'] = attachment
+                try {
+                    let response = await chain.sendExecuteContractTx(contract_tx)
+                    res.transactionId = response.id
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to " + method
+                    console.log(respError)
+                }
+            } else {
+                res.result = false
+                res.message = 'User denied the action'
+                return res
+            }
+            break
+        case "signContent":
+            if (!request.params || !request.params.publicKey || !request.params.content) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
+            triggerUi(request)
+            confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                try {
+                    let bytes = Base58.decode(request.params.content)
+                    apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                    signature = apiAccount.getSignature(bytes)
+                    res.signature = signature
+                } catch (err) {
+                    res.result = false
+                    res.message = "Invalid content"
+                    console.log(err)
+                }
+            } else {
+                res.result = false
+                res.message = 'User denied the action'
+            }
+            break
+        case "regContract":
+            if (!request.params || !request.params.publicKey || !request.params.initData || !request.params.contract) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            if (request.params.publicKey !== seed.keyPair.publicKey) {
+                res.result = false
+                res.message = "Inconsistent publicKey!"
+                break
+            }
+            params = request.params
+            triggerUi(request)
+            confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                tra = new Transaction(networkByte)
+                timestamp = Date.now() * 1e6
+                let contract_description = params.description ? params.description : ""
+                let contract_tx = tra.buildRegisterContractTx(params.publicKey, params.contract, params.initData, contract_description, timestamp)
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                let field_type = 8 & (255);
+                let bytes = TxUtil.toBytes(contract_tx, field_type)
+                signature = apiAccount.getSignature(bytes)
+                contract_tx['signature'] = signature
+                try {
+                    let response = await chain.sendRegisterContractTx(contract_tx)
+                    res.transactionId = response.id
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to " + method
+                    console.log(respError)
+                }
+            } else {
+                res.result = false
+                res.message = 'User denied the action'
             }
             break
     }
