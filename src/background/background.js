@@ -90,6 +90,8 @@ function resetInteractData() {
 
 function triggerUi(data) {
     let args = {
+        'width': 500,
+        'height': 700,
         "type": "popup",
         'url': 'confirmPopup.html'
     }

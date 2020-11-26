@@ -1,7 +1,7 @@
 <template>
   <div class="confirm" :style="{'width':screenWidth+'px','height':screenHeight+'px'}">
     <img class="logo" src="../../../static/icons/vsys_logo.svg" alt />
-    <div class="tips" v-if="!isNext && isShowWarning">
+    <div class="tips" v-if="!isNext && isShowWarning" :style="{width:tips_width}">
       <img class="warning" src="../../../static/icons/warning.svg" alt />
       <h5>This action may cause your assets to be transferred to other account and irreversible. Please make sure you trust the website and understand what you are doing now!</h5>
       <div class="check_box">
@@ -11,14 +11,14 @@
           name="checkbox-1"
           :value="false"
           :unchecked-value="true"
-        >I understand the risks and the possible consequences. Please continue!</b-form-checkbox>
+        >I understand the risks and the possible consequences.</b-form-checkbox>
       </div>
       <div class="next_btn">
         <button class="btn left" @click="getSelection(false)">Cancel</button>
-        <button class="btn right" @click="isNext=true" :disabled="isAccept">Continue</button>
+        <button class="btn right" @click="btnOpt(true)" :disabled="isAccept">Continue</button>
       </div>
     </div>
-    <div v-else class="confirm_body">
+    <div v-else class="confirm_body" :style="{width:confirm_body_width}">
       <div class="method">
         <h3>{{interactData.method.toUpperCase()}}</h3>
       </div>
@@ -48,7 +48,7 @@
       </div>
       <div class="btn_group">
         <button class="btn left" @click="getSelection(false)" v-if="!isShowWarning">Cancel</button>
-        <button class="btn left" @click="isNext=false" v-else>Prev</button>
+        <button class="btn left" @click="btnOpt(false)" v-else>Prev</button>
         <button class="btn right" @click="getSelection(true)">Confirm</button>
       </div>
     </div>
@@ -70,9 +70,11 @@ export default {
       }
     }
     if (this.interactData.method == "regContract") {
-      this.interactData.params.Fee = '100 VSYS'
+      this.interactData.params.Fee = "100 VSYS";
     }
-    this.isShowWarning = this.interactData.method == "execContractFunc" || this.interactData.method == "signContent" 
+    this.isShowWarning =
+      this.interactData.method == "execContractFunc" ||
+      this.interactData.method == "signContent";
     this.windowId = await this.getWindowId();
     this.interactData.windowId = this.windowId;
     window.localStorage.setItem(
@@ -80,17 +82,26 @@ export default {
       JSON.stringify(this.interactData)
     );
     this.screenWidth = window.innerWidth;
-    this.screenHeight = window.innerHeight;
+    this.screenHeight = window.innerWidth+ 350;
+    this.changeWidth();
+
+    window.onresize = () => {
+      this.screenWidth = window.innerWidth;
+      this.screenHeight = window.innerHeight + 250;
+      this.changeWidth();
+    };
   },
   data() {
     return {
       interactData: {},
       windowId: 1,
-      screenWidth: 1080,
-      screenHeight: 760,
+      screenWidth: 500,
+      screenHeight: 850,
+      confirm_body_width: "90%",
+      tips_width: "95%",
       isNext: false,
       isAccept: true,
-      isShowWarning:false
+      isShowWarning: false
     };
   },
   methods: {
@@ -110,6 +121,19 @@ export default {
           resolve(window.id);
         });
       });
+    },
+    btnOpt(type) {
+      this.isNext = type;
+      window.scrollTo(0, 0);
+    },
+    changeWidth() {
+      if (this.screenWidth > 1337) {
+        this.confirm_body_width = "40%";
+        this.tips_width = "70%";
+      } else {
+        this.confirm_body_width = "90%";
+        this.tips_width = "95%";
+      }
     }
   }
 };
@@ -145,7 +169,6 @@ export default {
 }
 
 .tips {
-  width: 70%;
   margin-top: 8%;
   margin-bottom: 20px;
   font-weight: 300;
@@ -155,29 +178,28 @@ export default {
   align-items: center;
 }
 
-.warning{
- width: 100px;
- height: 100px;
+.warning {
+  width: 100px;
+  height: 100px;
 }
 
-h5{
-text-align: left;
-margin-top: 75px;
+h5 {
+  text-align: left;
+  margin-top: 75px;
 }
 
-.check_box{
+.check_box {
   margin: 45px 0 35px 0;
 }
 
 .next_btn {
-  width: 40%;
+  width: 50%;
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
 
 .confirm_body {
-  width: 40%;
   margin-top: 35px;
   display: flex;
   flex-direction: column;
