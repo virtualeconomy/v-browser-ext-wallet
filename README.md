@@ -448,9 +448,9 @@ Result:
 The JS sample code of request:
 
 ``` javascript
-function registerContractFunction() {
+function signContent() {
    window.vsys.request({
-      method: 'regContract',
+      method: 'signContent',
       params:
         {
           publicKey: '2nCUEoyoquxxxxxxxxugG3ENdGcrRduGxnzC',
