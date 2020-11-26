@@ -1,11 +1,21 @@
 <template>
   <div class="confirm" :style="{'width':screenWidth+'px','height':screenHeight+'px'}">
-    <img class="logo" src="../../../static/icons/V_Wallet_Logo_big.png" alt />
-    <div class="tips" v-if="!isNext">
-      <h5>此动作可能造成您资产转移到其他钱包上并且不可逆转，请确保您信任该网址并了解您现在所做的动作.</h5>
+    <img class="logo" src="../../../static/icons/vsys_logo.svg" alt />
+    <div class="tips" v-if="!isNext && isShowWarning">
+      <img class="warning" src="../../../static/icons/warning.svg" alt />
+      <h5>This action may cause your assets to be transferred to other account and irreversible. Please make sure you trust the website and understand what you are doing now!</h5>
+      <div class="check_box">
+        <b-form-checkbox
+          id="checkbox-1"
+          v-model="isAccept"
+          name="checkbox-1"
+          :value="false"
+          :unchecked-value="true"
+        >I understand the risks and the possible consequences. Please continue!</b-form-checkbox>
+      </div>
       <div class="next_btn">
-        <button class="btn left" @click="getSelection(false)">取消</button>
-        <button class="btn right" @click="isNext=true">我已了解风险并愿意承担后果，请继续</button>
+        <button class="btn left" @click="getSelection(false)">Cancel</button>
+        <button class="btn right" @click="isNext=true" :disabled="isAccept">Continue</button>
       </div>
     </div>
     <div v-else class="confirm_body">
@@ -18,6 +28,7 @@
           <b-form-input
             id="amount-input"
             class="form-item"
+            :style="{color:key=='Fee'?'red':''}"
             :value="value"
             disabled
             aria-describedby="inputLiveFeedback"
@@ -36,8 +47,9 @@
         </div>
       </div>
       <div class="btn_group">
-        <button class="btn left" @click="isNext=false">上一步</button>
-        <button class="btn conf" @click="getSelection(true)">确定</button>
+        <button class="btn left" @click="getSelection(false)" v-if="!isShowWarning">Cancel</button>
+        <button class="btn left" @click="isNext=false" v-else>Prev</button>
+        <button class="btn right" @click="getSelection(true)">Confirm</button>
       </div>
     </div>
   </div>
@@ -47,13 +59,20 @@ export default {
   async created() {
     this.interactData = JSON.parse(window.localStorage.getItem("interactData"));
     if (this.interactData.method == "send") {
-      if (this.interactData.params.tokenId && this.interactData.params.tokenId != "") {
+      if (
+        this.interactData.params.tokenId &&
+        this.interactData.params.tokenId != ""
+      ) {
         this.interactData.method += " TOKEN";
       } else {
         this.interactData.method += " VSYS";
         delete this.interactData.params.tokenId;
       }
     }
+    if (this.interactData.method == "regContract") {
+      this.interactData.params.Fee = '100 VSYS'
+    }
+    this.isShowWarning = this.interactData.method == "execContractFunc" || this.interactData.method == "signContent" 
     this.windowId = await this.getWindowId();
     this.interactData.windowId = this.windowId;
     window.localStorage.setItem(
@@ -69,7 +88,9 @@ export default {
       windowId: 1,
       screenWidth: 1080,
       screenHeight: 760,
-      isNext: false
+      isNext: false,
+      isAccept: true,
+      isShowWarning:false
     };
   },
   methods: {
@@ -125,7 +146,7 @@ export default {
 
 .tips {
   width: 70%;
-  margin-top: 13%;
+  margin-top: 8%;
   margin-bottom: 20px;
   font-weight: 300;
   font-size: 17px;
@@ -134,9 +155,22 @@ export default {
   align-items: center;
 }
 
+.warning{
+ width: 100px;
+ height: 100px;
+}
+
+h5{
+text-align: left;
+margin-top: 75px;
+}
+
+.check_box{
+  margin: 45px 0 35px 0;
+}
+
 .next_btn {
   width: 40%;
-  margin: 55px 0;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -176,6 +210,7 @@ export default {
 
 .btn {
   border: none;
+  width: 85px;
   height: 35px;
   font-size: 14px;
   font-weight: bold;
@@ -183,16 +218,10 @@ export default {
   color: #fff;
 }
 .left {
-  width: 70px;
   background-color: #fff;
   color: #000;
 }
 .right {
-  background-color: rgba(255, 136, 55, 1);
-}
-
-.conf {
-  width: 70px;
   background-color: rgba(255, 136, 55, 1);
 }
 </style>

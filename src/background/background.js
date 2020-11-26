@@ -102,6 +102,13 @@ function triggerUi(data) {
 
 function getConfirmResult() {
     return new Promise((resolve, reject) => {
+        let checkIsHandleClose = setInterval(() => {
+            let interactData = JSON.parse(window.localStorage.getItem('interactData'))
+            if (!interactData || !interactData.isPopupOpened) {
+                clearInterval(checkIsHandleClose)
+                resolve(false)
+            }
+        }, 500)
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (request.method && request.method === 'confirm') {
                 resetInteractData()
@@ -261,7 +268,7 @@ async function resolveRequset(request, webListData) {
                             addToken(tokenId, tokenSymbol, networkByte)
                         } else {
                             res.message = 'User denied to add token'
-                            res.result =  false
+                            res.result = false
                         }
                     }
                 }
