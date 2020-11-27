@@ -305,7 +305,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             triggerUi(request)
@@ -377,7 +377,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             triggerUi(request)
@@ -446,7 +446,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             params = request.params
@@ -478,7 +478,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             triggerUi(request)
@@ -587,7 +587,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             params = request.params
@@ -636,7 +636,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             triggerUi(request)
@@ -665,7 +665,7 @@ async function resolveRequset(request, webListData) {
             }
             if (request.params.publicKey !== seed.keyPair.publicKey) {
                 res.result = false
-                res.message = "Inconsistent publicKey!"
+                res.message = "Request public key does not match current selected account!"
                 break
             }
             params = request.params
