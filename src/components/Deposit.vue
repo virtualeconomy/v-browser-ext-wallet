@@ -86,6 +86,7 @@ export default {
 
 <style scoped>
 .deposit-content {
+    margin-top: 10px;
     padding: 30px;
     min-height: 500px;
 }

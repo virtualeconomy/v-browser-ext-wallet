@@ -9,7 +9,7 @@ module.exports = {
         'background':'./src/background/background.js',
         'content':'./src/content/content.js',
         'inpage':'./src/inpage/inpage.js',
-        'option':'./src/option/option.js',
+        'confirmPopup':'./src/confirmPopup/confirmPopup.js',
         'popup':'./src/popup/popup.js',
         'signup': './src/signup/signup.js'
     },
@@ -21,10 +21,10 @@ module.exports = {
     plugins: [
         new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
-            filename: 'option.html',
-            template: 'src/option/option.html',
+            filename: 'confirmPopup.html',
+            template: 'src/confirmPopup/confirmPopup.html',
             inject: 'body',
-            chunks: ["option"],
+            chunks: ["confirmPopup"],
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,

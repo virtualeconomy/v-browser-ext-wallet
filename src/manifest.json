@@ -16,7 +16,6 @@
         "default_title": "V Wallet Extension",
         "default_popup": "popup.html"
     },
-    "options_page": "option.html",
     "background":
     {
         "persistent": false,

@@ -8,8 +8,9 @@ import store from '../store'
 Vue.use(BootstrapVue)
 router.push('/confirm')
 new Vue({
-    el: '#option',
+    el: '#confirmPopup',
     store,
     router: router,
     render: h => h(App)
 })
+
