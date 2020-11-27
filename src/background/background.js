@@ -216,16 +216,7 @@ async function resolveRequset(request, webListData) {
             }
             break
         case "watchedTokens":
-            let tokenRecords
-            if (String.fromCharCode(networkByte) === 'T') {
-                tokenRecords = testnetTokenRecords
-            } else if (String.fromCharCode(networkByte) === 'M') {
-                tokenRecords = mainnetTokenRecords
-            } else {
-                res.result = false
-                res.message = "No tokens found"
-                break
-            }
+            let tokenRecords = String.fromCharCode(networkByte) === 'T' ? testnetTokenRecords : mainnetTokenRecords
             let tokens = []
             for (let tokenId in tokenRecords) {
                 let token = {
@@ -245,13 +236,37 @@ async function resolveRequset(request, webListData) {
             res.token = tokens
             break
         case "addToken":
-            if (!request.params || !request.params.tokenId || !request.params.tokenSymbol) {
+            if (!request.params || !request.params.tokenId || !request.params.hasOwnProperty("tokenSymbol")) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
             }
             let tokenId = request.params.tokenId
             const tokenSymbol = request.params.tokenSymbol
+            if (!tokenSymbol) {
+                res.result = false
+                res.message = "Invalid token symbol"
+                break
+            }
+            if (tokenSymbol === "VSYS") {
+                res.result = false
+                res.message = "Token symbol already exists"
+                break
+            }
+            let Regx = /^[A-Za-z0-9]*$/
+            if (tokenSymbol.length > 5 || !Regx.test(tokenSymbol)) {
+                res.result = false
+                res.message = "Symbol must be digits or English letters within 5."
+                break
+            }
+            tokenRecords = String.fromCharCode(networkByte) === 'T' ? testnetTokenRecords : mainnetTokenRecords
+            for (let tokenId in tokenRecords) {
+                if (tokenRecords[tokenId] === tokenSymbol) {
+                    res.result = false
+                    res.message = "Token symbol already exists"
+                    return res
+                }
+            }
             let contractId = common.tokenIDToContractID(tokenId)
             try {
                 let response = await chain.getContractInfo(contractId)

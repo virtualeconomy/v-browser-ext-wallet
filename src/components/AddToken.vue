@@ -78,13 +78,17 @@
                                 <label>Token Symbol</label>
                                 <b-form-input class="form-control input-bottom"
                                               v-model="tokenSymbol"
-                                              :state="isValidSymbol(tokenSymbol)"
+                                              :state="checkSymbol(tokenSymbol)"
                                               aria-describedby="inputSymbolLiveFeedback"
                                               placeholder="Please input Token Symbol"
                                               onfocus="this.select()"></b-form-input>
                                 <b-form-invalid-feedback id="inputSymbolLiveFeedback"
                                                          v-if="!isValidSymbol(tokenSymbol)">
                                     Symbol must be digits or English letters within 5.
+                                </b-form-invalid-feedback>
+                                <b-form-invalid-feedback id="inputSymbolLiveFeedback"
+                                                         v-if="!isUsedSymbol(tokenSymbol)">
+                                    Symbol already exists.
                                 </b-form-invalid-feedback>
                             </div>
                             <b-row class="button-row">
@@ -158,7 +162,7 @@ export default {
             if (this.activeTab === 'verified') {
                 return this.isExistedToken(tokenId)
             } else {
-                return tokenId.length <= 0 || !this.isValidSymbol(this.tokenSymbol) || this.isVerifiedToken(tokenId)
+                return tokenId.length <= 0 || !this.checkSymbol(this.tokenSymbol) || this.isVerifiedToken(tokenId) || this.tokenSymbol.length <= 0
             }
         }
     },
@@ -215,6 +219,21 @@ export default {
         },
         isExistedToken(tokenId) {
             return tokenId in this.tokenRecords
+        },
+        checkSymbol(symbol) {
+            return this.isUsedSymbol(symbol) && this.isValidSymbol(symbol)
+        },
+        isUsedSymbol(symbol) {
+            if (symbol === "VSYS") {
+                return false
+            }
+            let tmp = this.tokenRecords
+            for (let tokenId in tmp) {
+              if (tmp[tokenId] === symbol) {
+                return false
+              }
+            }
+            return true
         },
         isValidSymbol(symbol) {
             let Regx = /^[A-Za-z0-9]*$/;

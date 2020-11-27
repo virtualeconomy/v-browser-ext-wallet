@@ -126,8 +126,8 @@ export default {
                         let tokenId = common.contractIDToTokenID(recItem['contractId'])
                         if (this.tokenRecords.hasOwnProperty(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
                             let functionData = convert.parseFunctionData(recItem['functionData'])
-                            recItem['recipient'] = functionData[0]
-                            recItem['amount'] = BigNumber(functionData[1]).dividedBy(this.tokenBalances[tokenId].unity)
+                            recItem['recipient'] = functionData[0]['data']
+                            recItem['amount'] = BigNumber(functionData[1]['data']).dividedBy(this.tokenBalances[tokenId].unity)
                             recItem['sentToken'] = true
                             recItem['officialName'] = this.tokenRecords[tokenId]
                         }
