@@ -120,7 +120,7 @@ export default {
             } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
-                if (this.isSentToken) {
+                if (this.isSentToken && this.txRecord['status'] === 'Success') {
                     if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined && this.txStatus === 'Success') {
                         return 'Received'
                     } else return 'Sent'
@@ -196,7 +196,7 @@ export default {
             return year.toString()
         },
         txAmount() {
-            if (this.isSentToken) {
+            if (this.isSentToken && this.txRecord['status'] === 'Success') {
                 if (this.txType === 'Sent') {
                     return '-' + BigNumber(this.txRecord.amount) + ' ' + this.txRecord.officialName
                 } else {

@@ -30,7 +30,7 @@
 
 <script>
 import TransactionRecord from './TransactionRecord.vue'
-import { EXECUTE_CONTRACT_TX, PAYMENT_TX } from '../js-v-sdk/src/constants'
+import { EXECUTE_CONTRACT_TX, PAYMENT_TX, NFT_CONTRACT_SEND_FUNCIDX, ACCOUNT_ADDR_TYPE, INT32_TYPE, AMOUNT_TYPE, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '../js-v-sdk/src/constants'
 import common from '../js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
 import { ADDRESS_TEST_EXPLORER, ADDRESS_EXPLORER } from '../store/network.js'
@@ -38,6 +38,7 @@ import Vue from 'vue'
 import base58 from 'base-58'
 import BigNumber from 'bignumber.js'
 import convert from '../js-v-sdk/src/utils/convert'
+import * as Constants from "src/js-v-sdk/src/constants";
 export default {
     name: "TransactionRecords",
     components: {
@@ -111,6 +112,15 @@ export default {
                 window.open(ADDRESS_EXPLORER + this.address)
             }
         },
+        isSendExecuteContractTx(functionIndex, Data) {
+            let functionData = convert.parseFunctionData(Data)
+            console.log(functionData)
+            if (functionIndex === NFT_CONTRACT_SEND_FUNCIDX && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === INT32_TYPE) {
+                return true
+            }
+            return (functionIndex === SEND_FUNCIDX || functionIndex === SEND_FUNCIDX_SPLIT) && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === AMOUNT_TYPE
+
+        },
         getTxRecords() {
             this.txRecords = {}
             this.showDisable = true
@@ -124,10 +134,14 @@ export default {
                     Vue.set(recList, count++, recItem)
                     if (recItem['type'] === EXECUTE_CONTRACT_TX) {
                         let tokenId = common.contractIDToTokenID(recItem['contractId'])
-                        if (this.tokenRecords.hasOwnProperty(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
+                        if (this.tokenRecords.hasOwnProperty(tokenId) && this.isSendExecuteContractTx(recItem['functionIndex'], recItem['functionData'])) {
                             let functionData = convert.parseFunctionData(recItem['functionData'])
                             recItem['recipient'] = functionData[0]['data']
-                            recItem['amount'] = BigNumber(functionData[1]['data']).dividedBy(this.tokenBalances[tokenId].unity)
+                            if (functionData[1]['type'] === INT32_TYPE) {
+                                recItem['amount'] = 1
+                            } else {
+                                recItem['amount'] = BigNumber(functionData[1]['data']).dividedBy(this.tokenBalances[tokenId].unity)
+                            }
                             recItem['sentToken'] = true
                             recItem['officialName'] = this.tokenRecords[tokenId]
                         }
