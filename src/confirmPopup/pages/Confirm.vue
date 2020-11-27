@@ -20,7 +20,7 @@
     </div>
     <div v-else class="confirm_body" :style="{width:confirm_body_width}">
       <div class="method">
-        <h3>{{interactData.method.toUpperCase()}}</h3>
+        <h3>{{interactData.method.charAt(0).toUpperCase()+interactData.method.slice(1)}}</h3>
       </div>
       <div class="content" v-if="interactData.params">
         <div class="params" v-for="(value,key,i) in interactData.params" :key="i">
@@ -63,9 +63,9 @@ export default {
         this.interactData.params.tokenId &&
         this.interactData.params.tokenId != ""
       ) {
-        this.interactData.method += " TOKEN";
+        this.interactData.method += " Token";
       } else {
-        this.interactData.method += " VSYS";
+        this.interactData.method += " Vsys";
         delete this.interactData.params.tokenId;
       }
     }
