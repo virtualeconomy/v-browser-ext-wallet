@@ -65,7 +65,7 @@ export default {
       ) {
         this.interactData.method += " Token";
       } else {
-        this.interactData.method += " Vsys";
+        this.interactData.method += " VSYS";
         delete this.interactData.params.tokenId;
       }
     }
