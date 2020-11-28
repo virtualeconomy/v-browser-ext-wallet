@@ -3,7 +3,7 @@
     src: url('/static/fonts/Roboto-Regular.ttf') format('truetype');
 }
 html, body, #app {
-    font-family: 'Roboto-Regular' !important;
+    font-family: 'Roboto-Regular';
     background:rgba(247,247,252,1);
 }
 .details-dialog {
