@@ -16,12 +16,21 @@
         "default_title": "V Wallet Extension",
         "default_popup": "popup.html"
     },
-    "options_page": "option.html",
     "background":
     {
         "persistent": false,
         "scripts": ["background.main.js"]
     },
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "css": ["./static/common.css"],
+            "js": ["content.main.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        "inpage.main.js"
+    ],
     "permissions": [
         "http://*/*",
         "https://*/*",

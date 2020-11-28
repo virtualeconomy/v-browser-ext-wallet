@@ -7,7 +7,8 @@ export default {
         sessionTimeout: false,
         networkByte: false,
         password: false,
-        info: false
+        info: false,
+        webList:[]
     },
     mutations: {
         updateWallet(state, object) {
@@ -27,6 +28,9 @@ export default {
         updateSettings(state, object) {
             state.networkByte = object.networkByte
             state.sessionTimeout = object.sessionTimeout
+        },
+        updateWebList(state, object) {
+            state.webList.push(object)
         }
     }
 

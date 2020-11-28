@@ -29,6 +29,15 @@
             <label>Amount</label>
             <b-form-input id="amount-input"
                           class="form-item"
+                          v-if="isNFT"
+                          disabled
+                          v-model="amount"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isValidAmount">
+            </b-form-input>
+            <b-form-input id="amount-input"
+                          class="form-item"
+                          v-else
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount">
@@ -139,6 +148,8 @@ import jdenticon from 'jdenticon'
 import converters from '../js-v-sdk/src/utils/converters.js'
 import common from '../js-v-sdk/src/utils/common.js'
 import { CONTRACT_EXEC_FEE, TX_FEE, VSYS_PRECISION } from '../js-v-sdk/src/constants'
+import { getContractFunctionIndex, NonFungibleTokenContractDataGenerator } from '../js-v-sdk/src/data'
+import * as ContractType from '../js-v-sdk/src/contract_type'
 const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140
 export default {
     name: "Send",
@@ -148,6 +159,7 @@ export default {
           amount: 0,
           unity: VSYS_PRECISION,
           isSplit: false,
+          isNFT: false,
           description: '',
           pageId: 0,
           txFee: this.selectedToken === 'VSYS' ? TX_FEE : CONTRACT_EXEC_FEE
@@ -310,6 +322,10 @@ export default {
             let contractId = common.tokenIDToContractID(this.selectedToken)
             this.chain.getContractInfo(contractId).then(response => {
                 this.isSplit = response.type === 'TokenContractWithSplit'
+                this.isNFT = response.type === 'NonFungibleContract'
+                if (this.isNFT) {
+                    this.amount = this.assetBalance
+                }
             }, respError => {
             })
             this.chain.getTokenInfo(this.selectedToken).then(response => {
@@ -338,7 +354,17 @@ export default {
             if (this.selectedToken === 'VSYS') {
                 tra.buildPaymentTx(this.getKeypair.publicKey, this.recipient, this.amount, this.description, Date.now() * 1e6)
             } else {
-                tra.buildSendTokenTx(this.getKeypair.publicKey, this.selectedToken, this.recipient, this.amount, this.unity, this.isSplit, this.description)
+                if (this.isNFT) {
+                    let tokenContract = common.tokenIDToContractID(this.selectedToken)
+                    let data_generator = new NonFungibleTokenContractDataGenerator()
+                    let timestamp = Date.now() * 1e6
+                    let function_index = getContractFunctionIndex(ContractType.NFT, 'SEND')
+                    let token_index = common.getTokenIndex(this.selectedToken)
+                    let function_data = data_generator.createSendData(this.recipient, token_index)
+                    tra.buildExecuteContractTx(this.getKeypair.publicKey, tokenContract, function_index, function_data, timestamp, this.description)
+                } else {
+                    tra.buildSendTokenTx(this.getKeypair.publicKey, this.selectedToken, this.recipient, this.amount, this.unity, this.isSplit, this.description)
+                }
             }
             this.account.buildFromPrivateKey(this.getKeypair.privateKey)
             let signature = this.account.getSignature(tra.toBytes())

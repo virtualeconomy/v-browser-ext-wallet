@@ -8,6 +8,7 @@ import CreateAccount from "src/signup/pages/CreateAccount.vue";
 import Terms from '../signup/pages/Terms.vue'
 import TokenSelect from '../components/TokenSelect.vue'
 import AddToken from '../components/AddToken.vue'
+import Confirm from '../confirmPopup/pages/Confirm.vue'
 Vue.use(Router)
 
 const router = new Router({
@@ -47,6 +48,10 @@ const router = new Router({
         path: '/addToken',
         name: 'addToken',
         component: AddToken
+    }, {
+        path: '/confirm',
+        name: 'confirm',
+        component: Confirm
     }
     ]
 })

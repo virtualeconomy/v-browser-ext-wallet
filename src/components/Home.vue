@@ -22,7 +22,7 @@
                 <b-button class="btn-deposit"
                           @click="deposit">
                     <img class="icon-btn"
-                         src="../../static/icons/ic_deposit.png"><b class="deposit-txt">Deposit</b></b-button>
+                         src="../../static/icons/ic_deposit.png"><b class="deposit-txt">Receive</b></b-button>
                 <b-button class="btn-send"
                           @click="send">
                     <img class="icon-btn"
