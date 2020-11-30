@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
     "name": "V Wallet Extension",
-    "version": "1.0.0",
-    "description": "the browser extension for V wallet",
+    "version": "1.1.5",
+    "description": "A browser extension wallet for V Systems",
     "icons": {
         "16":"static/icons/ic_v_logo@3x(1).png",
         "19":"static/icons/ic_v_logo@3x(1).png",
@@ -30,10 +30,6 @@
     "web_accessible_resources": [
         "inpage.main.js"
     ],
-    "permissions": [
-        "http://*/*",
-        "https://*/*",
-        "<all_urls>"
-    ],
+    "permissions": [],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
