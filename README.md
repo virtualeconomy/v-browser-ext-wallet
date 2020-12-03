@@ -1,5 +1,9 @@
 # V Browser Extension Wallet
 
+## Install from Chrome Web Store
+
+The V Browser Extension Wallet is now listing in Chrome Web Store. You can install it from [here](https://chrome.google.com/webstore/detail/v-wallet-extension/adfnjoodbdcoikkhallnfejjokefkkbd) .
+
 ## How to build and import to Chrome manually
 
 1. install node.js from https://nodejs.org
@@ -30,7 +34,7 @@
 	```
 
 6. import to chrome
-Open Chrome browser, go to the `chrome://extensions/` page and click the `Load unpacked extension` button and select the build folder for your extension to install it.
+Open Chrome browser, go to the `chrome://extensions/` page and click the `Load unpacked extension` button and select the build folder (`.../v-browser-ext-wallet/dist`) for your extension to install it.
 
 ## Web page interaction specification (for dApp developer)
 
@@ -55,7 +59,7 @@ async function getWalletInfo() {
 
 Result:
 
-``` 
+```
 {
     "result": true,
     "message": "OK",
@@ -78,7 +82,7 @@ async function getAddress() {
 
 Result:
 
-``` 
+```
 {
     "result": true,
     "message": "OK",
@@ -99,7 +103,7 @@ async function getPublicKey() {
 
 Result:
 
-``` 
+```
 {
     "result": true,
     "message": "OK",
@@ -121,7 +125,7 @@ async function getAmount() {
 
 Result:
 
-``` 
+```
 {
     "result": true,
     "message": "OK",
@@ -143,7 +147,7 @@ function getTokenAmount() {
           tokenId: '<Token ID>'
         }
     })
-    .then((response) => { 
+    .then((response) => {
         const tokenAmount = response.data
         return tokenAmount
     })
@@ -153,7 +157,7 @@ function getTokenAmount() {
 
 Result:
 
-``` 
+```
 {
     "result": true,
     "message": "OK",
@@ -176,7 +180,7 @@ async function getWatchedTokens() {
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -230,10 +234,10 @@ function addToken() {
 
 Result:
 
-``` 
+```
 {
 	"result": true,
-	"message": "OK"	
+	"message": "OK"
 }
 ```
 
@@ -264,7 +268,7 @@ If you send Token, you need to fill in `tokenId`. Otherwise, if not set `tokenId
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -296,7 +300,7 @@ function sendNFTToken() {
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -367,7 +371,7 @@ The `contractId` must be lock contract ID or payment channel contract ID. The `m
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -402,7 +406,7 @@ The `contractId` can be any contract ID. The `functionIndex` is the function ind
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -435,7 +439,7 @@ function registerContractFunction() {
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -466,7 +470,7 @@ The `content` is the content bytes, which encoded with Base58.
 
 Result:
 
-``` 
+```
 {
 	"result": true,
 	"message": "OK",
@@ -478,25 +482,25 @@ Result:
 
 1. If the wallet is first time used without account created, any request will be failed, and the returned result is as follows:
 
-	``` 
+	```
 	{
 	    "result": false,
 	    "message": "account is not created"
 	}
 	```
-	
+
 	To solve this problem, the user needs to **open the extension wallet and create a account** before proceeding to the next step.
 
 
 2. When the wallet is locked, any request will be failed, and the returned result is as follows:
 
-	``` 
+	```
 	{
 	    "result": false,
 	    "message": "account is locked"
 	}
 	```
-	
+
 	To solve this problem, the user needs to **open the extension wallet and enter the password to unlock** before proceeding to the next step.
 
 
