@@ -36,17 +36,18 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.4.4",
+    "base-58": "0.0.1",
+    "bignumber.js": "^7.2.1",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.28",
     "jdenticon": "^2.2.0",
     "jr-qrcode": "^1.1.1",
     "js-v-sdk": "./src/js-v-sdk",
     "vue": "^2.6.10",
+    "vue-m-validator": "^1.0.5",
+    "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-persist": "^1.4.3",
-    "vue-m-validator": "^1.0.5",
-    "base-58": "0.0.1",
-    "bignumber.js": "^7.2.1"
+    "vuex-persist": "^1.4.3"
   }
 }

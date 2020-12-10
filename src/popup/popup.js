@@ -6,8 +6,11 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import jdenticon from 'jdenticon'
 import store from '../store'
+import VueResource from 'vue-resource'
+
 Vue.use(BootstrapVue)
 Vue.use(jdenticon)
+Vue.use(VueResource)
 if (store.state.wallet.info === false) {
     chrome.runtime.sendMessage({
         method: 'showAlert'

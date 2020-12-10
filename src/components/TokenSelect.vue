@@ -57,7 +57,7 @@
                                  :balance="tokenBalances[tokenId].value"
                                  :token-id="tokenId"
                                  :token-records="tokenRecords"
-                                 :token-symbol="tokenRecords[tokenId]"
+                                 :token-symbol="tokenRecords[tokenId].name"
                                  @selectSucceed="selectSucceed"></TokenRecord>
                 </div>
             </div>
@@ -157,9 +157,6 @@ export default {
         },
         selectSucceed() {
             this.$emit('selectSucceed')
-        },
-        avatarDataHex(address) {
-            return converters.stringToHexString(address).split('').reverse().slice(1, 21).join('')
         }
     },
     computed: {

@@ -59,12 +59,32 @@ function getData() {
     return data
 }
 
-function addToken(tokenId, tokenSymbol, networkByte) {
+function updateVersion() {
+    const { networkByte, mainnetTokenRecords, testnetTokenRecords } = getData()
+    let isTestnet = String.fromCharCode(networkByte) === 'T'
+    let tmpTokenRecords = isTestnet ? testnetTokenRecords : mainnetTokenRecords
+    for (let tokenId in tmpTokenRecords) {
+        if (!(tmpTokenRecords[tokenId] instanceof Object)) {
+            tmpTokenRecords[tokenId] = { name: tmpTokenRecords[tokenId], contractType:'Unknown' }
+        }
+    }
+    let storage = JSON.parse(window.localStorage.getItem("vuex"))
+    if (isTestnet) {
+        storage.account.testnetTokenRecords = tmpTokenRecords
+    } else {
+        storage.account.mainnetTokenRecords = tmpTokenRecords
+    }
+    window.localStorage.setItem("vuex", JSON.stringify(storage))
+}
+
+updateVersion()
+
+function addToken(tokenId, tokenSymbol, contractType, networkByte) {
     let storage = JSON.parse(window.localStorage.getItem("vuex"))
     if (String.fromCharCode(networkByte) === 'T') {
-        storage.account.testnetTokenRecords[tokenId] = tokenSymbol
+        storage.account.testnetTokenRecords[tokenId] = { name: tokenSymbol, contractType: contractType }
     } else if (String.fromCharCode(networkByte) === 'M') {
-        storage.account.mainnetTokenRecords[tokenId] = tokenSymbol
+        storage.account.mainnetTokenRecords[tokenId] = { name: tokenSymbol, contractType: contractType }
     }
     window.localStorage.setItem("vuex", JSON.stringify(storage))
 }
@@ -221,15 +241,8 @@ async function resolveRequset(request, webListData) {
             for (let tokenId in tokenRecords) {
                 let token = {
                     tokenId: tokenId,
-                    contractId: common.tokenIDToContractID(tokenId)
-                }
-                try {
-                    //TODO: save ContractInfo in local storage when add token in watch list
-                    let response = await chain.getContractInfo(token.contractId)
-                    token.contractType = response.type
-                } catch (respError) {
-                    token.contractType = "Unknown"
-                    console.log(respError)
+                    contractId: common.tokenIDToContractID(tokenId),
+                    contractType: tokenRecords[tokenId].contractType
                 }
                 tokens.push(token)
             }
@@ -261,7 +274,7 @@ async function resolveRequset(request, webListData) {
             }
             tokenRecords = String.fromCharCode(networkByte) === 'T' ? testnetTokenRecords : mainnetTokenRecords
             for (let tokenId in tokenRecords) {
-                if (tokenRecords[tokenId] === tokenSymbol) {
+                if (tokenRecords[tokenId].name === tokenSymbol) {
                     res.result = false
                     res.message = "Token symbol already exists"
                     return res
@@ -279,13 +292,14 @@ async function resolveRequset(request, webListData) {
                         res.message = 'Invalid token!'
                     } else {
                         let tokenType = 'Token '
-                        if (response.type === 'NonFungibleContract') {
+                        let contractType = response.type
+                        if (contractType === 'NonFungibleContract') {
                             tokenType = 'NFT '
-                        } else if (response.type === 'TokenContractWithSplit') {
+                        } else if (contractType === 'TokenContractWithSplit') {
                             tokenType = 'Splittable Token '
                         }
                         if (confirm("Add " + tokenType + tokenId + " to your extension wallet?")) {
-                            addToken(tokenId, tokenSymbol, networkByte)
+                            addToken(tokenId, tokenSymbol, contractType, networkByte)
                         } else {
                             res.message = 'User denied to add token'
                             res.result = false
