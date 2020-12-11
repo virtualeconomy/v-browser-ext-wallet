@@ -59,7 +59,7 @@ function getData() {
     return data
 }
 
-function updateVersion() {
+function checkLocalTokens() {
     const { networkByte, mainnetTokenRecords, testnetTokenRecords } = getData()
     let isTestnet = String.fromCharCode(networkByte) === 'T'
     let tmpTokenRecords = isTestnet ? testnetTokenRecords : mainnetTokenRecords
@@ -77,7 +77,7 @@ function updateVersion() {
     window.localStorage.setItem("vuex", JSON.stringify(storage))
 }
 
-updateVersion()
+checkLocalTokens()
 
 function addToken(tokenId, tokenSymbol, contractType, networkByte) {
     let storage = JSON.parse(window.localStorage.getItem("vuex"))
