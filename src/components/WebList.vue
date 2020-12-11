@@ -37,6 +37,7 @@ export default {
     deleteDomain(idx) {
       this.storage.wallet.webList.splice(idx, 1);
       window.localStorage.setItem("vuex", JSON.stringify(this.storage));
+      this.$emit('checkWebList')
     },
     close() {
       this.$refs.webListModal.hide();

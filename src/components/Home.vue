@@ -126,17 +126,30 @@ export default {
             if (this.selectedToken === 'VSYS') {
                 return 'VSYS'
             } else {
-                return this.tokenRecords[this.selectedToken]
+                return this.tokenRecords[this.selectedToken].name
             }
         },
         tokenSvg() {
             let name = this.tokenName
-            if (name === 'VSYS'){
-                return "../../static/icons/token/" + name + ".png"
-            } else if (name === 'DLL' || name === 'DM' || name === 'IPX' || name === 'VTEST') {
-                return "../../static/icons/token/" + name + ".svg"
-            } else {
-                return "../../static/icons/token/other.svg"
+            switch (name) {
+              case "VSYS":
+                return "../../static/icons/token/VSYS.png"
+              case "BlockDesk":
+                return "../../static/icons/token/BlockDesk.png"
+              case "DLL":
+                return "../../static/icons/token/Dll.svg"
+              case "DM":
+                return "../../static/icons/token/DM.svg"
+              case "GoldZip":
+                return "../../static/icons/token/GoldZip.jpg"
+              case "IPX":
+                return "../../static/icons/token/IPX.svg"
+              case "OCT":
+                return "../../static/icons/token/OCT.jpg"
+              case "VTest":
+                return "../../static/icons/token/VTest.svg"
+              default:
+                return this.tokenRecords[this.selectedToken].iconUrl || "../../static/icons/token/other.svg"
             }
         },
         accountBalance() {

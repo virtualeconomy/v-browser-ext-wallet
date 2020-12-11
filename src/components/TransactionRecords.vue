@@ -114,7 +114,6 @@ export default {
         },
         isSendExecuteContractTx(functionIndex, Data) {
             let functionData = convert.parseFunctionData(Data)
-            console.log(functionData)
             if (functionIndex === NFT_CONTRACT_SEND_FUNCIDX && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === INT32_TYPE) {
                 return true
             }
@@ -143,7 +142,7 @@ export default {
                                 recItem['amount'] = BigNumber(functionData[1]['data']).dividedBy(this.tokenBalances[tokenId].unity)
                             }
                             recItem['sentToken'] = true
-                            recItem['officialName'] = this.tokenRecords[tokenId]
+                            recItem['officialName'] = this.tokenRecords[tokenId].name
                         }
                     }
                     if (recItem['type'] === PAYMENT_TX) {

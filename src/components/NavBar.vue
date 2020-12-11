@@ -85,7 +85,7 @@
               <b-dropdown-item v-b-modal.addAccount href="#" class="drop-down"> <img class="icon" src="../../static/icons/ic_add_account.png"><span class="text">Add Account</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.about href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_about.png"><span class="text">About</span></b-dropdown-item>
               <b-dropdown-item v-b-modal.settings href="#" class="drop-down"><img class="icon" src="../../static/icons/ic_setting.png"><span class="text">Settings</span></b-dropdown-item>
-              <b-dropdown-item v-b-modal.webList href="#" class="drop-down"><img class="icon" src="../../static/icons/web.png"><span class="text">Trusted List</span></b-dropdown-item>
+              <b-dropdown-item v-show="isWebListExisted" v-b-modal.webList href="#" class="drop-down"><img class="icon" src="../../static/icons/web.png"><span class="text">Trusted List</span></b-dropdown-item>
               <b-dropdown-item @click="logout" class="drop-down"><img class="icon" src="../../static/icons/ic_logout.png"><span class="text">Log Out</span></b-dropdown-item>
               </b-nav-item-dropdown>
             </b-navbar-nav>
@@ -95,7 +95,7 @@
                :selected-account="selectedAccount"
                :account-name="accountNames[selectedAccount]"></Details>
       <Settings></Settings>
-      <WebList></WebList>
+      <WebList @checkWebList="checkWebList"></WebList>
       <About></About>
     </div>
 </template>
@@ -117,6 +117,7 @@ export default {
     name: "NavBar",
     created() {
         this.getAccountBalances()
+        this.checkWebList()
     },
     mounted() {
       jdenticon()
@@ -124,6 +125,7 @@ export default {
     data() {
         return {
             pop: false,
+            isWebListExisted: true,
             accountBalances: {}
         }
     },
@@ -174,6 +176,10 @@ export default {
         WebList
     },
     methods: {
+        checkWebList() {
+            let storage = JSON.parse(window.localStorage.getItem("vuex"))
+            this.isWebListExisted = storage.wallet.webList && storage.wallet.webList.length > 0
+        },
         getAccountBalances() {
             if (this.selectedToken === 'VSYS') {
                 for (const addr in this.addresses) {

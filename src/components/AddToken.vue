@@ -13,17 +13,23 @@
                             <div><span>Verified Token</span></div>
                         </template>
                         <div class="content">
+                            <div v-if="showDisable"
+                                 style="text-align: center;margin-top: 120px;">
+                                <img height="70"
+                                     width="70"
+                                     src="../../static/icons/ic_wait.svg">
+                            </div>
                             <div class="accounts-part">
                                 <div class="scroll"
-                                     :style="{height: '264px'}">
+                                     :style="{height: showDisable ? '94px': '264px' }">
                                     <div v-for="(certifiedToken, tokenId) in certifiedTokens"
                                          :key="tokenId">
                                         <b-btn class="token-unit"
-                                               @click="addVerifiedToken(tokenId, certifiedToken)">
+                                               @click="addVerifiedToken(tokenId, certifiedToken.name)">
                                             <div class="token-svg"><img width="56px"
                                                                         height="56px"
-                                                                        :src="certifiedTokenSvg(certifiedToken)"></div>
-                                            <div class="cer-name"><span>{{certifiedToken}}</span></div>
+                                                                        :src="certifiedToken.iconUrl"></div>
+                                            <div class="cer-name"><span>{{certifiedToken.name}}</span></div>
                                             <div class="notice" v-if="isExistedToken(tokenId)">Already added!</div>
                                         </b-btn>
                                     </div>
@@ -124,6 +130,8 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import certify from '../utils/certify.js'
+import { CERTIFIED_TOKENS, CERTIFIED_TEST_TOKENS } from '../store/network.js'
+import common from 'src/js-v-sdk/src/utils/common'
 export default {
     name: "AddToken",
     data: function() {
@@ -134,7 +142,8 @@ export default {
             certifiedTokens: {},
             selectedVerifiedToken: '',
             selectedVerifiedSymbol: '',
-            responseErr: false
+            responseErr: false,
+            showDisable: false
         }
     },
     created() {
@@ -168,13 +177,30 @@ export default {
     },
     methods: {
         getCertifiedTokens() {
-            if (String.fromCharCode(this.networkByte) === 'T') {
-                this.certifiedTokens = certify.certifiedTokensList['Testnet']
-            } else if (String.fromCharCode(this.networkByte) === 'M') {
-                this.certifiedTokens = certify.certifiedTokensList['Mainnet']
-            } else {
-                this.certifiedTokens = {}
-            }
+            let isTestnet = String.fromCharCode(this.networkByte) === 'T'
+            let url = isTestnet ? CERTIFIED_TEST_TOKENS : CERTIFIED_TOKENS
+            let localCertifiedTokens = isTestnet ? certify.certifiedTokensList['Testnet'] : certify.certifiedTokensList['Mainnet']
+            let iconUrl = url.slice(0, url.length - 11)
+            this.showDisable = true
+            this.$http.get(url).then(res => {
+                try {
+                    let data = res.body.data.list
+                    let tmpTokens = {}
+                    let tmpToken = {}
+                    for (let index in data) {
+                        tmpToken = data[index]
+                        tmpTokens[tmpToken.Id] = { 'name': tmpToken.Name, 'iconUrl': iconUrl + tmpToken.IconUrl }
+                    }
+                    this.certifiedTokens = tmpTokens
+                } catch (err) {
+                    this.certifiedTokens = localCertifiedTokens
+                }
+                this.showDisable = false
+            },err => {
+                console.log(err)
+                this.certifiedTokens = localCertifiedTokens
+                this.showDisable = false
+            })
         },
         tokenTabChange(tabIndex) {
             if (tabIndex === 0) {
@@ -187,6 +213,10 @@ export default {
             let tmp = this.tokenRecords
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
             let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
+            let iconUrl = ''
+            if (tokenId in this.certifiedTokens) {
+                iconUrl = this.certifiedTokens[tokenId].iconUrl
+            }
             if (tokenId in tmp) {
                 this.$emit('changePage', 'home')
             }
@@ -197,11 +227,26 @@ export default {
                         this.responseErr = true
                         return
                     }
-                    Vue.set(tmp, tokenId, tokenSymbol)
-                    const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
-                    this.$store.commit('account/updateToken', updateInfo)
-                    this.$store.commit('account/updateSelectedToken', tokenId)
-                    this.$emit('changePage', 'home')
+                    let contractID = common.tokenIDToContractID(tokenId)
+                    this.chain.getContractInfo(contractID).then(res => {
+                        if (res.hasOwnProperty('error')) {
+                            this.responseErr = true
+                            return
+                        }
+                        if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit') {
+                            this.responseErr = true
+                            return
+                        }
+                        let contractType = res.type
+                        let tokenInfo = { 'name': tokenSymbol, 'contractType': contractType,'iconUrl': iconUrl }
+                        Vue.set(tmp, tokenId, tokenInfo)
+                        const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
+                        this.$store.commit('account/updateToken', updateInfo)
+                        this.$store.commit('account/updateSelectedToken', tokenId)
+                        this.$emit('changePage', 'home')
+                    }, err => {
+                        this.responseErr = true
+                    })
                 }, respError => {
                     this.responseErr = true
                 })
@@ -213,9 +258,6 @@ export default {
         addVerifiedToken(tokenId, verifiedSymbol) {
             this.selectedVerifiedToken = tokenId
             this.selectedVerifiedSymbol = verifiedSymbol
-        },
-        certifiedTokenSvg(name) {
-            return "../../static/icons/token/" + name + ".svg"
         },
         isExistedToken(tokenId) {
             return tokenId in this.tokenRecords
@@ -229,7 +271,7 @@ export default {
             }
             let tmp = this.tokenRecords
             for (let tokenId in tmp) {
-              if (tmp[tokenId] === symbol) {
+              if (tmp[tokenId].name === symbol) {
                 return false
               }
             }

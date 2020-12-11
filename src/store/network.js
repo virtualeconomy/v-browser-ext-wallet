@@ -6,5 +6,5 @@ export const ADDRESS_TEST_EXPLORER = 'https://testexplorer.v.systems/address/'
 export const ADDRESS_EXPLORER = 'https://explorer.v.systems/address/'
 export const TOKEN_TEST_EXPLORER = 'https://testexplorer.v.systems/token/'
 export const TOKEN_EXPLORER = 'https://explorer.v.systems/token/'
-
-
+export const CERTIFIED_TOKENS = 'https://explorer.v.systems/api/tokens'
+export const CERTIFIED_TEST_TOKENS = 'https://testexplorer.v.systems/api/tokens'
