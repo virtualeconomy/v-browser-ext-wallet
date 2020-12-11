@@ -213,6 +213,10 @@ export default {
             let tmp = this.tokenRecords
             let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
             let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
+            let iconUrl = ''
+            if (tokenId in this.certifiedTokens) {
+                iconUrl = this.certifiedTokens[tokenId].iconUrl
+            }
             if (tokenId in tmp) {
                 this.$emit('changePage', 'home')
             }
@@ -234,7 +238,7 @@ export default {
                             return
                         }
                         let contractType = res.type
-                        let tokenInfo = { 'name': tokenSymbol, 'contractType': contractType }
+                        let tokenInfo = { 'name': tokenSymbol, 'contractType': contractType,'iconUrl': iconUrl }
                         Vue.set(tmp, tokenId, tokenInfo)
                         const updateInfo = { 'networkByte': this.networkByte, 'tokens': tmp}
                         this.$store.commit('account/updateToken', updateInfo)

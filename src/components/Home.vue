@@ -149,7 +149,7 @@ export default {
               case "VTest":
                 return "../../static/icons/token/VTest.svg"
               default:
-                return "../../static/icons/token/other.svg"
+                return this.tokenRecords[this.selectedToken].iconUrl ? this.tokenRecords[this.selectedToken].iconUrl : "../../static/icons/token/other.svg"
             }
         },
         accountBalance() {

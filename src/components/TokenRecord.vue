@@ -111,7 +111,7 @@ export default {
           case "VTest":
             return "../../static/icons/token/VTest.svg"
           default:
-            return "../../static/icons/token/other.svg"
+            return this.tokenRecords[this.tokenId].iconUrl ? this.tokenRecords[this.tokenId].iconUrl : "../../static/icons/token/other.svg"
         }
       },
         addConfirm() {
