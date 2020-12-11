@@ -191,7 +191,7 @@ export default {
                         tmpToken = data[index]
                         tmpTokens[tmpToken.Id] = { 'name': tmpToken.Name, 'iconUrl': iconUrl + tmpToken.IconUrl }
                     }
-                    this.certifiedTokens = localCertifiedTokens
+                    this.certifiedTokens = tmpTokens
                 } catch (err) {
                     this.certifiedTokens = localCertifiedTokens
                 }
