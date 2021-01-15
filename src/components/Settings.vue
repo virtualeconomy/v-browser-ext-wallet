@@ -27,6 +27,14 @@
                 </b-form-select>
             </div>
             <div class="form-group select-form">
+              <label>Node</label>
+              <b-form-input id="address-input"
+                            class="amount-input"
+                            v-model="selectedNodeUrl"
+                            onfocus="this.select()">
+              </b-form-input>
+            </div>
+            <div class="form-group select-form">
                 <label>Session Timeout</label>
                 <b-form-select class="form-control select"
                                :options="timeoutOptions"
@@ -59,17 +67,20 @@
 
 <script>
 import { mapState } from 'vuex'
+import seedLib from 'src/utils/seed'
 export default {
     name: "Settings",
     created() {
         this.selectedNetwork = this.networkByte
         this.selectedSession = this.sessionTimeout
+        this.selectedNodeUrl = String.fromCharCode(this.networkByte) === 'M' ? this.nodeUrl : this.testNodeUrl
     },
     data: function() {
         return {
             selectedNetwork: this.networkByte,
             selectedLang: 'en',
             selectedSession: this.sessionTimeout,
+            selectedNodeUrl: String.fromCharCode(this.networkByte) === 'M' ? this.nodeUrl : this.testNodeUrl,
             networkOptions: [
                 {
                     value: 'M'.charCodeAt(0),
@@ -118,16 +129,59 @@ export default {
     computed: {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
-            sessionTimeout: state => state.wallet.sessionTimeout
-        })
+            sessionTimeout: state => state.wallet.sessionTimeout,
+            nodeUrl: state => state.wallet.nodeUrl,
+            testNodeUrl: state => state.wallet.testNodeUrl,
+            wallet: state => state.wallet
+        }),
+        secretInfo() {
+          if (this.wallet.password) {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+          }
+        }
+    },
+    watch: {
+        selectedNetwork(now, old) {
+            this.selectedNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? this.nodeUrl : this.testNodeUrl
+        }
     },
     methods: {
-        confirm() {
-            const savedSettings = {
-                sessionTimeout: this.selectedSession,
-                networkByte: this.selectedNetwork
+        getAddress() {
+            if (this.secretInfo) {
+              let seedPhrase = seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+              let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, 0, this.selectedNetwork)
+              return seed.address
             }
-            this.$store.commit('wallet/updateSettings', savedSettings)
+        },
+        confirm() {
+            let originalNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? this.nodeUrl : this.testNodeUrl
+            let savedSettings = {
+                sessionTimeout: this.selectedSession,
+                networkByte: this.selectedNetwork,
+                nodeUrl: originalNodeUrl
+            }
+            this.selectedNodeUrl = this.selectedNodeUrl.replace(/\s*/g, '')
+            if (originalNodeUrl !== this.selectedNodeUrl) {
+                let address = this.getAddress()
+                let suffix = '/addresses/balance/' + address
+                this.$http.get(this.selectedNodeUrl + suffix).then(res => {
+                    if (res.ok && res.body.address === address) {
+                        savedSettings.nodeUrl = this.selectedNodeUrl
+                        let apiData = {
+                            networkByte: this.networkByte,
+                            nodeUrl: this.selectedNodeUrl
+                        }
+                        this.$store.commit('API/updateAPI', apiData)
+                    }
+                    this.$store.commit('wallet/updateSettings', savedSettings)
+                }, error => {
+                    this.selectedNodeUrl = originalNodeUrl
+                    this.$store.commit('wallet/updateSettings', savedSettings)
+                })
+            } else {
+                this.$store.commit('wallet/updateSettings', savedSettings)
+            }
             this.$refs.settingsModal.hide()
         },
         close() {
