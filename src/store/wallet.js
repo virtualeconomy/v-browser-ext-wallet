@@ -1,3 +1,5 @@
+import { MAINNET_IP, TESTNET_IP } from '../store/network'
+
 export default {
     namespaced: true,
 
@@ -8,6 +10,8 @@ export default {
         networkByte: false,
         password: false,
         info: false,
+        nodeUrl: '',
+        testNodeUrl: '',
         webList:[]
     },
     mutations: {
@@ -28,6 +32,15 @@ export default {
         updateSettings(state, object) {
             state.networkByte = object.networkByte
             state.sessionTimeout = object.sessionTimeout
+            if (String.fromCharCode(object.networkByte) === 'M') {
+                state.nodeUrl = object.nodeUrl
+            } else {
+                state.testNodeUrl = object.nodeUrl
+            }
+        },
+        initializeNode(state) {
+            state.nodeUrl = state.nodeUrl ? state.nodeUrl : MAINNET_IP
+            state.testNodeUrl = state.testNodeUrl ? state.testNodeUrl : TESTNET_IP
         },
         updateWebList(state, object) {
             state.webList.push(object)

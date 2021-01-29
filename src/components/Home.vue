@@ -69,6 +69,7 @@ import Vue from 'vue'
 import seedLib from '../utils/seed.js'
 import BigNumber from 'bignumber.js'
 import AddToken from './AddToken.vue'
+import { MAINNET_IP, TESTNET_IP } from 'src/store/network'
 
 export default {
     name: "Home",
@@ -83,8 +84,9 @@ export default {
         if (this.wallet.password === false) {
             this.$router.push('/login')
         }
+        this.$store.commit('wallet/initializeNode')
         this.getTokenRecords()
-        this.$store.commit('API/updateAPI', this.networkByte)
+        this.updateAPI()
         this.getAddresses()
         this.getVSYS()
         this.getTokenBalances()
@@ -193,7 +195,7 @@ export default {
         },
         networkByte(now, old) {
             this.getTokenRecords()
-            this.$store.commit('API/updateAPI', this.networkByte)
+            this.updateAPI()
             this.getAddresses()
             this.$store.commit('account/updateSelectedToken', 'VSYS')
             this.getVSYS()
@@ -210,6 +212,23 @@ export default {
         clearTimeout(this.sessionClearTimeout)
     },
     methods: {
+        updateAPI() {
+            let apiData = {
+                networkByte: this.networkByte,
+                nodeUrl: String.fromCharCode(this.networkByte) === 'M' ? MAINNET_IP : TESTNET_IP
+            }
+            this.$store.commit('API/updateAPI', apiData)
+            let localNode = String.fromCharCode(this.networkByte) === 'M' ? this.wallet.nodeUrl : this.wallet.testNodeUrl
+            if (localNode !== apiData.nodeUrl) {
+                let suffix = '/blocks/height'
+                this.$http.get(localNode + suffix).then(res => {
+                  if (res.ok && res.body.height) {
+                    apiData.nodeUrl = localNode
+                    this.$store.commit('API/updateAPI', apiData)
+                  }
+                })
+            }
+        },
         getTokenRecords() {
             if (String.fromCharCode(this.networkByte) === 'T') {
                 this.tokenRecords = this.testnetTokenRecords

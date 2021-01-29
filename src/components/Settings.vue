@@ -3,6 +3,7 @@
              ref="settingsModal"
              lazy
              centered
+             @hidden="resetData"
              hide-footer
              hide-header>
         <button class="btn-close close settings-close"
@@ -25,6 +26,19 @@
                                :options="networkOptions"
                                v-model="selectedNetwork">
                 </b-form-select>
+            </div>
+            <div class="form-group select-form">
+              <label>Node</label>
+              <b-form-input id="address-input"
+                            class="amount-input"
+                            :state="isValidUrl"
+                            aria-describedby="inputUrlLiveFeedback"
+                            v-model="selectedNodeUrl"
+                            onfocus="this.select()">
+              </b-form-input>
+              <b-form-invalid-feedback id="inputUrlLiveFeedback">
+                Please input valid node url !
+              </b-form-invalid-feedback>
             </div>
             <div class="form-group select-form">
                 <label>Session Timeout</label>
@@ -59,17 +73,23 @@
 
 <script>
 import { mapState } from 'vuex'
+import seedLib from 'src/utils/seed'
+import { MAINNET_IP, TESTNET_IP } from 'src/store/network'
 export default {
     name: "Settings",
     created() {
         this.selectedNetwork = this.networkByte
         this.selectedSession = this.sessionTimeout
+        this.selectedNodeUrl = String.fromCharCode(this.networkByte) === 'M' ? this.nodeUrl : this.testNodeUrl
     },
     data: function() {
         return {
+            init: true,
+            isValidUrl: true,
             selectedNetwork: this.networkByte,
             selectedLang: 'en',
             selectedSession: this.sessionTimeout,
+            selectedNodeUrl: String.fromCharCode(this.networkByte) === 'M' ? this.nodeUrl : this.testNodeUrl,
             networkOptions: [
                 {
                     value: 'M'.charCodeAt(0),
@@ -118,21 +138,81 @@ export default {
     computed: {
         ...mapState({
             networkByte: state => state.wallet.networkByte,
-            sessionTimeout: state => state.wallet.sessionTimeout
-        })
+            sessionTimeout: state => state.wallet.sessionTimeout,
+            nodeUrl: state => state.wallet.nodeUrl,
+            testNodeUrl: state => state.wallet.testNodeUrl,
+            wallet: state => state.wallet
+        }),
+        secretInfo() {
+          if (this.wallet.password) {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+          }
+        }
+    },
+    watch: {
+        selectedNetwork(now, old) {
+            if (!old || this.init) {
+                if (old) {
+                    this.init = false
+                }
+                this.selectedNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? this.nodeUrl : this.testNodeUrl
+            } else {
+                this.selectedNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? MAINNET_IP : TESTNET_IP
+            }
+        },
+        selectedNodeUrl(now, old) {
+            this.isValidUrl = true
+        }
     },
     methods: {
-        confirm() {
-            const savedSettings = {
-                sessionTimeout: this.selectedSession,
-                networkByte: this.selectedNetwork
-            }
-            this.$store.commit('wallet/updateSettings', savedSettings)
-            this.$refs.settingsModal.hide()
-        },
-        close() {
+        resetData() {
             this.selectedNetwork = this.networkByte
             this.selectedSession = this.sessionTimeout
+            this.selectedNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? this.nodeUrl : this.testNodeUrl
+            this.init = true
+            this.isValidUrl = true
+        },
+        getAddress() {
+            if (this.secretInfo) {
+              let seedPhrase = seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+              let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, 0, this.selectedNetwork)
+              return seed.address
+            }
+        },
+        confirm() {
+            let originalNodeUrl = String.fromCharCode(this.selectedNetwork) === 'M' ? this.nodeUrl : this.testNodeUrl
+            let savedSettings = {
+                sessionTimeout: this.selectedSession,
+                networkByte: this.selectedNetwork,
+                nodeUrl: originalNodeUrl
+            }
+            this.selectedNodeUrl = this.selectedNodeUrl.replace(/\s*/g, '')
+            if (originalNodeUrl !== this.selectedNodeUrl) {
+                let address = this.getAddress()
+                let suffix = '/addresses/balance/' + address
+                this.$http.get(this.selectedNodeUrl + suffix).then(res => {
+                    if (res.ok && res.body.address === address) {
+                        savedSettings.nodeUrl = this.selectedNodeUrl
+                        let apiData = {
+                            networkByte: this.networkByte,
+                            nodeUrl: this.selectedNodeUrl
+                        }
+                        this.$store.commit('API/updateAPI', apiData)
+                        this.$store.commit('wallet/updateSettings', savedSettings)
+                        this.$refs.settingsModal.hide()
+                    } else {
+                        this.isValidUrl = false
+                    }
+                }, error => {
+                    this.isValidUrl = false
+                })
+            } else {
+                this.$store.commit('wallet/updateSettings', savedSettings)
+                this.$refs.settingsModal.hide()
+            }
+        },
+        close() {
             this.$refs.settingsModal.hide()
         }
     }
