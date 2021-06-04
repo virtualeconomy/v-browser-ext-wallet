@@ -199,6 +199,32 @@ async function resolveRequset(request, webListData) {
     let seed = getSeed(wallet, selectedAccount)
 
     switch (method) {
+        case "signMsg":
+            if (!request.params || !request.params.encodedMessage) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            //TODO TriggerUi
+            let signResult = true
+            if (signResult) {
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                try {
+                    let bytes = Base58.decode(request.params.encodedMessage)
+                    res.signature = apiAccount.getSignature(bytes)
+                    res.publicKey = seed.keyPair.publicKey
+                    res.encodeMessage = request.params.encodedMessage
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Failed to sign message"
+                    console.log(respError)
+                }
+            } else {
+                res.result = false
+                res.message = 'User denied the action'
+                return res
+            }
+            break
         case "address":
             res.address = seed.address
             break
