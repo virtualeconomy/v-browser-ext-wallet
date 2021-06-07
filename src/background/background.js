@@ -205,9 +205,9 @@ async function resolveRequset(request, webListData) {
                 res.message = "Invalid params!"
                 break
             }
-            //TODO TriggerUi
-            let signResult = true
-            if (signResult) {
+            triggerUi(request)
+            let confirmResult = await getConfirmResult()
+            if (confirmResult) {
                 apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
                 try {
                     let bytes = Base58.decode(request.params.encodedMessage)
@@ -349,7 +349,7 @@ async function resolveRequset(request, webListData) {
                 break
             }
             triggerUi(request)
-            let confirmResult = await getConfirmResult()
+            confirmResult = await getConfirmResult()
             let params = request.params
             if (confirmResult) {
                 let tra = new Transaction(networkByte)
