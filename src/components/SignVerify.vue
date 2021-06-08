@@ -3,7 +3,7 @@
     <button class="btn-close close sign-verify-close" @click="close">
       <img width="12" height="12" src="../../static/icons/ic_close.png" />
     </button>
-    <b-tabs class="tabs" :title-item-class="{fontWeight:bold}" justified @input="chageFeature">
+    <b-tabs class="tabs" :title-item-class="{fontWeight:bold}" justified @input="switchTab">
       <b-tab>
         <div class="tab_title" slot="title">Sign</div>
         <div class="sign" v-if="step==1">
@@ -14,7 +14,7 @@
             </div>
             <div class="form-group" style="margin-top: 20px;">
               <label class="add-label">Private Key</label>
-              <input class="form-control input-height" v-model="signPrivateKey" />
+              <input class="form-control input-height" readonly v-model="this.getPrivateKey" />
             </div>
           </div>
         </div>
@@ -34,15 +34,22 @@
               <input class="form-control input-height" v-model="verifyMsg" />
             </div>
             <div class="form-group" style="margin-top: 20px;">
+              <label class="add-label">Signature</label>
+              <input class="form-control input-height" v-model="verifySignature" />
+            </div>
+            <div class="form-group" style="margin-top: 20px;">
               <label class="add-label">Public Key</label>
               <input class="form-control input-height" v-model="verifyPublicKey" />
             </div>
           </div>
         </div>
         <div class="confirm_page" v-else>
-          <div class="form-group" style="margin-top: 20px;">
+          <div v-if="isSign" class="form-group" style="margin-top: 20px;">
             <label class="add-label signature_title">Signature</label>
             <div class="confirm_text">{{verifySignature}}</div>
+          </div>
+          <div v-else class="form-group" style="margin-top: 20px;">
+            <div class="confirm_text">Signature is {{isValidSignature?'valid':'invalid'}} !</div>
           </div>
         </div>
       </b-tab>
@@ -71,46 +78,106 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import seedLib from '../utils/seed.js'
+import Base58 from 'base-58'
+import Axlsign from 'axlsign'
+import { PUBLIC_KEY_BYTE_LENGTH } from 'src/js-v-sdk/src/constants'
 export default {
   name: "SignVerify",
-  created() {},
+  created() {
+  },
   data: function() {
     return {
       isSign: true,
       step: 1,
       signMsg: "",
-      signPrivateKey: "",
       verifyMsg: "",
+      errorMsg: "",
       verifyPublicKey: "",
       signSignature: "",
+      isValidSignature: false,
       verifySignature: ""
     };
   },
+  computed: {
+    ...mapState({
+      networkByte: state => state.wallet.networkByte,
+      wallet: state => state.wallet,
+      account: state => state.API.account,
+      selectedAccount: state => state.account.selectedAccount,
+    }),
+    secretInfo() {
+      if (this.wallet.password) {
+        return JSON.parse(
+            seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password))
+      }
+    },
+    getPrivateKey() {
+      return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase, this.selectedAccount, this.networkByte).keyPair.privateKey
+    },
+    getSeedPhrase() {
+      if (this.secretInfo) {
+        return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, this.wallet.password)
+      }
+    },
+  },
   methods: {
     resetData() {
-      this.step = 1;
-      this.signMsg = "";
-      this.signPrivateKey = "";
-      this.verifyMsg = "";
-      this.verifyPublicKey = "";
+      this.step = 1
+      this.signMsg = ""
+      this.errorMsg = ""
+      this.verifyMsg = ""
+      this.verifySignature = ""
+      this.verifyPublicKey = ""
+      this.signSignature = ""
+      this.isValidSignature = false
     },
     close() {
-      this.$refs.signVerifyModal.hide();
+      this.resetData()
+      this.$refs.signVerifyModal.hide()
     },
     prev() {
-      this.step = 1;
+      this.step = 1
     },
     sign() {
-      //TODO sign
-      this.step = 2;
+      try {
+        this.account.buildFromPrivateKey(this.getPrivateKey)
+        let bytes = Base58.decode(this.signMsg)
+        this.signSignature = this.account.getSignature(bytes)
+        this.step = 2
+      } catch (e) {
+        this.errorMsg = e
+        console.log(this.errorMsg)
+      }
     },
     verify() {
-      //TODO verify
-      this.step = 2;
+      try {
+        let msgBytes = Base58.decode(this.verifyMsg)
+        if (!msgBytes || !(msgBytes instanceof Uint8Array)) {
+          throw new Error('Missing or invalid msg');
+        }
+        if (!this.verifySignature || typeof this.verifySignature !== 'string') {
+          throw new Error('Missing or invalid signature');
+        }
+        if (!this.verifyPublicKey || typeof this.verifyPublicKey !== 'string') {
+          throw new Error('Missing or invalid public key');
+        }
+        let signatureBytes = Base58.decode(this.verifySignature)
+        let publicKeyBytes = Base58.decode(this.verifyPublicKey)
+        if (publicKeyBytes.length !== PUBLIC_KEY_BYTE_LENGTH) {
+          throw new Error('Invalid public key');
+        }
+        this.isValidSignature = Axlsign.verify(publicKeyBytes, msgBytes, signatureBytes);
+        this.step = 2
+      } catch (e) {
+        this.errorMsg = e
+        console.log(this.errorMsg)
+      }
     },
-    chageFeature(idx) {
-      this.isSign = idx === 0;
-      this.resetData();
+    switchTab(idx) {
+      this.isSign = idx === 0
+      this.resetData()
     },
     copySignature() {
       navigator.clipboard
