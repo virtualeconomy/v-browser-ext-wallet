@@ -199,12 +199,13 @@ async function resolveRequset(request, webListData) {
     let seed = getSeed(wallet, selectedAccount)
 
     switch (method) {
-        case "signMsg":
+        case "signMessage":
             if (!request.params || !request.params.encodedMessage) {
                 res.result = false
                 res.message = "Invalid params!"
                 break
             }
+            request.params.privateKey = seed.keyPair.privateKey
             triggerUi(request)
             let confirmResult = await getConfirmResult()
             if (confirmResult) {
@@ -213,10 +214,10 @@ async function resolveRequset(request, webListData) {
                     let bytes = Base58.decode(request.params.encodedMessage)
                     res.signature = apiAccount.getSignature(bytes)
                     res.publicKey = seed.keyPair.publicKey
-                    res.encodeMessage = request.params.encodedMessage
+                    res.encodedMessage = request.params.encodedMessage
                 } catch (respError) {
                     res.result = false
-                    res.message = "Failed to sign message"
+                    res.message = "Invalid message.Message should be encoded in Base58 format."
                     console.log(respError)
                 }
             } else {
