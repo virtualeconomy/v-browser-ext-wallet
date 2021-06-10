@@ -8,13 +8,11 @@
         <div class="tab_title" slot="title">Sign</div>
         <div class="sign" v-if="step==1">
           <div class="add-account">
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group" style="margin-top: 10px;">
               <label class="add-label">Message</label>
               <input class="form-control input-height" v-model="signMsg" />
-              <div class="warning_text" v-if="!isSignInputValid">{{warningText_signMsg}}</div>
-              <div class="warning_text" v-else></div>
             </div>
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group" style="margin-top: 10px;">
               <label class="add-label">Private Key</label>
               <input class="form-control input-height" readonly v-model="this.getPrivateKey" />
             </div>
@@ -31,29 +29,17 @@
         <div class="tab_title" slot="title">Verify</div>
         <div class="verify" v-if="step==1">
           <div class="add-account">
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group" style="margin-top: 10px;">
               <label class="add-label">Message</label>
               <input class="form-control input-height" v-model="verifyMsg" />
-              <div class="warning_text" v-if="!isVerifyMsgInputValid">{{warningText_verifyMsg}}</div>
-              <div class="warning_text" v-else></div>
             </div>
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group" style="margin-top: 10px;">
               <label class="add-label">Signature</label>
               <input class="form-control input-height" v-model="verifySignature" />
-              <div
-                class="warning_text"
-                v-if="!isVerifySignatureInputValid"
-              >{{warningText_verifySignature}}</div>
-              <div class="warning_text" v-else></div>
             </div>
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group" style="margin-top: 10px;">
               <label class="add-label">Public Key</label>
               <input class="form-control input-height" v-model="verifyPublicKey" />
-              <div
-                class="warning_text"
-                v-if="!isVerifyPublicKeyInputValid"
-              >{{warningText_verifyPublicKey}}</div>
-              <div class="warning_text" v-else></div>
             </div>
           </div>
         </div>
@@ -79,6 +65,8 @@
         </div>
       </b-tab>
     </b-tabs>
+    <div class="warning_text" v-if="!isInputValid">{{warningText}}</div>
+    <div class="warning_text" v-else></div>
     <b-row style="margin-top: 20px;margin-bottom: 15px;">
       <b-col class="col-lef" v-if="step==1">
         <b-button class="btn-cancel" block variant="light" size="lg" @click="close">Cancel</b-button>
@@ -109,11 +97,11 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import seedLib from "../utils/seed.js";
-import Base58 from "base-58";
-import Axlsign from "axlsign";
-import { PUBLIC_KEY_BYTE_LENGTH } from "src/js-v-sdk/src/constants";
+import { mapState } from "vuex"
+import seedLib from "../utils/seed.js"
+import Base58 from "base-58"
+import Axlsign from "axlsign"
+import { PUBLIC_KEY_BYTE_LENGTH } from "src/js-v-sdk/src/constants"
 export default {
   name: "SignVerify",
   created() {},
@@ -128,15 +116,9 @@ export default {
       signSignature: "",
       isValidSignature: false,
       verifySignature: "",
-      isSignInputValid: true,
-      isVerifyMsgInputValid: true,
-      isVerifySignatureInputValid: true,
-      isVerifyPublicKeyInputValid: true,
-      warningText_signMsg: "Message can not be empty !",
-      warningText_verifyMsg: "Message can not be empty !",
-      warningText_verifySignature: "Signature can not be empty !",
-      warningText_verifyPublicKey: "PublicKey can not be empty !"
-    };
+      isInputValid: true,
+      warningText: "Content can not be empty !"
+    }
   },
   computed: {
     ...mapState({
@@ -149,7 +131,7 @@ export default {
       if (this.wallet.password) {
         return JSON.parse(
           seedLib.decryptSeedPhrase(this.wallet.info, this.wallet.password)
-        );
+        )
       }
     },
     getPrivateKey() {
@@ -157,53 +139,53 @@ export default {
         this.getSeedPhrase,
         this.selectedAccount,
         this.networkByte
-      ).keyPair.privateKey;
+      ).keyPair.privateKey
     },
     getSeedPhrase() {
       if (this.secretInfo) {
         return seedLib.decryptSeedPhrase(
           this.secretInfo.encrSeed,
           this.wallet.password
-        );
+        )
       }
     }
   },
   methods: {
     resetData() {
-      this.step = 1;
-      this.signMsg = "";
-      this.errorMsg = "";
-      this.verifyMsg = "";
-      this.verifySignature = "";
-      this.verifyPublicKey = "";
-      this.signSignature = "";
-      this.isValidSignature = false;
-      this.isSignInputValid = true;
-      this.isVerifyMsgInputValid = true;
-      this.isVerifySignatureInputValid = true;
-      this.isVerifyPublicKeyInputValid = true;
+      this.step = 1
+      this.signMsg = ""
+      this.errorMsg = ""
+      this.verifyMsg = ""
+      this.verifySignature = ""
+      this.verifyPublicKey = ""
+      this.signSignature = ""
+      this.isValidSignature = false
+      this.isInputValid = true
     },
     close() {
-      this.resetData();
-      this.$refs.signVerifyModal.hide();
+      this.resetData()
+      this.$refs.signVerifyModal.hide()
     },
     prev() {
-      this.step = 1;
+      this.step = 1
     },
     sign() {
       try {
         if (this.signMsg === "") {
-          this.isSignInputValid = false;
+          this.isInputValid = false
+          this.warningText = "Content can not be empty !"
         } else {
-          this.account.buildFromPrivateKey(this.getPrivateKey);
-          let bytes = Base58.decode(this.signMsg);
-          this.signSignature = this.account.getSignature(bytes);
-          this.step = 2;
-          this.isSignInputValid = true;
+          this.account.buildFromPrivateKey(this.getPrivateKey)
+          let bytes = Base58.decode(this.signMsg)
+          this.signSignature = this.account.getSignature(bytes)
+          this.step = 2
+          this.isInputValid = true
         }
       } catch (e) {
-        this.errorMsg = e;
-        console.log(this.errorMsg);
+        this.errorMsg = e
+        this.isInputValid = false
+        this.warningText = "Invalid message.Message should be encoded in Base58 format."
+        console.log(this.errorMsg)
       }
     },
     verify() {
@@ -213,74 +195,48 @@ export default {
           this.verifySignature != "" &&
           this.verifyPublicKey != ""
         ) {
-          let msgBytes = Base58.decode(this.verifyMsg);
+          let msgBytes = Base58.decode(this.verifyMsg)
           if (!msgBytes || !(msgBytes instanceof Uint8Array)) {
-            this.isVerifyMsgInputValid = false;
-            this.isVerifySignatureInputValid = true;
-            this.isVerifyPublicKeyInputValid = true;
-            this.warningText_verifyMsg = "Invalid Message !";
-            throw new Error("Missing or invalid msg");
+            throw new Error("Missing or invalid msg")
           }
           if (
             !this.verifySignature ||
             typeof this.verifySignature !== "string"
           ) {
-            this.isVerifySignatureInputValid = false;
-            this.isVerifyMsgInputValid = true;
-            this.isVerifyPublicKeyInputValid = true;
-            this.warningText_verifySignature = "Invalid Signature !";
-            throw new Error("Missing or invalid signature");
+            throw new Error("Missing or invalid signature")
           }
           if (
             !this.verifyPublicKey ||
             typeof this.verifyPublicKey !== "string"
           ) {
-            this.isVerifyPublicKeyInputValid = false;
-            this.isVerifyMsgInputValid = true;
-            this.isVerifySignatureInputValid = true;
-            this.warningText_verifyPublicKey = "Invalid Public Key !";
-            throw new Error("Missing or invalid public key");
+            throw new Error("Missing or invalid public key")
           }
-          let signatureBytes = Base58.decode(this.verifySignature);
-          let publicKeyBytes = Base58.decode(this.verifyPublicKey);
+          let signatureBytes = Base58.decode(this.verifySignature)
+          let publicKeyBytes = Base58.decode(this.verifyPublicKey)
           if (publicKeyBytes.length !== PUBLIC_KEY_BYTE_LENGTH) {
-            this.isVerifyPublicKeyInputValid = false;
-            this.isVerifyMsgInputValid = true;
-            this.isVerifySignatureInputValid = true;
-            this.warningText_verifyPublicKey = "Invalid Public Key !";
-            throw new Error("Invalid public key");
+            throw new Error("Invalid public key")
           }
           this.isValidSignature = Axlsign.verify(
             publicKeyBytes,
             msgBytes,
             signatureBytes
-          );
-          this.step = 2;
-          this.isVerifyMsgInputValid = true;
-          this.isVerifySignatureInputValid = true;
-          this.isVerifyPublicKeyInputValid = true;
+          )
+          this.step = 2
+          this.isInputValid = true
         } else {
-          this.isVerifyMsgInputValid = this.verifyMsg != "";
-          this.isVerifySignatureInputValid = this.verifySignature != "";
-          this.isVerifyPublicKeyInputValid = this.verifyPublicKey != "";
-          this.warningText_verifyMsg = "Message can not be empty !";
-          this.warningText_verifySignature = "Signature can not be empty !";
-          this.warningText_verifyPublicKey = "PublicKey can not be empty !";
+          this.isInputValid = false
+          this.warningText = "Content can not be empty !"
         }
       } catch (e) {
-        this.errorMsg = e;
-        console.log(this.errorMsg);
-        if (this.errorMsg.toString() === "Error: wrong signature length") {
-          this.isVerifySignatureInputValid = false;
-          this.isVerifyMsgInputValid = true;
-          this.isVerifyPublicKeyInputValid = true;
-          this.warningText_verifySignature = "Wrong Signature Length !";
-        }
+        this.errorMsg = e
+        console.log(this.errorMsg)
+        this.isInputValid = false
+        this.warningText = this.errorMsg.toString()
       }
     },
     switchTab(idx) {
-      this.isSign = idx === 0;
-      this.resetData();
+      this.isSign = idx === 0
+      this.resetData()
     },
     copySignature() {
       navigator.clipboard
@@ -290,10 +246,10 @@ export default {
         })
         .catch(err => {
           // fail
-        });
+        })
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -302,7 +258,7 @@ export default {
 }
 .tabs {
   margin-top: 30px;
-  height: 370px;
+  height: 350px;
 }
 
 .tab_title {
@@ -370,6 +326,7 @@ export default {
   word-break: break-all;
   overflow: scroll;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 .verify_text {
   height: 45px;
@@ -390,8 +347,7 @@ export default {
 .warning_text {
   color: #f56c6c;
   font-size: 12px;
-  margin-top: 5px;
-  margin-left: 2px;
-  height: 10px;
+  height: 20px;
+  margin-left: 5px;
 }
 </style>
