@@ -9,12 +9,12 @@
         <div class="sign" v-if="step==1">
           <div class="add-account">
             <div class="form-group" style="margin-top: 10px;">
-              <label class="add-label">Message</label>
+              <label class="add-label">Message (Base58 Format)</label>
               <input class="form-control input-height" v-model="signMsg" />
             </div>
             <div class="form-group" style="margin-top: 10px;">
-              <label class="add-label">Private Key</label>
-              <input class="form-control input-height" readonly v-model="this.getPrivateKey" />
+              <label class="add-label">Public Key</label>
+              <input class="form-control input-height" readonly v-model="this.getPublicKey" />
             </div>
           </div>
         </div>
@@ -30,7 +30,7 @@
         <div class="verify" v-if="step==1">
           <div class="add-account">
             <div class="form-group" style="margin-top: 10px;">
-              <label class="add-label">Message</label>
+              <label class="add-label">Message (Base58 Format)</label>
               <input class="form-control input-height" v-model="verifyMsg" />
             </div>
             <div class="form-group" style="margin-top: 10px;">
@@ -51,15 +51,15 @@
             >Signature is {{isValidSignature?'valid':'invalid'}} !</div>
           </div>
           <div class="form-group">
-            <label class="lebel_text add-label">Message</label>
+            <label class="label_text add-label">Message</label>
             <div class="verify_text confirm_text">{{verifyMsg}}</div>
           </div>
           <div class="form-group">
-            <label class="lebel_text add-label">Signature</label>
+            <label class="label_text add-label">Signature</label>
             <div class="verify_text confirm_text">{{verifySignature}}</div>
           </div>
           <div class="form-group">
-            <label class="lebel_text add-label">Public Key</label>
+            <label class="label_text add-label">Public Key</label>
             <div class="verify_text confirm_text">{{verifyPublicKey}}</div>
           </div>
         </div>
@@ -141,6 +141,13 @@ export default {
         this.networkByte
       ).keyPair.privateKey
     },
+    getPublicKey() {
+      return seedLib.fromExistingPhrasesWithIndex(
+          this.getSeedPhrase,
+          this.selectedAccount,
+          this.networkByte
+      ).keyPair.publicKey
+    },
     getSeedPhrase() {
       if (this.secretInfo) {
         return seedLib.decryptSeedPhrase(
@@ -199,16 +206,10 @@ export default {
           if (!msgBytes || !(msgBytes instanceof Uint8Array)) {
             throw new Error("Missing or invalid msg")
           }
-          if (
-            !this.verifySignature ||
-            typeof this.verifySignature !== "string"
-          ) {
+          if (typeof this.verifySignature !== "string") {
             throw new Error("Missing or invalid signature")
           }
-          if (
-            !this.verifyPublicKey ||
-            typeof this.verifyPublicKey !== "string"
-          ) {
+          if (typeof this.verifyPublicKey !== "string") {
             throw new Error("Missing or invalid public key")
           }
           let signatureBytes = Base58.decode(this.verifySignature)
@@ -232,6 +233,9 @@ export default {
         console.log(this.errorMsg)
         this.isInputValid = false
         this.warningText = this.errorMsg.toString()
+        if (this.warningText.indexOf('Base58') >=0 ) {
+          this.warningText = 'Invalid message.Message should be encoded in Base58 format.'
+        }
       }
     },
     switchTab(idx) {
@@ -260,12 +264,10 @@ export default {
   margin-top: 30px;
   height: 350px;
 }
-
 .tab_title {
   font-weight: 500;
   font-size: 18px;
 }
-
 .input-height {
   height: 48px;
   background: rgba(255, 255, 255, 1);
@@ -279,9 +281,6 @@ export default {
 }
 .add-account {
   padding-top: 10px !important;
-}
-.add-close {
-  margin-top: -6px !important;
 }
 .add-label {
   height: 16px;
@@ -331,12 +330,9 @@ export default {
 .verify_text {
   height: 45px;
 }
-.lebel_text {
+.label_text {
   font-weight: bold;
   font-size: 16px;
-}
-.btn-copy {
-  width: 70px;
 }
 .signature_title {
   font-weight: bold;

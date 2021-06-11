@@ -205,7 +205,7 @@ async function resolveRequset(request, webListData) {
                 res.message = "Invalid params!"
                 break
             }
-            request.params.privateKey = seed.keyPair.privateKey
+            request.params.publicKey = seed.keyPair.publicKey
             triggerUi(request)
             let confirmResult = await getConfirmResult()
             if (confirmResult) {
