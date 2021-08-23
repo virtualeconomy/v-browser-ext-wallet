@@ -14,6 +14,8 @@ console.log(file)
 let s = document.createElement('script')
 s.type = 'text/javascript'
 s.src = file
+// let scriptFile = document.getElementsByTagName("script")[0];
+// scriptFile.parentNode.insertBefore(s, scriptFile);
 document.documentElement.appendChild(s)
 
 function listenForProviderRequest () {
