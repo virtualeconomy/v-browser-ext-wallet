@@ -361,7 +361,12 @@ async function resolveRequset(request, webListData) {
                 if (!request.params.tokenId) {
                     try {
                         let response = await chain.sendPaymentTx(sendTx)
-                        res.transactionId = response.id
+                        if (response.hasOwnProperty("error")) {
+                            res.result = false
+                            res.message = response.message
+                        } else {
+                            res.transactionId = response.id
+                        }
                     } catch (respError) {
                         res.result = false
                         res.message = "Failed to send VSYS"
@@ -370,7 +375,12 @@ async function resolveRequset(request, webListData) {
                 } else {
                     try {
                         let response = await chain.sendExecuteContractTx(sendTx)
-                        res.transactionId = response.id
+                        if (response.hasOwnProperty("error")) {
+                            res.result = false
+                            res.message = response.message
+                        } else {
+                            res.transactionId = response.id
+                        }
                     } catch (respError) {
                         res.result = false
                         res.message = "Failed to send Token"
@@ -439,7 +449,12 @@ async function resolveRequset(request, webListData) {
                 let contract_tx = tra.toJsonForSendingTx(signature)
                 try {
                     let response = await chain.sendExecuteContractTx(contract_tx)
-                    res.transactionId = response.id
+                    if (response.hasOwnProperty("error")) {
+                        res.result = false
+                        res.message = response.message
+                    } else {
+                        res.transactionId = response.id
+                    }
                 } catch (respError) {
                     res.result = false
                     res.message = "Failed to send NFT Token"
@@ -476,7 +491,12 @@ async function resolveRequset(request, webListData) {
             let sendTx = tra.toJsonForSendingTx(signature)
             try {
                 let response = await chain.sendExecuteContractTx(sendTx)
-                res.transactionId = response.id
+                if (response.hasOwnProperty("error")) {
+                    res.result = false
+                    res.message = response.message
+                } else {
+                    res.transactionId = response.id
+                }
             } catch (respError) {
                 res.result = false
                 res.message = "Failed to lock token"
@@ -581,7 +601,12 @@ async function resolveRequset(request, webListData) {
                 sendTx = tra.toJsonForSendingTx(signature)
                 try {
                     let response = await chain.sendExecuteContractTx(sendTx)
-                    res.transactionId = response.id
+                    if (response.hasOwnProperty("error")) {
+                        res.result = false
+                        res.message = response.message
+                    } else {
+                        res.transactionId = response.id
+                    }
                 } catch (respError) {
                     res.result = false
                     res.message = "Failed to " + method
@@ -630,7 +655,12 @@ async function resolveRequset(request, webListData) {
                 contract_tx['attachment'] = attachment
                 try {
                     let response = await chain.sendExecuteContractTx(contract_tx)
-                    res.transactionId = response.id
+                    if (response.hasOwnProperty("error")) {
+                        res.result = false
+                        res.message = response.message
+                    } else {
+                        res.transactionId = response.id
+                    }
                 } catch (respError) {
                     res.result = false
                     res.message = "Failed to " + method
@@ -697,7 +727,12 @@ async function resolveRequset(request, webListData) {
                 contract_tx['signature'] = signature
                 try {
                     let response = await chain.sendRegisterContractTx(contract_tx)
-                    res.transactionId = response.id
+                    if (response.hasOwnProperty("error")) {
+                        res.result = false
+                        res.message = response.message
+                    } else {
+                        res.transactionId = response.id
+                    }
                 } catch (respError) {
                     res.result = false
                     res.message = "Failed to " + method
