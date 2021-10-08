@@ -199,6 +199,33 @@ async function resolveRequset(request, webListData) {
     let seed = getSeed(wallet, selectedAccount)
 
     switch (method) {
+        case "signMessage":
+            if (!request.params || !request.params.encodedMessage) {
+                res.result = false
+                res.message = "Invalid params!"
+                break
+            }
+            request.params.publicKey = seed.keyPair.publicKey
+            triggerUi(request)
+            let confirmResult = await getConfirmResult()
+            if (confirmResult) {
+                apiAccount.buildFromPrivateKey(seed.keyPair.privateKey)
+                try {
+                    let bytes = Base58.decode(request.params.encodedMessage)
+                    res.signature = apiAccount.getSignature(bytes)
+                    res.publicKey = seed.keyPair.publicKey
+                    res.encodedMessage = request.params.encodedMessage
+                } catch (respError) {
+                    res.result = false
+                    res.message = "Invalid message.Message should be encoded in Base58 format."
+                    console.log(respError)
+                }
+            } else {
+                res.result = false
+                res.message = 'User denied the action'
+                return res
+            }
+            break
         case "address":
             res.address = seed.address
             break
@@ -323,7 +350,7 @@ async function resolveRequset(request, webListData) {
                 break
             }
             triggerUi(request)
-            let confirmResult = await getConfirmResult()
+            confirmResult = await getConfirmResult()
             let params = request.params
             if (confirmResult) {
                 let tra = new Transaction(networkByte)
