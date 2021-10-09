@@ -13,6 +13,15 @@ export default {
         updateAPI(state, object) {
             state.chain = new Blockchain(object.nodeUrl, object.networkByte)
             state.account = new Account(object.networkByte)
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    notification: "chainChanged",
+                    data: {
+                        nodeUrl: apiData.nodeUrl,
+                        networkType: String.fromCharCode(apiData.networkByte)
+                    }
+                });
+            });
         }
     }
 }

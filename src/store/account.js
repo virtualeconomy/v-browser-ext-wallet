@@ -15,6 +15,12 @@ export default {
         },
         updateSelectedAccount(state, index) {
             state.selectedAccount = index
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    notification: "accountsChanged",
+                    data: ["testAddress"]
+                });
+            });
         },
         updateToken(state, tokenRecordsInfo) {
             if (String.fromCharCode(tokenRecordsInfo.networkByte) === 'M') {

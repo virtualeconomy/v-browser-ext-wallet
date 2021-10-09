@@ -1,7 +1,10 @@
 
 
 let providerHandle
+let EventEmitter = require("events").EventEmitter
+const vsysEventEmitter = new EventEmitter()
 const methodType = ["address", "publicKey", "amount", "tokenAmount", "watchedTokens", "depositToken", "withdrawToken", "lockToken", "send", "addToken",'webList', "info", "sendNFT", "execContractFunc", "signContent", "regContract"]
+const eventType = ["accountsChanged", "chainChanged"]
 class vsys {
 
     constructor() {
@@ -41,6 +44,25 @@ class vsys {
             window.addEventListener("vsys-request-" + method, providerHandle)
             window.postMessage(message, "*")
         })
+    }
+    on(eventName, callBack) {
+        if (!eventType.includes(eventName)) {
+            return { "result": false, "message": "Invalid event" }
+        }
+        vsysEventEmitter.on(eventName, callBack)
+        providerHandle = ({detail}) => {
+            vsysEventEmitter.emit(eventName, detail)
+        }
+        let listenerName = "vsys-on-" + eventName
+        window.addEventListener(listenerName, providerHandle)
+    }
+    removeListener(eventName, callBack) {
+        let listenerName = "vsys-on-" + eventName
+        providerHandle = ({detail}) => {
+            vsysEventEmitter.emit(eventName, detail)
+        }
+        window.removeEventListener(listenerName, providerHandle)
+        vsysEventEmitter.removeListener(eventName, callBack)
     }
 }
 window.vsys = new vsys()
