@@ -46,8 +46,7 @@ chrome.runtime.onMessage.addListener(
         if (sender.tab || !request.data || !request.notification) return
         switch (request.notification) {
             case 'accountsChanged': case 'chainChanged':
-                let eventName = "vsys-on-" + request.notification
-                injectScript(`window.dispatchEvent(new CustomEvent('${eventName}', { detail: ${ JSON.stringify(request.data) } }))`)
+                injectScript(`window.vsys.emit('${request.notification}', ${ JSON.stringify(request.data)})`)
                 break
         }
     }
