@@ -213,6 +213,39 @@ GeneralContract
 
 If developers want to get user NFT list, he/she can filter the result with `NonFungibleContract` type only to get the user's NFT list.
 
+### Listen for AccountsChanged and ChainChanged Events
+
+The JS sample code of listening
+
+```javascript
+//Accounts Changed
+window.vsys.on('accountsChanged', (accounts) => {
+  // Handle the new accounts, or lack thereof.
+  // "accounts" will always be an array, but it can be empty.
+});
+
+// Chain Changed
+window.vsys.on('chainChanged', (chain) => {
+  // Handle the new chain.
+  // "chain" is an object which includes `networkType` and `nodeUrl` two keys
+});
+```
+
+Also, don't forget to remove listeners once you are done listening to them:
+
+```javascript
+function handleAccountsChanged(accounts) {
+  // ...
+}
+
+window.vsys.on('accountsChanged', handleAccountsChanged);
+
+// Later
+
+window.vsys.removeListener('accountsChanged', handleAccountsChanged);
+```
+
+
 ### Add Token to Watch List of Extension Wallet
 
 The JS sample code of request:

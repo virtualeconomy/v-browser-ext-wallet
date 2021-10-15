@@ -13,8 +13,14 @@ export default {
         addAccount(state, account) {
             state.accountNames.push(account)
         },
-        updateSelectedAccount(state, index) {
-            state.selectedAccount = index
+        updateSelectedAccount(state, newAccountInfo) {
+            state.selectedAccount = newAccountInfo.index
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    notification: "accountsChanged",
+                    data: [newAccountInfo.address]
+                });
+            });
         },
         updateToken(state, tokenRecordsInfo) {
             if (String.fromCharCode(tokenRecordsInfo.networkByte) === 'M') {

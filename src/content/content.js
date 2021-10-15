@@ -41,6 +41,17 @@ function listenForProviderRequest () {
     })
 }
 
+chrome.runtime.onMessage.addListener(
+    function(request, sender) {
+        if (sender.tab || !request.data || !request.notification) return
+        switch (request.notification) {
+            case 'accountsChanged': case 'chainChanged':
+                injectScript(`window.vsys.emit('${request.notification}', ${ JSON.stringify(request.data)})`)
+                break
+        }
+    }
+);
+
 listenForProviderRequest()
 
 function getSiteName (window) {

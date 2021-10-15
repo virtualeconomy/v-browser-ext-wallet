@@ -216,7 +216,8 @@ export default {
             return amount
         },
         select(index) {
-            this.$store.commit('account/updateSelectedAccount', index)
+            const newAccountInfo = { 'index': index, 'address': this.addresses[index]}
+            this.$store.commit('account/updateSelectedAccount', newAccountInfo)
         },
         changePage(data) {
             this.$refs.popover.$emit('close')
