@@ -48,7 +48,8 @@ export default {
     },
     computed: {
         ...mapState({
-            wallet: state => state.wallet
+            wallet: state => state.wallet,
+            selectedAccount: state => state.account.selectedAccount
         })
     },
     methods: {
@@ -74,6 +75,10 @@ export default {
                 return
             }
             this.$store.commit('wallet/updatePassword', this.password)
+            let secretInfo = JSON.parse(seedLib.decryptSeedPhrase(this.wallet.info, this.password))
+            let seedPhrase = seedLib.decryptSeedPhrase(secretInfo.encrSeed, this.password)
+            let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, this.selectedAccount, this.wallet.networkByte)
+            this.$store.commit('account/sendLoginStatus', seed.address)
             this.$router.push('/home')
         },
         restore() {

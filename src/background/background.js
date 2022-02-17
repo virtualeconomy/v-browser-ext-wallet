@@ -13,6 +13,10 @@ import Transaction from "src/js-v-sdk/src/transaction"
 import { TokenContractDataGenerator, LockContractDataGenerator, getContractFunctionIndex, NonFungibleTokenContractDataGenerator } from "src/js-v-sdk/src/data"
 import * as ContractType from "src/js-v-sdk/src/contract_type"
 
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.tabs.create({ url: chrome.extension.getURL('signup.html') })
+});
+
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
@@ -154,6 +158,7 @@ async function resolveRequset(request, webListData) {
     if (!networkByte) {
         res.result = false
         res.message = "account is not created"
+        chrome.tabs.create({ url: chrome.extension.getURL('signup.html') })
         return res
     }
     let apiAccount = new Account(networkByte)
