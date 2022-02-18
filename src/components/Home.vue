@@ -248,6 +248,7 @@ export default {
             }
             this.sessionClearTimeout = setTimeout(() => {
                 this.$store.commit('wallet/updatePassword', false)
+                this.$store.commit('account/sendLoginStatus', "")
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
 

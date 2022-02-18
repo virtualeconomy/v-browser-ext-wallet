@@ -202,6 +202,7 @@ export default {
         },
         logout() {
             this.$store.commit('wallet/updatePassword', false)
+            this.$store.commit('account/sendLoginStatus', "")
             this.$router.push('/login')
         },
         avatarDataHex(address) {
