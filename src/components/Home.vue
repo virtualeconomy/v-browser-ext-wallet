@@ -219,15 +219,10 @@ export default {
             }
             this.$store.commit('API/updateAPI', apiData)
             let localNode = String.fromCharCode(this.networkByte) === 'M' ? this.wallet.nodeUrl : this.wallet.testNodeUrl
-            if (localNode !== apiData.nodeUrl) {
-                let suffix = '/blocks/height'
-                this.$http.get(localNode + suffix).then(res => {
-                  if (res.ok && res.body.height) {
-                    apiData.nodeUrl = localNode
-                    this.$store.commit('API/updateAPI', apiData)
-                  }
-                })
+            if (localNode) {
+              apiData.nodeUrl = localNode
             }
+            this.$store.commit('API/updateAPI', apiData)
         },
         getTokenRecords() {
             if (String.fromCharCode(this.networkByte) === 'T') {

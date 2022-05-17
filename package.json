@@ -1,6 +1,6 @@
 {
   "name": "v-browser-ext-wallet",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "A browser extension wallet for V Systems",
   "scripts": {
     "build": "webpack --progress",
