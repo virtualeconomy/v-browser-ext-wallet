@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "V Wallet Extension",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "A browser extension wallet for V Systems",
     "icons": {
         "16":"static/icons/ic_v_logo@3x(1).png",
