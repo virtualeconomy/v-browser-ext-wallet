@@ -185,7 +185,7 @@ export default {
             return date.toString()
         },
         txMonthStr() {
-            const month = new Date(this.txRecord.timestamp / 1e6).getMonth()
+            const month = new Date(this.txRecord.timestamp / 1e6).getMonth() + 1
             if (month < 10) {
                 return '0' + month
             }
