@@ -233,7 +233,7 @@ export default {
                             this.responseErr = true
                             return
                         }
-                        if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit') {
+                        if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit' && res.type !== 'TokenContractWithWhitelist') {
                             this.responseErr = true
                             return
                         }
